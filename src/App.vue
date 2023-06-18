@@ -13,12 +13,19 @@ useIpcRendererOn('reply', (event, arg) => {
   console.log(arg)
 })
 
+// 打开新窗口
+function opSend() {
+  ipcRenderer.send('open')
+}
 
 </script>
 
 <template>
   <button @click="send">
     发送
+  </button>
+  <button @click="opSend">
+    打开新窗口
   </button>
 </template>
 
