@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {useIpcRenderer, useIpcRendererOn} from "@vueuse/electron";
+import TopBarMode from "@/view/layout/TopBarMode.vue";
 
 const ipcRenderer = useIpcRenderer()
 
@@ -18,15 +19,15 @@ function opSend() {
   ipcRenderer.send('open')
 }
 
+
 </script>
 
 <template>
-  <button @click="send">
-    发送
-  </button>
-  <button @click="opSend">
-    打开新窗口
-  </button>
+  <div class="t-w-screen t-h-screen">
+    <top-bar-mode>
+      <button @click="send">发送</button>
+    </top-bar-mode>
+  </div>
 </template>
 
 <style scoped>

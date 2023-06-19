@@ -1,0 +1,42 @@
+import {BrowserWindow} from "electron";
+// 窗口建造
+export function useBrowserWindow() {
+    // 创建主窗口
+    function buildMainWindow() {
+        const mainWindow = new BrowserWindow({
+            // 最小窗口大小
+            minWidth: 600,
+            minHeight: 400,
+            width: 1200,
+            height: 800,
+            frame: false,
+            // 隐藏默认菜单栏
+            autoHideMenuBar: true,
+            // 图标
+            icon: 'public/favicon.png',
+            // 首选项
+            webPreferences: {
+                // 是否启用node集成
+                nodeIntegration: true,
+                // 关闭安全警告
+                contextIsolation: false,
+            },
+            // 标题
+            title: 'Vite Electron App',
+        });
+        // 环境判断加载页面
+        if (process.env.VITE_DEV_SERVER_URL) {
+            // 打开开发者工具
+            mainWindow.webContents.toggleDevTools();
+            mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL).then()
+        } else {
+            mainWindow.loadFile('dist/index.html').then();
+        }
+
+        return mainWindow;
+    }
+
+    return {
+        buildMainWindow
+    }
+}

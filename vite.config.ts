@@ -3,7 +3,10 @@ import vue from '@vitejs/plugin-vue'
 import electron from "vite-plugin-electron";
 import Icons from 'unplugin-icons/vite';
 import IconResolver from 'unplugin-icons/resolver'
+import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
+import {join} from 'path'
+import {ElementPlusResolver} from "unplugin-vue-components/resolvers";
 
 export default defineConfig({
     plugins: [
@@ -11,8 +14,13 @@ export default defineConfig({
         electron({
             entry: 'electron/main.ts',
         }),
+        AutoImport({
+            resolvers: [ElementPlusResolver()],
+            dts: 'src/type/auto-imports.d.ts',
+        }),
         Components({
             resolvers: [
+                ElementPlusResolver(),
                 IconResolver({
                     prefix: 'icon',
                     enabledCollections: ['ant-design'],
@@ -23,4 +31,9 @@ export default defineConfig({
             compiler: 'vue3'
         })
     ],
+    resolve: {
+        alias: {
+            '@': join(__dirname, 'src'),
+        }
+    },
 })
