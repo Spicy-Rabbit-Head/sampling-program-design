@@ -26,7 +26,8 @@
       ]
     },
     "types": [
-      "unplugin-icons/types/vue"
+      "unplugin-icons/types/vue",
+      "vite/client"
     ]
   },
   "include": [

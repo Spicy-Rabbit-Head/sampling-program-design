@@ -6,7 +6,7 @@ export function useIpcEvent(win: BrowserWindow) {
     ipcMain.on('window-min', function () {
         win.minimize();
     })
-    // 恢复串口
+    // 恢复窗口
     ipcMain.on('window-restore', function () {
         win.restore()
     })

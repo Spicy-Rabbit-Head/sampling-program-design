@@ -1,77 +1,45 @@
 <script setup lang="ts">
-import {Layout as VexLayout} from "vexip-ui";
-import 'vexip-ui/es/css/layout'
-import {ref} from "vue";
-import {WindowFunction} from "@/type/interface.ts";
-import {useIpcRenderer} from "@vueuse/electron";
-import IconAntDesignMinusOutlined from "~icons/ant-design/minus-outlined"
-import IconAntDesignBlockOutlined from "~icons/ant-design/block-outlined"
-import IconAntDesignBorderOutlined from "~icons/ant-design/border-outlined"
-import IconAntDesignCloseOutlined from "~icons/ant-design/close-outlined"
+import {useTopBar} from "@/hooks/useTopBar.ts";
 
-const ipcRenderer = useIpcRenderer()
-
-const windowFunction: WindowFunction[] = [
-  {
-    icon: IconAntDesignMinusOutlined,
-    state: true
-  },
-  {
-    icon: IconAntDesignBlockOutlined,
-    state: false
-  },
-  {
-    icon: IconAntDesignBorderOutlined,
-    state: true
-  },
-  {
-    icon: IconAntDesignCloseOutlined,
-    state: true
-  },
-]
-
-const height = ref(30)
-
-function topBarFunction(i: number) {
-  switch (i) {
-    case 0:
-      ipcRenderer.send('window-min')
-      break
-    case 1:
-      ipcRenderer.send('window-restore')
-      windowFunction[1].state = false
-      windowFunction[2].state = true
-      break
-    case 2:
-      ipcRenderer.send('window-max')
-      windowFunction[1].state = true
-      windowFunction[2].state = false
-      break
-    case 3:
-      ipcRenderer.send('window-close')
-      break
-  }
-}
+const {
+  topBarWindow,
+  topBarWindowState,
+  topBarFunction,
+  menuOptions,
+  tagsToggle
+} = useTopBar()
 
 </script>
 <template>
-  <vex-layout no-aside :style="{'--vxp-layout-header-height': `${height}px`}">
-    <template #header-main>
-      <div style="-webkit-app-region: drag" class="t-bg-amber-400 t-w-screen">
-        Vexip
+  <div class="t-flex t-flex-col t-h-screen">
+    <div class="t-h-10 t-flex-none t-flex t-items-center t-w-screen t-bg-gray-200">
+      <!-- 标题 -->
+      <div style="-webkit-app-region: drag" class="t-flex-none t-px-1 t-flex t-select-none">
+        <img src="/favicon.png" class="t-w-6 t-h-6 t-mr-1" alt=""/>
+        <span class="t-font-mono t-subpixel-antialiased t-font-semibold">B03抽测程式</span>
       </div>
-    </template>
-    <template #header-user>
-      <div class="t-flex t-justify-center t-items-center t-absolute t-right-1">
-        <span v-for="(item,index) in windowFunction" @click.stop="topBarFunction(index)" class="hover:t-text-sky-500" :key="index">
-          <component v-if="item.state" :is="item.icon" class="t-mx-1"/>
+      <!-- 路由切换 -->
+      <div style="-webkit-app-region: drag" class="t-flex-auto t-h-full t-flex t-items-center t-px-4">
+        <span v-for="(item ,index) in menuOptions"
+              style="-webkit-app-region: no-drag" :key="index"
+              @click.stop="tagsToggle(item.key)"
+              :class="item.class"
+              class="t-mx-4 hover:t-text-emerald-400 t-font-sans t-cursor-pointer">
+          {{ item.label }}
         </span>
       </div>
-    </template>
-    <template #main>
-      <slot/>
-    </template>
-  </vex-layout>
+      <!-- 窗口功能 -->
+      <div class="t-flex t-flex-none">
+        <span v-for="(item,index) in topBarWindowState" :key="index" class="hover:t-text-sky-500">
+          <component v-if="item" class="t-mx-1" :is="topBarWindow[index]" @click.stop="topBarFunction(index)"/>
+        </span>
+      </div>
+    </div>
+    <!-- 主体 -->
+    <div class="t-h-[600px] t-flex-auto t-w-screen">
+      1
+    </div>
+  </div>
 </template>
 
 <style scoped>
