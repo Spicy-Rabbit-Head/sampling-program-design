@@ -14,7 +14,7 @@ const {
   <div class="t-flex t-flex-col t-h-screen">
     <div class="t-h-10 t-flex-none t-flex t-items-center t-w-screen t-bg-gray-200">
       <!-- 标题 -->
-      <div style="-webkit-app-region: drag" class="t-flex-none t-px-1 t-flex t-select-none">
+      <div style="-webkit-app-region: drag" class="t-flex-none t-px-1 t-flex t-items-center t-select-none">
         <img src="/favicon.png" class="t-w-6 t-h-6 t-mr-1" alt=""/>
         <span class="t-font-mono t-subpixel-antialiased t-font-semibold">B03抽测程式</span>
       </div>
@@ -36,8 +36,8 @@ const {
       </div>
     </div>
     <!-- 主体 -->
-    <div class="t-h-[600px] t-flex-auto t-w-screen">
-      1
+    <div class="t-h-[600px] t-flex-auto t-w-screen t-relative">
+      <slot/>
     </div>
   </div>
 </template>

@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+@layer components {
+    /* 离开 */
+    .slide-fade-leave-to {
+        position: absolute;
+        opacity: 0;
+        transform: translateX(50px)
+    }
+
+    /* 进入 */
+    .slide-fade-enter-from {
+        position: absolute;
+        opacity: 0;
+        transform: translateX(-50px)
+    }
+
+    /* 路由动画 */
+    .child-view {
+        position: absolute;
+        width: 100%;
+        overflow: hidden;
+        transition: all .8s cubic-bezier(.55, 0, .1, 1);
+    }
+}

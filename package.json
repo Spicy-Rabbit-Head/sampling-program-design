@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "@vueuse/electron": "^10.2.0",
-    "element-plus": "^2.3.6",
     "vue": "^3.3.4",
     "vue-router": "^4.2.2"
   },
@@ -22,6 +21,7 @@
     "cssnano": "^6.0.1",
     "electron": "^25.1.1",
     "electron-builder": "^24.4.0",
+    "naive-ui": "^2.34.4",
     "postcss": "^8.4.24",
     "tailwindcss": "^3.3.2",
     "typescript": "^5.0.2",

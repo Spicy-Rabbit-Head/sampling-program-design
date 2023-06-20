@@ -6,7 +6,7 @@ import IconResolver from 'unplugin-icons/resolver'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import {join} from 'path'
-import {ElementPlusResolver} from "unplugin-vue-components/resolvers";
+import {NaiveUiResolver} from "unplugin-vue-components/resolvers";
 
 export default defineConfig({
     plugins: [
@@ -15,12 +15,12 @@ export default defineConfig({
             entry: 'electron/main.ts',
         }),
         AutoImport({
-            resolvers: [ElementPlusResolver()],
+            resolvers: [],
             dts: 'src/type/auto-imports.d.ts',
         }),
         Components({
             resolvers: [
-                ElementPlusResolver(),
+                NaiveUiResolver(),
                 IconResolver({
                     prefix: 'icon',
                     enabledCollections: ['ant-design'],

@@ -5,6 +5,7 @@ import IconAntDesignBorderOutlined from "~icons/ant-design/border-outlined"
 import IconAntDesignCloseOutlined from "~icons/ant-design/close-outlined"
 import {reactive, ref} from "vue";
 import {useIpcRenderer} from "@vueuse/electron";
+import router from "@/router";
 
 const ipcRenderer = useIpcRenderer()
 // 窗口功能Icon
@@ -25,22 +26,17 @@ const topBarWindowState: Array<boolean> = reactive([
 const menuOptions = ref<Array<MenuOptions>>([
     {
         label: '首页',
-        key: 'M1',
+        key: 'Home',
         class: 't-text-emerald-500'
     },
     {
-        label: '文件2',
-        key: 'M2',
+        label: '校对机',
+        key: 'test1',
         class: ''
     },
     {
-        label: '文件3',
-        key: 'M3',
-        class: ''
-    },
-    {
-        label: '文件4',
-        key: 'M4',
+        label: '刹车点',
+        key: 'test2',
         class: ''
     },
 ])
@@ -70,13 +66,17 @@ export function useTopBar() {
 
     // 菜单切换
     function tagsToggle(key: string) {
-        menuOptions.value.forEach(item => {
-            if (item.key === key) {
-                item.class = 't-text-emerald-500'
-            } else {
-                item.class = ''
+        router.replace({name: key}).then(
+            () => {
+                menuOptions.value.forEach(item => {
+                    if (item.key === key) {
+                        item.class = 't-text-emerald-500'
+                    } else {
+                        item.class = ''
+                    }
+                })
             }
-        })
+        )
     }
 
     return {

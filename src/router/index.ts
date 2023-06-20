@@ -1,13 +1,32 @@
 // 引入js
 import {createRouter, createWebHistory, Router, RouteRecordRaw} from 'vue-router'
 
+const Home = () => import('@/view/home/HomePage.vue')
+const test1 = () => import('@/view/test/test1.vue')
+const test2 = () => import('@/view/test/test2.vue')
+
 // 定义路由
 const routes = [
     // 根目录重定向
     {
         path: '/',
         name: 'RootPath',
-        redirect: '/login',
+        redirect: '/home',
+    },
+    {
+        path: '/home',
+        name: 'Home',
+        component: Home,
+    },
+    {
+        path: '/test1',
+        name: 'test1',
+        component: test1,
+    },
+    {
+        path: '/test2',
+        name: 'test2',
+        component: test2,
     },
     // 匹配所有路径,如果没有匹配到,则重定向到404页面
     {

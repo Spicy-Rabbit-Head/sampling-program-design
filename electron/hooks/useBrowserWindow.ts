@@ -1,14 +1,15 @@
 import {BrowserWindow} from "electron";
+
 // 窗口建造
 export function useBrowserWindow() {
     // 创建主窗口
     function buildMainWindow() {
         const mainWindow = new BrowserWindow({
-            // 最小窗口大小
-            minWidth: 600,
-            minHeight: 400,
-            width: 1200,
+            width: 1300,
             height: 800,
+            // 最小窗口大小
+            minWidth: 1260,
+            minHeight: 800,
             frame: false,
             // 隐藏默认菜单栏
             autoHideMenuBar: true,
