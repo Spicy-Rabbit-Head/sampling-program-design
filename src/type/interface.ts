@@ -9,3 +9,9 @@ export type MenuOptions = {
     key: string,
     class: string
 }
+
+// 状态概述
+export type StatusOverview = {
+    label: string,
+    bgColor: string,
+}

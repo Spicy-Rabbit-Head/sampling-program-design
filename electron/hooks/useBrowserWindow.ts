@@ -14,7 +14,7 @@ export function useBrowserWindow() {
             // 隐藏默认菜单栏
             autoHideMenuBar: true,
             // 图标
-            icon: 'public/favicon.png',
+            icon: 'public/img/favicon.png',
             // 首选项
             webPreferences: {
                 // 是否启用node集成

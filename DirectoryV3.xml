@@ -1,5 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?> 
- <trees>
-     <tree path="/electron" title="主进程"/>
-     <tree path="/src" title="渲染进程"/>
- </trees>
+<?xml version="1.0" encoding="UTF-8"?>
+<trees>
+    <tree path="/electron" title="主进程"/>
+    <tree path="/src" title="渲染进程"/>
+    <tree path="/src/view/home" title="首页"/>
+    <tree path="/src/view/home/SideBar.vue" title="侧栏主体"/>
+    <tree path="/src/view/home/HomePage.vue" title="首页主体"/>
+    <tree path="/src/view/home/SideBarFunctionalBlock.vue" title="侧栏功能"/>
+    <tree path="/src/view/home/SideBarDataBlock.vue" title="侧栏数据"/>
+    <tree path="/src/view/home/SideBarExhibitionBlock.vue" title="侧栏展示"/>
+    <tree path="/src/hooks/useTopBar.ts" title="顶栏工具"/>
+    <tree path="/src/hooks/useEcharts.ts" title="图表工具"/>
+</trees>

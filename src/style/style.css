@@ -309,3 +309,9 @@ svg {
 ::-webkit-scrollbar {
     display: none;
 }
+
+/* 自定义字体 */
+@font-face {
+    font-family: NotoSerif;
+    src: url("public/font/NotoSerifSC-Regular.otf");
+}

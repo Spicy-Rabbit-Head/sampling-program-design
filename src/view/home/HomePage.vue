@@ -20,15 +20,22 @@ for (let i = 1; i <= 24; i++) {
 function select(i: number) {
   test[i].class = "t-bg-red-500";
 }
+
+function selectPass(i: number) {
+  test[i].class = "t-bg-green-600";
+}
+
 </script>
+
 
 <template>
   <div class="t-h-full t-select-none t-flex t-p-1">
     <div class="t-w-[500px] t-flex-auto t-grid t-grid-cols-32 t-gap-0.5">
       <n-popover trigger="hover" v-for="(item,index) in test" :key="item.path">
         <template #trigger>
-          <span class="t-rounded-md t-bg-cyan-500 t-cursor-pointer t-text-white t-border t-text-[8px] t-whitespace-nowrap t-flex t-items-center t-justify-center"
-                :class="item.class" @click.stop="select(index)">{{ item.path }}
+          <span
+              class="t-font-mono t-rounded-md t-bg-cyan-500 t-cursor-pointer t-text-white t-border t-text-[0.5rem] 2xl:t-text-[0.75rem] t-whitespace-nowrap t-flex t-items-center t-justify-center"
+              :class="item.class" @click.stop="select(index)" @contextmenu.prevent.stop="selectPass(index)">{{ item.path }}
           </span>
         </template>
         <template #header>
