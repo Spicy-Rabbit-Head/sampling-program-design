@@ -1,4 +1,4 @@
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import {use} from "echarts/core";
 import {CanvasRenderer} from "echarts/renderers";
 import {BarChart} from "echarts/charts";
@@ -18,20 +18,53 @@ use([
     LegendComponent
 ]);
 
-const option = ref({
-    tooltip: {},
-    xAxis: {
-        data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
-    },
-    yAxis: {},
-    series: [
-        {
-            name: '销量',
-            type: 'bar',
-            data: [5, 20, 36, 10, 10, 20]
-        }
-    ]
-});
+const data = ref([[0, 0]])
+
+function addData() {
+    let s = Math.floor((Math.random() * (3 - -3) + -3) * 10) / 10;
+    let index = data.value.findIndex(item => item[0] === s)
+    console.log(s)
+    if (index && index !== -1 || index === 0) {
+        console.log(666)
+        data.value[index][1] += 1
+    } else {
+        data.value.push([Number(s), 1])
+    }
+}
+
+setInterval(() => {
+    addData()
+}, 1000)
+
+const option = computed(() => {
+    return {
+        tooltip: {
+            trigger: "axis",
+            axisPointer: {
+                type: "shadow"
+            }
+        },
+        xAxis: [
+            {
+                type: "value",
+                min: -10,
+                max: 10,
+            }
+        ],
+        yAxis: [
+            {
+                type: "value",
+            },
+        ],
+        series: [
+            {
+                type: "bar",
+                barWidth: 6,
+                data: data.value,
+            }
+        ]
+    };
+})
 
 export function useEcharts() {
     return {
