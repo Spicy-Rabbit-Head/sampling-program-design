@@ -6,7 +6,8 @@ import {
     TitleComponent,
     TooltipComponent,
     LegendComponent,
-    GridComponent
+    GridComponent,
+    MarkLineComponent
 } from "echarts/components";
 
 use([
@@ -15,7 +16,8 @@ use([
     GridComponent,
     TitleComponent,
     TooltipComponent,
-    LegendComponent
+    LegendComponent,
+    MarkLineComponent
 ]);
 
 const data = ref([[0, 0]])
@@ -25,7 +27,6 @@ function addData() {
     let index = data.value.findIndex(item => item[0] === s)
     console.log(s)
     if (index && index !== -1 || index === 0) {
-        console.log(666)
         data.value[index][1] += 1
     } else {
         data.value.push([Number(s), 1])
@@ -61,6 +62,25 @@ const option = computed(() => {
                 type: "bar",
                 barWidth: 6,
                 data: data.value,
+                markLine: {
+                    symbol: 'none',
+                    data: [
+                        {
+                            lineStyle: {
+                                type: "dashed",
+                                color: "rgb(236,39,89)"
+                            },
+                            xAxis: -5
+                        },
+                        {
+                            lineStyle: {
+                                type: "dashed",
+                                color: "rgb(236,39,89)"
+                            },
+                            xAxis: 5
+                        }
+                    ]
+                }
             }
         ]
     };

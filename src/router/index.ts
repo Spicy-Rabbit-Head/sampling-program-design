@@ -2,7 +2,7 @@
 import {createRouter, createWebHistory, Router, RouteRecordRaw} from 'vue-router'
 
 const Home = () => import('@/view/home/HomePage.vue')
-const test1 = () => import('@/view/test/test1.vue')
+const Verifier = () => import('@/view/verifier/VerifierModule.vue')
 const test2 = () => import('@/view/test/test2.vue')
 
 // 定义路由
@@ -19,9 +19,9 @@ const routes = [
         component: Home,
     },
     {
-        path: '/test1',
-        name: 'test1',
-        component: test1,
+        path: '/verifier',
+        name: 'Verifier',
+        component: Verifier,
     },
     {
         path: '/test2',

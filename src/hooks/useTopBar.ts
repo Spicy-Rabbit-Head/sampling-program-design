@@ -31,7 +31,7 @@ const menuOptions = ref<Array<MenuOptions>>([
     },
     {
         label: '校对机',
-        key: 'test1',
+        key: 'Verifier',
         class: ''
     },
     {

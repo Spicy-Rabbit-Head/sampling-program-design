@@ -10,4 +10,6 @@
     <tree path="/src/view/home/SideBarExhibitionBlock.vue" title="侧栏展示"/>
     <tree path="/src/hooks/useTopBar.ts" title="顶栏工具"/>
     <tree path="/src/hooks/useEcharts.ts" title="图表工具"/>
+    <tree path="/src/view/layout/TopBarMode.vue" title="顶栏模块"/>
+    <tree path="/src/view/layout" title="布局"/>
 </trees>
