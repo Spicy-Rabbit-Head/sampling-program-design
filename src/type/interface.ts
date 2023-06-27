@@ -15,3 +15,9 @@ export type StatusOverview = {
     label: string,
     bgColor: string,
 }
+
+// 日志
+export type Log = {
+    time: string,
+    content: string,
+}

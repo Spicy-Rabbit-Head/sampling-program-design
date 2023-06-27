@@ -12,4 +12,7 @@
     <tree path="/src/hooks/useEcharts.ts" title="图表工具"/>
     <tree path="/src/view/layout/TopBarMode.vue" title="顶栏模块"/>
     <tree path="/src/view/layout" title="布局"/>
+    <tree path="/src/hooks/useProofreadingMachine.ts" title="校对机工具"/>
+    <tree path="/src/view/verifier/ProofreadingMachineModule.vue" title="校对机模块"/>
+    <tree path="/src/view/verifier/ProofreadingMachineStatus.vue" title="校对机状态"/>
 </trees>

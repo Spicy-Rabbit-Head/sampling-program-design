@@ -2,7 +2,7 @@
 import {createRouter, createWebHistory, Router, RouteRecordRaw} from 'vue-router'
 
 const Home = () => import('@/view/home/HomePage.vue')
-const Verifier = () => import('@/view/verifier/VerifierModule.vue')
+const Verifier = () => import('@/view/verifier/ProofreadingMachineModule.vue')
 const test2 = () => import('@/view/test/test2.vue')
 
 // 定义路由
