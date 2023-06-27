@@ -15,7 +15,7 @@ module.exports = {
             },
             fontFamily: {
                 'noto': ['NotoSerif'],
-            }
+            },
         },
     },
     corePlugins: {

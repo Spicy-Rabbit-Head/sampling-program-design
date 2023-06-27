@@ -1,4 +1,5 @@
 import {FunctionalComponent, SVGAttributes} from 'vue'
+import {StepsProps} from "naive-ui";
 
 // 窗口操作
 export type TopBarWindow = FunctionalComponent<SVGAttributes>
@@ -20,4 +21,15 @@ export type StatusOverview = {
 export type Log = {
     time: string,
     content: string,
+}
+
+// 步骤
+export type Step = {
+    current: number
+    currentStatus: StepsProps['status']
+    name: string
+    content: {
+        name: string
+        content: string
+    }[]
 }

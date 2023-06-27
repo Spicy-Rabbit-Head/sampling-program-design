@@ -2,6 +2,7 @@
 import IconAntDesignCaretUpOutlined from '~icons/ant-design/CaretUpOutlined'
 import IconAntDesignCaretDownOutlined from '~icons/ant-design/CaretDownOutlined'
 import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
+import ProofreadingMachineStatus from "@/view/verifier/ProofreadingMachineStatus.vue";
 
 // 校对机闭包
 const {
@@ -56,7 +57,7 @@ const {
           清除记录
         </n-button>
         <!-- 日志框 -->
-        <div class="t-flex t-flex-col t-flex-auto t-mt-1 t-border-2 t-rounded-md">
+        <div class="t-flex t-flex-col t-flex-auto t-mt-2 t-border-2 t-rounded-md">
           <!-- 日志顶栏 -->
           <div class="t-border-b-2 t-h-12 t-flex t-justify-between t-items-center t-px-1">
             <span>日志记录框</span>
@@ -87,8 +88,6 @@ const {
       </div>
     </div>
     <!-- 右侧状态栏 -->
-    <div class="t-bg-emerald-400 t-flex-auto">
-      2
-    </div>
+    <proofreading-machine-status/>
   </div>
 </template>
