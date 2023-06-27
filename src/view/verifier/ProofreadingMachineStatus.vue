@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {reactive} from "vue";
 import {Step} from "@/type/interface.ts";
-
+import IconNotoFaceWithMonocle from "~icons/noto/FaceWithMonocle";
 
 const phase = ['短路', '负载', '开路', '对机']
 const checkTheMachine = ['计算补偿值', '补偿值写入', '验证']
@@ -41,9 +41,10 @@ for (let i = 0; i < phase.length; i++) {
         <a-step v-for="item2 in item1.content" :description="item2.content">{{ item1.name + item2.name }}</a-step>
       </a-steps>
     </div>
-    <div class="t-flex-auto t-grid t-grid-cols-2">
-      <div class="t-bg-emerald-400">
-        1
+    <div class="t-flex-auto t-grid t-grid-cols-2 t-border-2 t-rounded-md">
+      <div class="t-text-4xl t-flex t-items-center t-justify-center">
+        <icon-noto-face-with-monocle/>
+        <span class="t-ml-2">等待开始</span>
       </div>
       <div class="t-bg-cyan-500">
         2

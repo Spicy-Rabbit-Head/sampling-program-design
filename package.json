@@ -20,6 +20,7 @@
   "devDependencies": {
     "@arco-design/web-vue": "^2.47.1",
     "@iconify-json/ant-design": "^1.1.5",
+    "@iconify-json/noto": "^1.1.11",
     "@vitejs/plugin-vue": "^4.1.0",
     "autoprefixer": "^10.4.14",
     "cssnano": "^6.0.1",
