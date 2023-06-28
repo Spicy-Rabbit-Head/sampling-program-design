@@ -32,27 +32,147 @@ for (let i = 0; i < phase.length; i++) {
   }
 }
 
+const data = [
+  {
+    label: '对机标品编号 :',
+    value: '25',
+  },
+  {
+    label: '对机标品值 :',
+    value: '2.1',
+  },
+  {
+    label: '验证标品编号 :',
+    value: '26',
+  },
+  {
+    label: '验证标品值 :',
+    value: '2.0',
+  }
+];
+
+const columns = [
+  {
+    title: '对机项',
+    dataIndex: 'name',
+  },
+  {
+    title: 'Post A-1',
+    dataIndex: 'post1',
+  },
+  {
+    title: 'Post A-2',
+    dataIndex: 'post2',
+  },
+  {
+    title: 'Post A-3',
+    dataIndex: 'post3',
+  },
+  {
+    title: 'Post A-4',
+    dataIndex: 'post4',
+  },
+];
+const dataBase = reactive([
+  [
+    {
+      key: 'title1',
+      value: '修改前测量'
+    },
+    {
+      key: 'beforePost1',
+      value: '0.1'
+    },
+    {
+      key: 'beforePost2',
+      value: '0.2'
+    },
+    {
+      key: 'beforePost3',
+      value: '0.4'
+    },
+    {
+      key: 'beforePost4',
+      value: '0.2'
+    }
+  ],
+  [
+    {
+      key: 'title1',
+      value: '补正值'
+    },
+    {
+      key: 'editPost1',
+      value: '0.21'
+    },
+    {
+      key: 'editPost2',
+      value: '0.25'
+    },
+    {
+      key: 'editPost3',
+      value: '0.42'
+    },
+    {
+      key: 'editPost4',
+      value: '0.12'
+    }
+  ],
+  [
+    {
+      key: 'title1',
+      value: '修改后测量'
+    },
+    {
+      key: 'afterPost1',
+      value: '0.15'
+    },
+    {
+      key: 'afterPost2',
+      value: '0.22'
+    },
+    {
+      key: 'afterPost3',
+      value: '0.44'
+    },
+    {
+      key: 'afterPost4',
+      value: '0.112'
+    }
+  ]
+]);
+
+
 </script>
 
 <template>
   <div class="t-flex-auto t-py-2 t-px-10 t-flex t-flex-col t-select-none">
-    <div class="t-h-[600px] t-flex-none t-grid t-grid-cols-1 t-content-evenly">
+    <div class="t-h-[500px] t-flex-none t-grid t-grid-cols-1 t-content-evenly">
       <a-steps v-for="(item1,index1) in steps" :key="index1" :current="item1.current" :status="item1.currentStatus">
         <a-step v-for="item2 in item1.content" :description="item2.content">{{ item1.name + item2.name }}</a-step>
       </a-steps>
     </div>
-    <div class="t-flex-auto t-grid t-grid-cols-2 t-border-2 t-rounded-md">
-      <div class="t-text-4xl t-flex t-items-center t-justify-center">
-        <icon-noto-face-with-monocle/>
-        <span class="t-ml-2">等待开始</span>
+    <div class="t-flex-auto t-grid t-grid-cols-2 t-border-2 t-rounded-md t-border-emerald-500">
+      <div class="t-flex t-flex-col t-items-center t-justify-center t-gap-2">
+        <div class="t-text-6xl t-flex">
+          <icon-noto-face-with-monocle/>
+          <span class="t-ml-2">等待开始</span>
+        </div>
+        <a-descriptions :data="data" :column="2" bordered/>
       </div>
-      <div class="t-bg-cyan-500">
-        2
+      <div class="t-p-2 t-m-2 t-text-center">
+        <table class="t-w-full t-h-full t-border-2 t-rounded-md">
+          <tr class="t-bg-gray-200">
+            <th v-for="item in columns" :key="item.dataIndex">{{ item.title }}</th>
+          </tr>
+          <tr v-for="(item1,index1) in dataBase" :key="index1">
+            <td class="t-border-2" v-for="item2 in item1" :key="item2.key">{{ item2.value }}</td>
+          </tr>
+        </table>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-
 </style>

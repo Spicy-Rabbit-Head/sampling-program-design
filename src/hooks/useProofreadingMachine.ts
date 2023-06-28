@@ -15,7 +15,7 @@ function stateReversal() {
 }
 
 // 当前通讯方式
-const communicationMode = ref<string>('')
+const communicationMode = ref<string>('ethernet')
 // 通讯方式
 const modes = [
     {
@@ -44,6 +44,25 @@ const logs = reactive<Array<Log>>([
     }
 ])
 
+const data = [{
+    label: '对机编号 :',
+    value: '2500',
+}];
+const standardProducts = [
+    {
+        label: '23',
+        value: '2.1',
+    },
+    {
+        label: '24',
+        value: '2.2',
+    },
+    {
+        label: '25',
+        value: '2.3',
+    }
+]
+
 export function useProofreadingMachine() {
     return {
         calibrationStatus,
@@ -53,6 +72,8 @@ export function useProofreadingMachine() {
         modes,
         portSelection,
         calibrationMode,
-        logs
+        logs,
+        data,
+        standardProducts
     }
 }

@@ -9,11 +9,12 @@ const {
   calibrationStatus,
   stateReversal,
   communicationMode,
-  standardNumber,
   modes,
   portSelection,
   calibrationMode,
-  logs
+  logs,
+  data,
+  standardProducts
 } = useProofreadingMachine();
 
 </script>
@@ -48,10 +49,8 @@ const {
             <n-select :options="calibrationMode" placeholder="" :consistent-menu-width="false"/>
           </n-input-group>
           <!-- 对机编号 -->
-          <n-input-group>
-            <n-input-group-label>对机编号 :</n-input-group-label>
-            <n-input-group-label>{{ standardNumber }}</n-input-group-label>
-          </n-input-group>
+          <a-descriptions :data="data" :column="1" title="当前料号 :" bordered/>
+          <a-descriptions align="center" :data="standardProducts" title="标品编号对应值 :" bordered layout="vertical"/>
         </div>
         <n-button type="error" dashed class="t-w-20 t-mt-2 t-ml-auto">
           清除记录
