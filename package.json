@@ -9,6 +9,9 @@
     "build": "vue-tsc --noEmit && vite build && electron-builder",
     "preview": "vite preview"
   },
+  "config": {
+    "arch": "ia32"
+  },
   "dependencies": {
     "@vueuse/electron": "^10.2.0",
     "echarts": "^5.4.2",

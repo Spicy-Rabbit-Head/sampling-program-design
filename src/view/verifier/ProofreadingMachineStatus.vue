@@ -2,11 +2,9 @@
 import {reactive} from "vue";
 import {Step} from "@/type/interface.ts";
 import IconNotoFaceWithMonocle from "~icons/noto/FaceWithMonocle";
-import {useMeasurement} from "../../../electron/hooks/useMeasurement.ts";
 
 const phase = ['短路', '负载', '开路', '对机']
 const checkTheMachine = ['计算补偿值', '补偿值写入', '验证']
-const {b} = useMeasurement();
 
 const steps: Step[] = reactive<Array<Step>>([])
 

@@ -17,4 +17,5 @@
     <tree path="/src/view/verifier/ProofreadingMachineStatus.vue" title="校对机状态"/>
     <tree path="/electron/hooks/useBrowserWindow.ts" title="窗口闭包"/>
     <tree path="/electron/hooks/useIpcEvent.ts" title="事件闭包"/>
+    <tree path="/electron/hooks/useMeasurement.ts" title="量测闭包"/>
 </trees>

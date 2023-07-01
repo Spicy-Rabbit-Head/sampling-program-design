@@ -3,6 +3,14 @@
 import {reactive} from "vue";
 import SideBar from "@/view/home/SideBar.vue";
 
+import {useIpcRenderer} from "@vueuse/electron";
+import {onMounted} from "vue";
+
+const ipcRenderer = useIpcRenderer()
+onMounted(() => {
+  ipcRenderer.send('set-text')
+})
+
 type tab = {
   path: string,
   class: string,
@@ -35,7 +43,9 @@ function selectPass(i: number) {
         <template #trigger>
           <span
               class="t-font-mono t-rounded-md t-bg-cyan-500 t-cursor-pointer t-text-white t-border t-text-[0.5rem] 2xl:t-text-[0.75rem] t-whitespace-nowrap t-flex t-items-center t-justify-center"
-              :class="item.class" @click.stop="select(index)" @contextmenu.prevent.stop="selectPass(index)">{{ item.path }}
+              :class="item.class" @click.stop="select(index)" @contextmenu.prevent.stop="selectPass(index)">{{
+              item.path
+            }}
           </span>
         </template>
         <template #header>

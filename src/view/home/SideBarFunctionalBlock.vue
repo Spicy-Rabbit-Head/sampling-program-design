@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {computed, ref} from "vue";
+import {useIpcRenderer} from "@vueuse/electron";
 
 const autoButton = ref<boolean>(false);
 const regex: RegExp = /\\([^\\.]+)\./;
@@ -33,7 +34,7 @@ const optionsValue = ref<number>(0);
 const optionsExhibition = computed<string>(() => {
   return optionsValue ? 'Carrier' + options[optionsValue.value].label : '';
 })
-
+const ipcRenderer = useIpcRenderer()
 </script>
 
 <template>
@@ -41,7 +42,7 @@ const optionsExhibition = computed<string>(() => {
     <n-input-group>
       <n-input-group-label class="t-bg-gray-100">当前料号 :</n-input-group-label>
       <n-input class="t-font-mono" placeholder="" readonly v-model:value="currentFileName"/>
-      <n-button type="warning" :disabled="autoButton">
+      <n-button type="warning" :disabled="autoButton" @click="ipcRenderer.send('get-text')">
         修改
       </n-button>
     </n-input-group>
