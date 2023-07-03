@@ -3,12 +3,13 @@
 import {reactive} from "vue";
 import SideBar from "@/view/home/SideBar.vue";
 
-import {useIpcRenderer} from "@vueuse/electron";
+import {useIpcRenderer, useIpcRendererInvoke} from "@vueuse/electron";
 import {onMounted} from "vue";
 
 const ipcRenderer = useIpcRenderer()
 onMounted(() => {
-  ipcRenderer.send('set-text')
+  ipcRenderer.send('dll-init')
+  useIpcRendererInvoke('get-port-list')
 })
 
 type tab = {

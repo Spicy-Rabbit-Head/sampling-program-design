@@ -5,7 +5,7 @@
   "main": "dist-electron/main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "vite",
+    "dev": "chcp 65001 &&  vite",
     "build": "vue-tsc --noEmit && vite build && electron-builder",
     "preview": "vite preview"
   },
