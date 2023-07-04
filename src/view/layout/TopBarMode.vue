@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import {useTopBar} from "@/hooks/useTopBar.ts";
+import {useGlobalStore} from "@/store";
 
 const {
   topBarWindow,
-  topBarWindowState,
   topBarFunction,
   menuOptions,
   tagsToggle
 } = useTopBar()
+
+const {
+  topBarWindowState
+} = useGlobalStore()
 
 </script>
 <template>

@@ -17,6 +17,7 @@
     "echarts": "^5.4.2",
     "electron-edge-js": "^23.0.0",
     "electron-store": "^8.1.0",
+    "pinia": "^2.1.4",
     "vue": "^3.3.4",
     "vue-echarts": "^6.6.0",
     "vue-router": "^4.2.2"

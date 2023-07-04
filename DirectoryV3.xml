@@ -8,15 +8,23 @@
     <tree path="/src/view/home/SideBarFunctionalBlock.vue" title="侧栏功能"/>
     <tree path="/src/view/home/SideBarDataBlock.vue" title="侧栏数据"/>
     <tree path="/src/view/home/SideBarExhibitionBlock.vue" title="侧栏展示"/>
-    <tree path="/src/hooks/useTopBar.ts" title="顶栏工具"/>
-    <tree path="/src/hooks/useEcharts.ts" title="图表工具"/>
+    <tree path="/src/hooks/useTopBar.ts" title="顶栏闭包" extension="" presentableText="" tooltipTitle="" icon=""
+          textColor="" backgroundColor=""/>
+    <tree path="/src/hooks/useEcharts.ts" title="图表闭包" extension="" presentableText="" tooltipTitle="" icon=""
+          textColor="" backgroundColor=""/>
     <tree path="/src/view/layout/TopBarMode.vue" title="顶栏模块"/>
     <tree path="/src/view/layout" title="布局"/>
-    <tree path="/src/hooks/useProofreadingMachine.ts" title="校对机工具"/>
+    <tree path="/src/hooks/useProofreadingMachine.ts" title="校对机闭包" extension="" presentableText="" tooltipTitle=""
+          icon="" textColor="" backgroundColor=""/>
     <tree path="/src/view/verifier/ProofreadingMachineModule.vue" title="校对机模块"/>
     <tree path="/src/view/verifier/ProofreadingMachineStatus.vue" title="校对机状态"/>
     <tree path="/electron/hooks/useBrowserWindow.ts" title="窗口闭包"/>
     <tree path="/electron/hooks/useIpcEvent.ts" title="事件闭包"/>
     <tree path="/electron/hooks/useMeasurement.ts" title="量测闭包"/>
     <tree path="/src/hooks/useHome.ts" title="主体闭包"/>
+    <tree path="/src/hooks/useIpcRendererEvent.ts" title="IPC通讯闭包"/>
+    <tree path="/src/view/verifier" title="校对机"/>
+    <tree path="/electron/hooks/useIpcViewportEvent.ts" title="视口事件闭包"/>
+    <tree path="/src/router" title="路由"/>
+    <tree path="/src/store" title="全局共享"/>
 </trees>

@@ -36,9 +36,9 @@ const autoButton = ref<boolean>(false);
 const regex: RegExp = /\\([^\\.]+)\./;
 
 // 当前文件名
-const currentFileName = computed<string>(() => {
+const currentFileName = computed(() => {
     let str = filePath.value.match(regex);
-    return str ? str[1] : '';
+    return str ? str[1] : ''
 })
 
 // 当前文件路径

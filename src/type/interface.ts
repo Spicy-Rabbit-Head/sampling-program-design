@@ -1,5 +1,6 @@
 import {FunctionalComponent, SVGAttributes} from 'vue'
 import {StepsProps} from "naive-ui";
+import type {BrowserWindow} from "electron";
 
 // 窗口操作
 export type TopBarWindow = FunctionalComponent<SVGAttributes>
@@ -29,6 +30,11 @@ export type tab = {
     class: string,
 }
 
+// 窗口缓存
+export type WindowCache = {
+    main: BrowserWindow | null
+}
+
 // 步骤
 export type Step = {
     current: number
@@ -38,4 +44,9 @@ export type Step = {
         name: string
         content: string
     }[]
+}
+
+// 全局共享
+export type GlobalStoreInterface = {
+    topBarWindowState: Array<boolean>
 }

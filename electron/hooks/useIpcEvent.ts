@@ -8,27 +8,27 @@ const {
 } = useMeasurement();
 
 // 事件监听
-export function useIpcEvent(win: BrowserWindow) {
-    // 最小化
+export function useIpcEvent(main: BrowserWindow) {
+// 最小化
     ipcMain.on('window-min', function () {
-        win.minimize();
+        main.minimize();
     })
 
     // 恢复窗口
     ipcMain.on('window-restore', function () {
-        win.restore()
+        main.restore()
     })
 
     // 最大化
     ipcMain.on('window-max', function () {
-        win.maximize()
+        main.maximize()
     })
 
     // 关闭窗口
     ipcMain.on('window-close', function () {
         // 关闭服务
         ServiceStop()
-        win.close()
+        main.close()
     })
 
     // dll初始化

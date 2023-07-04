@@ -3,6 +3,7 @@ import IconAntDesignCaretUpOutlined from '~icons/ant-design/CaretUpOutlined'
 import IconAntDesignCaretDownOutlined from '~icons/ant-design/CaretDownOutlined'
 import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
 import ProofreadingMachineStatus from "@/view/verifier/ProofreadingMachineStatus.vue";
+import {useHome} from "@/hooks/useHome.ts";
 
 // 校对机闭包
 const {
@@ -13,9 +14,9 @@ const {
   portSelection,
   calibrationMode,
   logs,
-  data,
   standardProducts
 } = useProofreadingMachine();
+const {currentFileName} = useHome()
 
 </script>
 
@@ -49,7 +50,12 @@ const {
             <n-select :options="calibrationMode" placeholder="" :consistent-menu-width="false"/>
           </n-input-group>
           <!-- 对机编号 -->
-          <a-descriptions :data="data" :column="1" title="当前料号 :" bordered/>
+          <div>
+            <span class="t-text-[16px] t-font-normal">当前料号 :</span>
+            <div class="t-border t-mt-2 t-h-8 t-rounded-md t-flex t-items-center t-justify-center">
+              {{ currentFileName }}
+            </div>
+          </div>
           <a-descriptions align="center" :data="standardProducts" title="标品编号对应值 :" bordered layout="vertical"/>
         </div>
         <n-button type="error" dashed class="t-w-20 t-mt-2 t-ml-auto">

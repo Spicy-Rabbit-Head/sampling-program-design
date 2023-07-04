@@ -4,7 +4,7 @@ import {BrowserWindow} from "electron";
 export function useBrowserWindow() {
     // 创建主窗口
     function buildMainWindow() {
-        const mainWindow = new BrowserWindow({
+        const main = new BrowserWindow({
             width: 1300,
             height: 800,
             // 最小窗口大小
@@ -28,13 +28,12 @@ export function useBrowserWindow() {
         // 环境判断加载页面
         if (process.env.VITE_DEV_SERVER_URL) {
             // 打开开发者工具
-            mainWindow.webContents.toggleDevTools();
-            mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL).then()
+            main.webContents.toggleDevTools();
+            main.loadURL(process.env.VITE_DEV_SERVER_URL).then()
         } else {
-            mainWindow.loadFile('dist/index.html').then();
+            main.loadFile('dist/index.html').then();
         }
-
-        return mainWindow;
+        return main
     }
 
     return {
