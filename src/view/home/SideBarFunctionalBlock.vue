@@ -1,38 +1,15 @@
 <script setup lang="ts">
-import {computed, ref} from "vue";
+import {useHome} from "@/hooks/useHome.ts";
 
-const autoButton = ref<boolean>(false);
-const regex: RegExp = /\\([^\\.]+)\./;
-const currentFileName = computed<string>(() => {
-  let str = filePath.value.match(regex);
-  return str ? str[1] : '';
-})
-const filePath = ref<string>("D:\\.work_documents\\Syncdisk\\OW7680012002.qcc");
-
-function startSwitch() {
-  autoButton.value = !autoButton.value;
-}
-
-const options = [
-  {
-    label: '实时',
-    value: 0,
-  },
-]
-
-for (let i = 1; i <= 2; i++) {
-  for (let j = 1; j <= 5; j++) {
-    options.push({
-      label: `${i}-${j}`,
-      value: options.length,
-    })
-  }
-}
-
-const optionsValue = ref<number>(0);
-const optionsExhibition = computed<string>(() => {
-  return optionsValue ? 'Carrier' + options[optionsValue.value].label : '';
-})
+const {
+  autoButton,
+  currentFileName,
+  filePath,
+  startSwitch,
+  options,
+  optionsValue,
+  optionsExhibition,
+} = useHome();
 
 </script>
 

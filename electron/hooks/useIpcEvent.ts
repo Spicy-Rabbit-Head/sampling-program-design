@@ -1,5 +1,11 @@
 import {BrowserWindow, ipcMain} from "electron";
-import {CloseMeasuringProgram, GetSerialPortList, OpenMeasuringProgram, ServiceDllInit} from "./useMeasurement";
+import {useMeasurement} from "./useMeasurement";
+
+const {
+    ServiceInit,
+    ServiceStop,
+    PortListUpdate,
+} = useMeasurement();
 
 // 事件监听
 export function useIpcEvent(win: BrowserWindow) {
@@ -20,37 +26,21 @@ export function useIpcEvent(win: BrowserWindow) {
 
     // 关闭窗口
     ipcMain.on('window-close', function () {
-        // 关闭250B
-        CloseMeasuringProgram(null, (error, value) => {
-            if (error) throw error;
-            console.log(value);
-        })
+        // 关闭服务
+        ServiceStop()
         win.close()
     })
 
     // dll初始化
     ipcMain.on('dll-init', () => {
-        ServiceDllInit(null, (error, result) => {
-            if (error) throw error;
-            console.log(result);
-        })
-        // 打开250B
-        OpenMeasuringProgram(null, (error, result) => {
-            if (error) throw error;
-            console.log(result);
-        })
+        // 初始化并启动250B
+        ServiceInit()
         return true
     })
 
     // 获取串口列表
-    ipcMain.handle('get-port-list', () => {
-        const list = GetSerialPortList(null, (error, result) => {
-            if (error) throw error;
-            console.log(typeof result);
-            console.log(result)
-            return result
-        })
-        console.log(list);
-        return list
+    ipcMain.on('get-port-list', () => {
+        PortListUpdate()
+        return true
     })
 }

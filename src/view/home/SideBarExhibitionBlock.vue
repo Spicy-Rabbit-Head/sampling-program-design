@@ -10,7 +10,7 @@ const {option} = useEcharts();
   <div class="t-h-72 t-flex-none">
     <v-chart :option="option"/>
   </div>
-</template>z
+</template>
 
 <style scoped>
 

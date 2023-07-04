@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {StatusOverview} from "@/type/interface.ts";
+import type {StatusOverview} from "@/type/interface.ts";
 // 状态概述
 const status: Array<StatusOverview> = [
   {
@@ -31,14 +31,16 @@ const status: Array<StatusOverview> = [
 </script>
 
 <template>
-  <div class="t-h-44 t-my-2 t-grid t-grid-cols-1 t-rounded-md t-text-center t-shadow-status" style="background-image: linear-gradient(to right, #a8edea 0%, #fed6e3 100%);">
+  <div class="t-h-44 t-my-2 t-grid t-grid-cols-1 t-rounded-md t-text-center t-shadow-status"
+       style="background-image: linear-gradient(to right, #a8edea 0%, #fed6e3 100%);">
     <div class="t-w-full t-h-6 t-grid t-grid-cols-2 t-py-1">
       <span>状态一览</span>
       <span>当前测量值</span>
     </div>
     <div class="t-grid t-grid-cols-2 t-font-mono">
       <div class="t-grid t-grid-cols-1 t-h-36 t-content-around">
-        <div v-for="(item,index) in status" :key="index" class="t-flex t-w-full t-justify-between t-items-center t-px-6">
+        <div v-for="(item,index) in status" :key="index"
+             class="t-flex t-w-full t-justify-between t-items-center t-px-6">
           <span>{{ item.label }}</span>
           <span :class="item.bgColor" class="t-h-4 t-w-4 t-ml-6 t-rounded"/>
         </div>

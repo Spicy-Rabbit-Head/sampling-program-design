@@ -23,6 +23,12 @@ export type Log = {
     content: string,
 }
 
+// 主体表格
+export type tab = {
+    path: string,
+    class: string,
+}
+
 // 步骤
 export type Step = {
     current: number
