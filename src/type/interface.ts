@@ -48,5 +48,6 @@ export type Step = {
 
 // 全局共享
 export type GlobalStoreInterface = {
-    topBarWindowState: Array<boolean>
+    topBarWindowState: Array<boolean>,
+    filePath: string,
 }

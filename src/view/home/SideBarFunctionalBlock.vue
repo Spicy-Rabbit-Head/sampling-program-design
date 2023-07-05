@@ -1,15 +1,20 @@
 <script setup lang="ts">
 import {useHome} from "@/hooks/useHome.ts";
+import {useIpcRenderer} from "@vueuse/electron";
+import {useGlobalStore} from "@/store";
+import {storeToRefs} from "pinia";
 
 const {
   autoButton,
-  currentFileName,
-  filePath,
   startSwitch,
   options,
   optionsValue,
   optionsExhibition,
 } = useHome();
+
+const {currentFileName, filePath} = storeToRefs(useGlobalStore());
+
+const {send} = useIpcRenderer()
 
 </script>
 
@@ -18,7 +23,7 @@ const {
     <n-input-group>
       <n-input-group-label class="t-bg-gray-100">当前料号 :</n-input-group-label>
       <n-input class="t-font-mono" placeholder="" readonly v-model:value="currentFileName"/>
-      <n-button type="warning" :disabled="autoButton">
+      <n-button type="warning" :disabled="autoButton" @click="send('open-file-dialog')">
         修改
       </n-button>
     </n-input-group>

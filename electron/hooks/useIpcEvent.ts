@@ -1,4 +1,4 @@
-import {BrowserWindow, ipcMain} from "electron";
+import {BrowserWindow, ipcMain, dialog} from "electron";
 import {useMeasurement} from "./useMeasurement";
 
 const {
@@ -42,5 +42,24 @@ export function useIpcEvent(main: BrowserWindow) {
     ipcMain.on('get-port-list', () => {
         PortListUpdate()
         return true
+    })
+
+    // 打开文件对话框
+    ipcMain.on('open-file-dialog', (event) => {
+        dialog.showOpenDialog({
+            title: '选择QCC文件',
+            filters: [
+                {name: 'QCC文件', extensions: ['qcc']},
+            ],
+            properties: ['openFile', 'multiSelections']
+        }).then(result => {
+            if (result.canceled) {
+                console.log('取消选择')
+                return
+            }
+            event.sender.send('main-select-file', result.filePaths)
+        }).catch(err => {
+            console.log(err)
+        })
     })
 }

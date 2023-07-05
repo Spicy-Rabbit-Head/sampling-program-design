@@ -3,7 +3,8 @@ import IconAntDesignCaretUpOutlined from '~icons/ant-design/CaretUpOutlined'
 import IconAntDesignCaretDownOutlined from '~icons/ant-design/CaretDownOutlined'
 import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
 import ProofreadingMachineStatus from "@/view/verifier/ProofreadingMachineStatus.vue";
-import {useHome} from "@/hooks/useHome.ts";
+import {useGlobalStore} from "@/store";
+import {storeToRefs} from "pinia";
 
 // 校对机闭包
 const {
@@ -16,7 +17,7 @@ const {
   logs,
   standardProducts
 } = useProofreadingMachine();
-const {currentFileName} = useHome()
+const {currentFileName} = storeToRefs(useGlobalStore());
 
 </script>
 

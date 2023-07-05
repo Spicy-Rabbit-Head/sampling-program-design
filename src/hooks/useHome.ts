@@ -32,18 +32,6 @@ for (let i = 1; i <= 2; i++) {
 // 自动运行
 const autoButton = ref<boolean>(false);
 
-// 当前文件正则
-const regex: RegExp = /\\([^\\.]+)\./;
-
-// 当前文件名
-const currentFileName = computed(() => {
-    let str = filePath.value.match(regex);
-    return str ? str[1] : ''
-})
-
-// 当前文件路径
-const filePath = ref<string>("D:\\.work_documents\\Syncdisk\\OW7680012002.qcc");
-
 // 当前选中的料盘
 const optionsValue = ref<number>(0);
 
@@ -51,7 +39,6 @@ const optionsValue = ref<number>(0);
 const optionsExhibition = computed<string>(() => {
     return optionsValue ? 'Carrier' + options[optionsValue.value].label : '';
 })
-
 
 export function useHome() {
     // 选中异常
@@ -74,8 +61,6 @@ export function useHome() {
         select,
         selectPass,
         autoButton,
-        currentFileName,
-        filePath,
         startSwitch,
         options,
         optionsValue,
