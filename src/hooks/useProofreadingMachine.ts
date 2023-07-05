@@ -31,9 +31,6 @@ const modes = [
     },
 ]
 
-// 通讯端口选择
-const portSelection = ref([])
-
 // 校准模式
 const calibrationMode = ref([
     {
@@ -251,7 +248,6 @@ export function useProofreadingMachine() {
         standardNumber,
         communicationMode,
         modes,
-        portSelection,
         calibrationMode,
         logs,
         standardProducts,

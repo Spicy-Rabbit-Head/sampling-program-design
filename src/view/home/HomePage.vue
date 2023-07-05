@@ -11,10 +11,10 @@ const {
   selectPass,
   select
 } = useHome();
-// const ipcRenderer = useIpcRenderer()
+const ipcRenderer = useIpcRenderer()
 onMounted(() => {
-  // ipcRenderer.send('dll-init')
-  // ipcRenderer.send('get-port-list')
+  ipcRenderer.send('main-send-dll-init')
+  ipcRenderer.send('main-send-get-port-list')
 })
 
 </script>

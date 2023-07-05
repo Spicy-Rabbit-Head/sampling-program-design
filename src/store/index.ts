@@ -13,7 +13,12 @@ export const useGlobalStore = defineStore('GlobalStore', {
                 true,
                 true
             ],
+            // 当前文件路径
             filePath: '',
+            // 当前端口
+            currentPort: '',
+            // 通讯端口选择
+            portSelection: [],
         }
     },
     getters: {

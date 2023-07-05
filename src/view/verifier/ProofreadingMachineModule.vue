@@ -12,12 +12,14 @@ const {
   stateReversal,
   communicationMode,
   modes,
-  portSelection,
   calibrationMode,
   logs,
   standardProducts
 } = useProofreadingMachine();
-const {currentFileName} = storeToRefs(useGlobalStore());
+
+const globalStore = useGlobalStore();
+
+const {currentFileName, portSelection} = storeToRefs(globalStore);
 
 </script>
 
@@ -43,7 +45,10 @@ const {currentFileName} = storeToRefs(useGlobalStore());
           <!-- 当前通讯方式端口选择 -->
           <n-input-group>
             <n-input-group-label>当前端口 :</n-input-group-label>
-            <n-select :options="portSelection" placeholder=""/>
+            <n-select v-model:value="globalStore.currentPort" @focus="console.log('该更新了')"
+                      @update-value=""
+                      :options="portSelection"
+                      placeholder=""/>
           </n-input-group>
           <!-- 校准模式选择 -->
           <n-input-group>

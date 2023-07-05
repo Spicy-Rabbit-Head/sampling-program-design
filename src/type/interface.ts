@@ -1,5 +1,5 @@
 import {FunctionalComponent, SVGAttributes} from 'vue'
-import {StepsProps} from "naive-ui";
+import {StepsProps, SelectOption} from "naive-ui";
 import type {BrowserWindow} from "electron";
 
 // 窗口操作
@@ -50,4 +50,6 @@ export type Step = {
 export type GlobalStoreInterface = {
     topBarWindowState: Array<boolean>,
     filePath: string,
+    currentPort: string,
+    portSelection: Array<SelectOption>
 }
