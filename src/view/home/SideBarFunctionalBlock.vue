@@ -2,7 +2,7 @@
 import {useHome} from "@/hooks/useHome.ts";
 import {useGlobalStore} from "@/store";
 import {storeToRefs} from "pinia";
-import {useIpcRendererEvent} from "@/hooks/useIpcRendererEvent.ts";
+import {useIpcSendEvent} from "@/hooks/useIpcSendEvent.ts";
 
 const {
   autoButton,
@@ -14,7 +14,7 @@ const {
 
 const {currentFileName, filePath} = storeToRefs(useGlobalStore());
 
-const {ReadNumberFile} = useIpcRendererEvent();
+const {ReadNumberFile} = useIpcSendEvent();
 
 </script>
 

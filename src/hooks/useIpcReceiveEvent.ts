@@ -1,18 +1,10 @@
-import {useIpcRenderer} from "@vueuse/electron";
 import {useGlobalStore} from "@/store";
+import {useIpcRenderer} from "@vueuse/electron";
 
-const {on, invoke} = useIpcRenderer()
+const {on} = useIpcRenderer()
 
-// 读取料号文件
-function ReadNumberFile() {
-    let filePath = invoke('main-send-open-file-dialog');
-    console.log(filePath)
-}
-
-
-export function useIpcRendererEvent() {
+export function useIpcReceiveEvent() {
     const globalStore = useGlobalStore();
-
     // 双击最大化及最大化按钮事件
     on('main-max-windows', () => {
         globalStore.topBarWindowState[1] = true
@@ -37,7 +29,7 @@ export function useIpcRendererEvent() {
     })
 
     // 选择文件
-    on('main-select-file', (_, path: string) => {
+    on('main-receive-select-file', (_, path: string) => {
         if (path.length == 1) {
             globalStore.filePath = path[0]
         } else {
@@ -46,12 +38,7 @@ export function useIpcRendererEvent() {
     })
 
     // 取消选择文件
-    on('main-cancel-select-file', () => {
+    on('main-receive-cancel-select-file', () => {
         console.log('取消选择文件')
     })
-
-
-    return {
-        ReadNumberFile,
-    }
 }

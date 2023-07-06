@@ -11,7 +11,8 @@ const app = createApp(App)
 app.use(pinia)
 // 使用路由
 app.use(router)
-import {useIpcRendererEvent} from "@/hooks/useIpcRendererEvent.ts";
-useIpcRendererEvent()
+import {useIpcReceiveEvent} from "@/hooks/useIpcReceiveEvent.ts";
+
+useIpcReceiveEvent()
 
 app.mount('#app')

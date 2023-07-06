@@ -22,9 +22,12 @@
     <tree path="/electron/hooks/useIpcEvent.ts" title="事件闭包"/>
     <tree path="/electron/hooks/useMeasurement.ts" title="量测闭包"/>
     <tree path="/src/hooks/useHome.ts" title="主体闭包"/>
-    <tree path="/src/hooks/useIpcRendererEvent.ts" title="IPC通讯闭包"/>
+    <tree path="/src/hooks/useIpcSendEvent.ts" title="IPC发送闭包" extension="" presentableText="" tooltipTitle=""
+          icon="" textColor="" backgroundColor=""/>
     <tree path="/src/view/verifier" title="校对机"/>
     <tree path="/electron/hooks/useIpcViewportEvent.ts" title="视口事件闭包"/>
     <tree path="/src/router" title="路由"/>
     <tree path="/src/store" title="全局共享"/>
+    <tree path="/src/hooks" title="闭包"/>
+    <tree path="/src/hooks/useIpcReceiveEvent.ts" title="IPC接收闭包"/>
 </trees>

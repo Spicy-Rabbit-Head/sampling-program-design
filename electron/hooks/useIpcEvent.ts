@@ -48,20 +48,22 @@ export function useIpcEvent(main: BrowserWindow) {
     })
 
     // 打开文件对话框
-    ipcMain.handle('main-send-open-file-dialog', () => {
+    ipcMain.on('main-send-open-file-dialog', (event) => {
         dialog.showOpenDialog(main, {
             title: '选择QCC文件',
             filters: [
                 {name: 'QCC文件', extensions: ['qcc']},
             ],
-            properties: ['openFile', 'multiSelections']
-        }).then(result => {
-            if (result.canceled) {
-                return '取消选择文件'
+            properties: ['openFile']
+        }).then(r => {
+            console.log(r)
+            if (r.canceled) {
+                event.reply('main-receive-cancel-select-file')
+            } else {
+                event.reply('main-receive-select-file', r.filePaths)
             }
-            return result.filePaths
-        }).catch(err => {
-            console.log(err)
+        }).then(e => {
+            console.log(e)
         })
     })
 }
