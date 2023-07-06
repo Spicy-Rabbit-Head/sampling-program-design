@@ -39,16 +39,16 @@ export function useTopBar() {
     function topBarFunction(i: number) {
         switch (i) {
             case 0:
-                ipcRenderer.send('window-min')
+                ipcRenderer.send('main-send-window-min')
                 break
             case 1:
-                ipcRenderer.send('window-restore')
+                ipcRenderer.send('main-send-window-restore')
                 break
             case 2:
-                ipcRenderer.send('window-max')
+                ipcRenderer.send('main-send-window-max')
                 break
             case 3:
-                ipcRenderer.send('window-close')
+                ipcRenderer.send('main-send-window-close')
                 break
         }
     }

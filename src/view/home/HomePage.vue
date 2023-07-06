@@ -13,6 +13,7 @@ const {
 } = useHome();
 const ipcRenderer = useIpcRenderer()
 onMounted(() => {
+  ipcRenderer.send('main-send-init')
   ipcRenderer.send('main-send-dll-init')
   ipcRenderer.send('main-send-get-port-list')
 })
