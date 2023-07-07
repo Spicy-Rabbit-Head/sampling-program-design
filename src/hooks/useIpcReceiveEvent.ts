@@ -5,6 +5,25 @@ const {on} = useIpcRenderer()
 
 export function useIpcReceiveEvent() {
     const globalStore = useGlobalStore();
+    // 数据初始化
+    on('main-receive-init', (_, data: any) => {
+        globalStore.filePath = data.filePath
+        globalStore.currentPort = data.currentPort
+        globalStore.currentCalibrationMode = data.currentCalibrationMode
+        globalStore.communicationMode = data.communicationMode
+    })
+
+    // 读取250BINI配置
+    on('main-receive-read-ini', (_, data: any) => {
+        globalStore.calibrationMode.length = 0
+        globalStore.calibrationMode = data
+    })
+
+    // 读取250BINI配置错误
+    on('main-receive-read-ini-error', (_, data: any) => {
+        console.log(data)
+    })
+
     // 双击最大化及最大化按钮事件
     on('main-receive-max-windows', () => {
         globalStore.topBarWindowState[1] = true

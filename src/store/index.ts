@@ -17,8 +17,16 @@ export const useGlobalStore = defineStore('GlobalStore', {
             filePath: '',
             // 当前端口
             currentPort: '',
+            // 当前地址
+            currentAddress: '',
             // 通讯端口选择
             portSelection: [],
+            // 当前校准模式
+            currentCalibrationMode: '',
+            // 校准模式
+            calibrationMode: [],
+            // 当前通讯模式
+            communicationMode: ''
         }
     },
     getters: {

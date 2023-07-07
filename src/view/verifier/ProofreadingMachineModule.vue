@@ -5,21 +5,27 @@ import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
 import ProofreadingMachineStatus from "@/view/verifier/ProofreadingMachineStatus.vue";
 import {useGlobalStore} from "@/store";
 import {storeToRefs} from "pinia";
+import {useIpcSendEvent} from "@/hooks/useIpcSendEvent.ts";
 
 // 校对机闭包
 const {
   calibrationStatus,
   stateReversal,
-  communicationMode,
   modes,
-  calibrationMode,
   logs,
   standardProducts
 } = useProofreadingMachine();
 
 const globalStore = useGlobalStore();
 
-const {currentFileName, portSelection} = storeToRefs(globalStore);
+const {currentFileName, portSelection, calibrationMode, communicationMode} = storeToRefs(globalStore);
+const {
+  PortUpdate,
+  CalibrationModeUpdate,
+  ReadIniConfiguration,
+  CommunicationModeUpdate,
+  ReadPortList
+} = useIpcSendEvent();
 
 </script>
 
@@ -27,9 +33,9 @@ const {currentFileName, portSelection} = storeToRefs(globalStore);
   <div class="t-w-screen t-h-full t-flex">
     <!-- 左侧功能栏 -->
     <div class="t-w-1/5 t-p-2">
-      <div class="t-flex t-flex-col t-p-2 t-border-2 t-rounded-md t-h-full">
+      <div class="t-flex t-flex-col t-p-2 t-border-2 t-rounded-md t-h-full t-w-full">
         <!-- 校对机功能及参数 -->
-        <div class="t-grid t-grid-cols-1 t-gap-2">
+        <div class="t-w-full t-grid t-grid-cols-1 t-gap-2">
           <n-button type="success" :disabled="calibrationStatus" @click.stop="stateReversal">
             自动校对机开始
           </n-button>
@@ -37,23 +43,31 @@ const {currentFileName, portSelection} = storeToRefs(globalStore);
             自动校对机停止
           </n-button>
           <!-- 通讯方式单选 -->
-          <n-radio-group class="t-mx-auto" v-model:value="communicationMode" name="radioGroup">
+          <n-radio-group class="t-mx-auto" v-model:value="globalStore.communicationMode"
+                         @update-value="CommunicationModeUpdate"
+                         name="radioGroup">
             <n-radio v-for="song in modes" :key="song.value" :value="song.value">
               {{ song.label }}
             </n-radio>
           </n-radio-group>
           <!-- 当前通讯方式端口选择 -->
-          <n-input-group>
-            <n-input-group-label>当前端口 :</n-input-group-label>
-            <n-select v-model:value="globalStore.currentPort" @focus="console.log('该更新了')"
-                      @update-value=""
+          <n-input-group class="t-text-center">
+            <n-input-group-label class="t-w-5/12">当前端口 :</n-input-group-label>
+            <n-select class="t-w-7/12" v-if="communicationMode != 'ethernet'" v-model:value="globalStore.currentPort"
+                      @focus="ReadPortList"
+                      @update-value="PortUpdate"
                       :options="portSelection"
                       placeholder=""/>
+            <n-input v-else v-model:value="globalStore.currentAddress" readonly placeholder=""/>
           </n-input-group>
           <!-- 校准模式选择 -->
-          <n-input-group>
-            <n-input-group-label>校准模式 :</n-input-group-label>
-            <n-select :options="calibrationMode" placeholder="" :consistent-menu-width="false"/>
+          <n-input-group class="t-text-center">
+            <n-input-group-label class="t-w-5/12">校准模式 :</n-input-group-label>
+            <n-select class="t-w-7/12" v-model:value="globalStore.currentCalibrationMode" :options="calibrationMode"
+                      @update-value="CalibrationModeUpdate"
+                      @focus="ReadIniConfiguration"
+                      placeholder=""
+                      :consistent-menu-width="false"/>
           </n-input-group>
           <!-- 对机编号 -->
           <div>

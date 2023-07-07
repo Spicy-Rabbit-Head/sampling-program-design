@@ -16,9 +16,6 @@ function stateReversal() {
     calibrationStatus.value = true
 }
 
-// 当前通讯方式
-const communicationMode = ref<string>('ethernet')
-
 // 通讯方式
 const modes = [
     {
@@ -30,14 +27,6 @@ const modes = [
         value: 'ethernet'
     },
 ]
-
-// 校准模式
-const calibrationMode = ref([
-    {
-        label: "2",
-        value: '1',
-    },
-])
 
 // 日志数据
 const logs = reactive<Array<Log>>([
@@ -246,9 +235,7 @@ export function useProofreadingMachine() {
         calibrationStatus,
         stateReversal,
         standardNumber,
-        communicationMode,
         modes,
-        calibrationMode,
         logs,
         standardProducts,
         steps,

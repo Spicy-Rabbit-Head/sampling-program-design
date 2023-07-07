@@ -51,5 +51,9 @@ export type GlobalStoreInterface = {
     topBarWindowState: Array<boolean>,
     filePath: string,
     currentPort: string,
+    currentAddress: string,
     portSelection: Array<SelectOption>
+    currentCalibrationMode: string,
+    calibrationMode: Array<SelectOption>
+    communicationMode: string,
 }
