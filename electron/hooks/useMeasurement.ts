@@ -32,6 +32,13 @@ const GetSerialPortList = edge.func({
     methodName: "GetSerialPortList",
 })
 
+// 标品数据查询
+const GetStandardProductData = edge.func({
+    assemblyFile: url,
+    typeName: "Measurement.Sa250B",
+    methodName: "GetStandardProductData",
+})
+
 export function useMeasurement() {
     // 服务初始化启动
     function ServiceInit() {
@@ -72,9 +79,29 @@ export function useMeasurement() {
         return portList;
     }
 
+    // 标品数据查询
+    function StandardProductQuery(path: string, pn: string, location: string, password: string) {
+        let portList: Array<string> = [];
+        let data = {
+            path: path,
+            pn: pn,
+            location: location,
+            password: password
+        }
+        GetStandardProductData(data, (error, result) => {
+            if (error) {
+                portList = null
+                return
+            }
+            portList = result
+        })
+        return portList;
+    }
+
     return {
         ServiceInit,
         ServiceStop,
-        PortListUpdate
+        PortListUpdate,
+        StandardProductQuery
     }
 }

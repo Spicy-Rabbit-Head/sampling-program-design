@@ -30,4 +30,5 @@
     <tree path="/src/store" title="全局共享"/>
     <tree path="/src/hooks" title="闭包"/>
     <tree path="/src/hooks/useIpcReceiveEvent.ts" title="IPC接收闭包"/>
+    <tree path="/src/view/configuration" title="配置"/>
 </trees>

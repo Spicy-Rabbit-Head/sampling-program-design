@@ -57,3 +57,11 @@ export type GlobalStoreInterface = {
     calibrationMode: Array<SelectOption>
     communicationMode: string,
 }
+
+// 配置文件
+export type ConfigStoreInterface = {
+    iniConfiguration: string,
+    standardProductPath: string,
+    standardProductPassword: string,
+    permissionPassword: string,
+}

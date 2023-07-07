@@ -4,6 +4,7 @@ import {createRouter, createWebHistory, Router, RouteRecordRaw} from 'vue-router
 const Home = () => import('@/view/home/HomePage.vue')
 const Verifier = () => import('@/view/verifier/ProofreadingMachineModule.vue')
 const test2 = () => import('@/view/test/test2.vue')
+const ConfigurationPage = () => import('@/view/configuration/ConfigurationPage.vue')
 
 // 定义路由
 const routes = [
@@ -27,6 +28,11 @@ const routes = [
         path: '/test2',
         name: 'test2',
         component: test2,
+    },
+    {
+        path: '/configuration',
+        name: 'ConfigurationPage',
+        component: ConfigurationPage,
     },
     // 匹配所有路径,如果没有匹配到,则重定向到404页面
     {

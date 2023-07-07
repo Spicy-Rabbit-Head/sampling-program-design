@@ -26,6 +26,18 @@ const LocalStoreInterface = {
     // 当前通讯模式
     communicationMode: {
         type: 'string',
+    },
+    // 标品数据路径
+    standardProductPath: {
+        type: 'string',
+    },
+    // 标品数据密码
+    standardProductPassword: {
+        type: 'string',
+    },
+    // 权限密码
+    permissionPassword: {
+        type: 'string',
     }
 }
 
@@ -33,12 +45,14 @@ const {
     ServiceInit,
     ServiceStop,
     PortListUpdate,
+    StandardProductQuery,
 } = useMeasurement();
 
 // 事件监听
 export function useIpcEvent(main: BrowserWindow) {
     // 本地配置储存
     const localStore = new Store({LocalStoreInterface});
+    // const {currentFileName} = storeToRefs(useGlobalStore());
     console.log(localStore.store)
 
     // 最小化
@@ -74,7 +88,9 @@ export function useIpcEvent(main: BrowserWindow) {
     })
 
     // Store读取
-
+    ipcMain.on('main-send-get-store', function (event, url, key) {
+        event.reply(url, localStore.get(key))
+    })
 
     // 250B配置文件读取
     ipcMain.on('main-send-read-ini', function (event) {
@@ -94,6 +110,11 @@ export function useIpcEvent(main: BrowserWindow) {
         }
     })
 
+    // 可修改配置读取
+    ipcMain.on('main-send-read-configuration', function (event) {
+        event.reply('main-receive-read-configuration', localStore.store)
+    })
+
     // dll初始化
     ipcMain.on('main-send-dll-init', function () {
         // 初始化并启动250B
@@ -110,8 +131,8 @@ export function useIpcEvent(main: BrowserWindow) {
         }
     })
 
-    // 打开文件对话框
-    ipcMain.on('main-send-open-file-dialog', function (event) {
+    // 打开文件对话框-QCC
+    ipcMain.on('main-send-open-qcc-dialog', function (event) {
         dialog.showOpenDialog(main, {
             title: '选择QCC文件',
             filters: [
@@ -122,11 +143,61 @@ export function useIpcEvent(main: BrowserWindow) {
             if (r.canceled) {
                 event.reply('main-receive-cancel-select-file')
             } else {
-                event.reply('main-receive-select-file', r.filePaths[0])
+                event.reply('main-receive-qcc-select-file', r.filePaths[0])
                 localStore.set('filePath', r.filePaths[0])
             }
         }).catch(err => {
             console.log(err)
         })
+    })
+
+    // 打开文件对话框-250B配置文件
+    ipcMain.on('main-send-open-ini-dialog', function (event) {
+        dialog.showOpenDialog(main, {
+            title: '选择250B配置文件',
+            filters: [
+                {name: 'INI文件', extensions: ['ini']},
+            ],
+            properties: ['openFile']
+        }).then(r => {
+            if (r.canceled) {
+                event.reply('main-receive-cancel-select-file')
+            } else {
+                event.reply('main-receive-ini-select-file', r.filePaths[0])
+                localStore.set('iniConfiguration', r.filePaths[0])
+            }
+        }).catch(err => {
+            console.log(err)
+        })
+    })
+
+    // 打开文件对话框-标品
+    ipcMain.on('main-send-open-standard-dialog', function (event) {
+        dialog.showOpenDialog(main, {
+            title: '选择标品数据文件',
+            filters: [
+                {name: 'Access', extensions: ['mdb']},
+            ],
+            properties: ['openFile']
+        }).then(r => {
+            if (r.canceled) {
+                event.reply('main-receive-cancel-select-file')
+            } else {
+                event.reply('main-receive-standard-select-file', r.filePaths[0])
+                localStore.set('standardProductPath', r.filePaths[0])
+            }
+        }).catch(err => {
+            console.log(err)
+        })
+    })
+
+    // 标品 Access 查询
+    ipcMain.on('main-send-standard-access-query', function (_, pn) {
+        let path = localStore.get('standardProductPath');
+        // let location = localStore.get('location');
+        let location = 'P4-2F'
+        let password = localStore.get('standardProductPassword');
+        let dataList = StandardProductQuery(path, pn, location, password);
+        console.log(dataList)
     })
 }

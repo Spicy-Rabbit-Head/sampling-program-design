@@ -1,16 +1,26 @@
-import {useGlobalStore} from "@/store";
+import {useConfigStore, useGlobalStore} from "@/store";
 import {useIpcRenderer} from "@vueuse/electron";
 
 const {on} = useIpcRenderer()
 
 export function useIpcReceiveEvent() {
     const globalStore = useGlobalStore();
+    const configStore = useConfigStore();
     // 数据初始化
     on('main-receive-init', (_, data: any) => {
         globalStore.filePath = data.filePath
         globalStore.currentPort = data.currentPort
         globalStore.currentCalibrationMode = data.currentCalibrationMode
         globalStore.communicationMode = data.communicationMode
+        globalStore.currentAddress = data.currentAddress
+    })
+
+    // 读取可修改配置
+    on('main-receive-read-configuration', (_, data: any) => {
+        configStore.iniConfiguration = data.iniConfiguration
+        configStore.standardProductPath = data.standardProductPath
+        configStore.standardProductPassword = data.standardProductPassword
+        configStore.permissionPassword = data.permissionPassword
     })
 
     // 读取250BINI配置
@@ -47,9 +57,19 @@ export function useIpcReceiveEvent() {
         })
     })
 
-    // 选择文件
-    on('main-receive-select-file', (_, path: string) => {
+    // 选择文件-QCC
+    on('main-receive-qcc-select-file', (_, path: string) => {
         globalStore.filePath = path
+    })
+
+    // 选择文件-INI
+    on('main-receive-ini-select-file', (_, path: string) => {
+        configStore.iniConfiguration = path
+    })
+
+    // 选择文件-标品
+    on('main-receive-standard-select-file', (_, path: string) => {
+        configStore.standardProductPath = path
     })
 
     // 取消选择文件

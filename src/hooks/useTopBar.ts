@@ -32,6 +32,11 @@ const menuOptions = ref<Array<MenuOptions>>([
         key: 'test2',
         class: ''
     },
+    {
+        label: '配置页',
+        key: 'ConfigurationPage',
+        class: ''
+    },
 ])
 
 export function useTopBar() {

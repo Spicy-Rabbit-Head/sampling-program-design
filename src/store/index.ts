@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import {GlobalStoreInterface} from "@/type/interface.ts";
+import {ConfigStoreInterface, GlobalStoreInterface} from "@/type/interface.ts";
 // 当前文件正则
 const regex: RegExp = /\\([^\\.]+)\./;
 
@@ -37,4 +37,20 @@ export const useGlobalStore = defineStore('GlobalStore', {
         }
     },
     actions: {}
+})
+
+
+export const useConfigStore = defineStore('ConfigStore', {
+    state: (): ConfigStoreInterface => {
+        return {
+            // 250B配置文件路径
+            iniConfiguration: '',
+            // 标品配置文件路径
+            standardProductPath: '',
+            // 标品数据密码
+            standardProductPassword: '',
+            // 权限密码
+            permissionPassword: ''
+        }
+    }
 })
