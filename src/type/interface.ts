@@ -64,4 +64,5 @@ export type ConfigStoreInterface = {
     standardProductPath: string,
     standardProductPassword: string,
     permissionPassword: string,
+    currentWorkshop: string,
 }

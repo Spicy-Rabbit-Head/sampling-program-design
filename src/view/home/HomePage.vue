@@ -12,11 +12,11 @@ const {
   select
 } = useHome();
 
-const {RenderThreadInitialization, DLLInitialization} = useIpcSendEvent();
+const {renderThreadInitialization, dllInitialization} = useIpcSendEvent();
 
 onMounted(() => {
-  RenderThreadInitialization();
-  DLLInitialization();
+  renderThreadInitialization();
+  dllInitialization();
 })
 
 </script>

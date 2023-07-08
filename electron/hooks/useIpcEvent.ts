@@ -38,6 +38,14 @@ const LocalStoreInterface = {
     // 权限密码
     permissionPassword: {
         type: 'string',
+    },
+    // 当前车间
+    currentWorkshop: {
+        type: 'string',
+    },
+    // 当前地址
+    location: {
+        type: 'string',
     }
 }
 
@@ -52,7 +60,6 @@ const {
 export function useIpcEvent(main: BrowserWindow) {
     // 本地配置储存
     const localStore = new Store({LocalStoreInterface});
-    // const {currentFileName} = storeToRefs(useGlobalStore());
     console.log(localStore.store)
 
     // 最小化
@@ -105,6 +112,24 @@ export function useIpcEvent(main: BrowserWindow) {
                 })
             }
             event.reply('main-receive-read-ini', calibrationList)
+        } catch (e) {
+            event.reply('main-receive-read-ini-error', e)
+        }
+    })
+
+    // 车间列表读取
+    ipcMain.on('main-send-workshop-list-query', function (event) {
+        try {
+            let iniRead = ini.parse(fs.readFileSync(__dirname + '../../customConfig.ini', 'utf8'));
+            let calibrationList: Array<SelectOption> = [];
+            for (let key in iniRead.WORKSHOP) {
+                calibrationList.push({
+                    label: key,
+                    value: key,
+                    location: iniRead.WORKSHOP[key]
+                })
+            }
+            event.reply('main-receive-workshop-list-update', calibrationList)
         } catch (e) {
             event.reply('main-receive-read-ini-error', e)
         }
@@ -192,12 +217,15 @@ export function useIpcEvent(main: BrowserWindow) {
     })
 
     // 标品 Access 查询
-    ipcMain.on('main-send-standard-access-query', function (_, pn) {
+    ipcMain.on('main-send-standard-access-query', function (event, pn) {
         let path = localStore.get('standardProductPath');
-        // let location = localStore.get('location');
-        let location = 'P4-2F'
+        let location = localStore.get('location');
         let password = localStore.get('standardProductPassword');
         let dataList = StandardProductQuery(path, pn, location, password);
-        console.log(dataList)
+        if (dataList == null) {
+            event.reply('main-receive-standard-query-error')
+        } else {
+            event.reply('main-receive-standard-query-success', dataList)
+        }
     })
 }

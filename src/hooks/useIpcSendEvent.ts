@@ -1,30 +1,34 @@
 import {useIpcRenderer} from "@vueuse/electron";
+import {storeToRefs} from "pinia";
+import {useGlobalStore} from "@/store";
 
-const {send} = useIpcRenderer()
+const {send} = useIpcRenderer();
 
 export function useIpcSendEvent() {
+    const {currentFileName} = storeToRefs(useGlobalStore());
+
     // 渲染线程初始化
-    function RenderThreadInitialization() {
+    function renderThreadInitialization() {
         send('main-send-init');
     }
 
     // DLL初始化
-    function DLLInitialization() {
+    function dllInitialization() {
         send('main-send-dll-init');
     }
 
     // 开启文件选择对话框-读取QCC文件
-    function ReadNumberFile() {
+    function readNumberFile() {
         send('main-send-open-qcc-dialog');
     }
 
     // 端口选择更新
-    function PortUpdate(value: string) {
+    function portUpdate(value: string) {
         send('main-send-set-store', 'currentPort', value);
     }
 
     // 窗口功能
-    function TopBarFunction(i: number) {
+    function topBarFunction(i: number) {
         switch (i) {
             case 0:
                 send('main-send-window-min')
@@ -42,37 +46,37 @@ export function useIpcSendEvent() {
     }
 
     // 校准模式更新
-    function CalibrationModeUpdate(value: string) {
+    function calibrationModeUpdate(value: string) {
         send('main-send-set-store', 'currentCalibrationMode', value);
     }
 
     // 通讯模式更新
-    function CommunicationModeUpdate(value: string) {
+    function communicationModeUpdate(value: string) {
         send('main-send-set-store', 'communicationMode', value);
     }
 
     // 读取串口列表
-    function ReadPortList() {
+    function readPortList() {
         send('main-send-get-port-list');
     }
 
     // 读取250BINI配置
-    function ReadIniConfiguration() {
+    function readIniConfiguration() {
         send('main-send-read-ini');
     }
 
     // 250BINI配置更新
-    function IniConfigurationUpdate() {
+    function iniConfigurationUpdate() {
         send('main-send-open-ini-dialog');
     }
 
     // 读取可修改配置
-    function ReadModifiableConfigurations() {
+    function readModifiableConfigurations() {
         send('main-send-read-configuration');
     }
 
     // 标品路径更新
-    function StandardProductPathUpdate() {
+    function standardProductPathUpdate() {
         send('main-send-open-standard-dialog');
     }
 
@@ -82,24 +86,37 @@ export function useIpcSendEvent() {
     }
 
     // 标品数据查询
-    function standardProductQuery(value: string) {
-        send('main-send-standard-access-query', value);
+    function standardProductQuery() {
+        send('main-send-standard-access-query', currentFileName.value);
+    }
+
+    // 车间列表查询
+    function workshopListQuery() {
+        send('main-send-workshop-list-query');
+    }
+
+    // 当前车间选项更新
+    function workshopListUpdate(value: any, data: any) {
+        send('main-send-set-store', 'currentWorkshop', value);
+        send('main-send-set-store', 'location', data.location);
     }
 
     return {
-        RenderThreadInitialization,
-        DLLInitialization,
-        ReadNumberFile,
-        ReadPortList,
-        TopBarFunction,
-        PortUpdate,
-        CalibrationModeUpdate,
-        ReadIniConfiguration,
-        CommunicationModeUpdate,
-        ReadModifiableConfigurations,
-        StandardProductPathUpdate,
+        renderThreadInitialization,
+        dllInitialization,
+        readNumberFile,
+        readPortList,
+        topBarFunction,
+        portUpdate,
+        calibrationModeUpdate,
+        readIniConfiguration,
+        communicationModeUpdate,
+        readModifiableConfigurations,
+        standardProductPathUpdate,
         standardProductPasswordUpdate,
-        IniConfigurationUpdate,
+        iniConfigurationUpdate,
         standardProductQuery,
+        workshopListQuery,
+        workshopListUpdate,
     }
 }

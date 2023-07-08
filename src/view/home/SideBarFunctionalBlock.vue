@@ -3,6 +3,7 @@ import {useHome} from "@/hooks/useHome.ts";
 import {useGlobalStore} from "@/store";
 import {storeToRefs} from "pinia";
 import {useIpcSendEvent} from "@/hooks/useIpcSendEvent.ts";
+import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
 
 const {
   autoButton,
@@ -12,9 +13,11 @@ const {
   optionsExhibition,
 } = useHome();
 
+const {calibrationStatus} = useProofreadingMachine();
+
 const {currentFileName, filePath} = storeToRefs(useGlobalStore());
 
-const {ReadNumberFile} = useIpcSendEvent();
+const {readNumberFile} = useIpcSendEvent();
 
 </script>
 
@@ -23,7 +26,7 @@ const {ReadNumberFile} = useIpcSendEvent();
     <n-input-group>
       <n-input-group-label class="t-bg-gray-100">当前料号 :</n-input-group-label>
       <n-input class="t-font-mono" placeholder="" readonly v-model:value="currentFileName"/>
-      <n-button type="warning" :disabled="autoButton" @click="ReadNumberFile">
+      <n-button type="warning" :disabled="autoButton || calibrationStatus" @click="readNumberFile">
         修改
       </n-button>
     </n-input-group>
@@ -36,7 +39,7 @@ const {ReadNumberFile} = useIpcSendEvent();
       <n-input-group-label>当前选择 :</n-input-group-label>
       <n-input placeholder="" readonly v-model:value="optionsExhibition"/>
     </n-input-group>
-    <n-button :disabled="autoButton" @click.stop="startSwitch" type="success">
+    <n-button :disabled="autoButton || calibrationStatus" @click.stop="startSwitch" type="success">
       自动抽测
     </n-button>
     <n-button :disabled="!autoButton" @click.stop="startSwitch" type="error">

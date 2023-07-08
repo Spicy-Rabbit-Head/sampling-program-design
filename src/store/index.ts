@@ -50,7 +50,9 @@ export const useConfigStore = defineStore('ConfigStore', {
             // 标品数据密码
             standardProductPassword: '',
             // 权限密码
-            permissionPassword: ''
+            permissionPassword: '',
+            // 当前车间
+            currentWorkshop: '',
         }
     }
 })

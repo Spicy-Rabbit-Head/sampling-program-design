@@ -7,26 +7,15 @@ const calibrationStatus = ref<boolean>(false);
 // 标品编号
 const standardNumber = ref<string>('2500')
 
-// 校对机开启状态反转
-function stateReversal() {
-    if (calibrationStatus.value) {
-        calibrationStatus.value = false
-        return
-    }
+// 自动校对机开启
+function automaticCalibrationStarts() {
     calibrationStatus.value = true
 }
 
-// 通讯方式
-const modes = [
-    {
-        label: "串口",
-        value: "serialPort"
-    },
-    {
-        label: '以太网',
-        value: 'ethernet'
-    },
-]
+// 自动校对机停止
+function automaticCalibrationStop() {
+    calibrationStatus.value = false
+}
 
 // 日志数据
 const logs = reactive<Array<Log>>([
@@ -37,7 +26,7 @@ const logs = reactive<Array<Log>>([
 ])
 
 // 标品状态
-const standardProducts = [
+const standardProducts = reactive([
     {
         label: '23',
         value: '2.1',
@@ -50,7 +39,7 @@ const standardProducts = [
         label: '25',
         value: '2.3',
     }
-]
+])
 
 // 校机步骤
 const phase = ['短路', '负载', '开路', '对机']
@@ -90,19 +79,19 @@ for (let i = 0; i < phase.length; i++) {
 const outputDisplay = [
     {
         label: '对机标品编号 :',
-        value: '25',
+        value: 'N/A',
     },
     {
         label: '对机标品值 :',
-        value: '2.1',
+        value: 'N/A',
     },
     {
         label: '验证标品编号 :',
-        value: '26',
+        value: 'N/A',
     },
     {
         label: '验证标品值 :',
-        value: '2.0',
+        value: 'N/A',
     }
 ];
 
@@ -215,27 +204,33 @@ const dataBase = reactive([
     ]
 ]);
 
-// 修改颜色
-function changeColor(i1: number, i2: number) {
-    if (i2) {
-        dataBase[i1][i2].style = 't-bg-red-500'
-    }
-}
-
-// 右键菜单修改颜色
-function contextmenuChangeColor(i1: number, i2: number) {
-    if (i2) {
-        dataBase[i1][i2].style = 't-bg-green-500'
-    }
-}
-
 
 export function useProofreadingMachine() {
+    // 修改颜色
+    function changeColor(i1: number, i2: number) {
+        if (i2) {
+            dataBase[i1][i2].style = 't-bg-red-500'
+        }
+    }
+
+    // 右键菜单修改颜色
+    function contextmenuChangeColor(i1: number, i2: number) {
+        if (i2) {
+            dataBase[i1][i2].style = 't-bg-green-500'
+        }
+    }
+
+    // 标品状态更新
+    function updateStandardStatus(value: any) {
+        standardProducts.length = 0
+        standardProducts.push(...value)
+    }
+
     return {
         calibrationStatus,
-        stateReversal,
+        automaticCalibrationStarts,
+        automaticCalibrationStop,
         standardNumber,
-        modes,
         logs,
         standardProducts,
         steps,
@@ -243,6 +238,7 @@ export function useProofreadingMachine() {
         columns,
         dataBase,
         changeColor,
-        contextmenuChangeColor
+        contextmenuChangeColor,
+        updateStandardStatus,
     }
 }

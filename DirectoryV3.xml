@@ -29,4 +29,6 @@
     <tree path="/src/hooks" title="闭包"/>
     <tree path="/src/hooks/useIpcReceiveEvent.ts" title="IPC接收闭包"/>
     <tree path="/src/view/configuration" title="配置"/>
+    <tree path="/src/view/configuration/ConfigurationPage.vue" title="配置页"/>
+    <tree path="/src/hooks/useConfig.ts" title="配置闭包"/>
 </trees>

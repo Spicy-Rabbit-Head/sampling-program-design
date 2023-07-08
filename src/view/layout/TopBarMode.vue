@@ -13,7 +13,7 @@ const router = useRouter()
 
 const {topBarWindowState} = useGlobalStore()
 
-const {TopBarFunction} = useIpcSendEvent();
+const {topBarFunction} = useIpcSendEvent();
 
 // 窗口功能Icon
 const topBarWindow: TopBarWindow[] = [
@@ -83,7 +83,7 @@ function tagsToggle(key: string) {
       <!-- 窗口功能 -->
       <div class="t-flex t-flex-none">
         <span v-for="(item,index) in topBarWindowState" :key="index" class="hover:t-text-sky-500">
-          <component v-if="item" class="t-mx-1" :is="topBarWindow[index]" @click.stop="TopBarFunction(index)"/>
+          <component v-if="item" class="t-mx-1" :is="topBarWindow[index]" @click.stop="topBarFunction(index)"/>
         </span>
       </div>
     </div>
