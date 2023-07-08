@@ -1,17 +1,65 @@
 <script setup lang="ts">
-import {useTopBar} from "@/hooks/useTopBar.ts";
 import {useGlobalStore} from "@/store";
+import {useIpcSendEvent} from "@/hooks/useIpcSendEvent.ts";
+import {MenuOptions, TopBarWindow} from "@/type/interface.ts";
+import IconAntDesignMinusOutlined from "~icons/ant-design/minus-outlined"
+import IconAntDesignBlockOutlined from "~icons/ant-design/block-outlined"
+import IconAntDesignBorderOutlined from "~icons/ant-design/border-outlined"
+import IconAntDesignCloseOutlined from "~icons/ant-design/close-outlined"
+import {reactive} from "vue";
+import {useRouter} from "vue-router";
 
-const {
-  topBarWindow,
-  topBarFunction,
-  menuOptions,
-  tagsToggle
-} = useTopBar()
+const router = useRouter()
 
-const {
-  topBarWindowState
-} = useGlobalStore()
+const {topBarWindowState} = useGlobalStore()
+
+const {TopBarFunction} = useIpcSendEvent();
+
+// 窗口功能Icon
+const topBarWindow: TopBarWindow[] = [
+  IconAntDesignMinusOutlined,
+  IconAntDesignBlockOutlined,
+  IconAntDesignBorderOutlined,
+  IconAntDesignCloseOutlined,
+]
+// 菜单
+const menuOptions = reactive<Array<MenuOptions>>([
+  {
+    label: '首页',
+    key: 'Home',
+    class: 't-text-emerald-500'
+  },
+  {
+    label: '校对机',
+    key: 'Verifier',
+    class: ''
+  },
+  {
+    label: '刹车点',
+    key: 'test2',
+    class: ''
+  },
+  {
+    label: '配置页',
+    key: 'ConfigurationPage',
+    class: ''
+  },
+])
+
+// 菜单切换
+function tagsToggle(key: string) {
+  router.replace({name: key}).then(
+      () => {
+        menuOptions.forEach(item => {
+          if (item.key === key) {
+            item.class = 't-text-emerald-500'
+          } else {
+            item.class = ''
+          }
+        })
+      }
+  )
+}
 
 </script>
 <template>
@@ -35,7 +83,7 @@ const {
       <!-- 窗口功能 -->
       <div class="t-flex t-flex-none">
         <span v-for="(item,index) in topBarWindowState" :key="index" class="hover:t-text-sky-500">
-          <component v-if="item" class="t-mx-1" :is="topBarWindow[index]" @click.stop="topBarFunction(index)"/>
+          <component v-if="item" class="t-mx-1" :is="topBarWindow[index]" @click.stop="TopBarFunction(index)"/>
         </span>
       </div>
     </div>

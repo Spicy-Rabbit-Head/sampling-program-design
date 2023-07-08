@@ -8,8 +8,6 @@
     <tree path="/src/view/home/SideBarFunctionalBlock.vue" title="侧栏功能"/>
     <tree path="/src/view/home/SideBarDataBlock.vue" title="侧栏数据"/>
     <tree path="/src/view/home/SideBarExhibitionBlock.vue" title="侧栏展示"/>
-    <tree path="/src/hooks/useTopBar.ts" title="顶栏闭包" extension="" presentableText="" tooltipTitle="" icon=""
-          textColor="" backgroundColor=""/>
     <tree path="/src/hooks/useEcharts.ts" title="图表闭包" extension="" presentableText="" tooltipTitle="" icon=""
           textColor="" backgroundColor=""/>
     <tree path="/src/view/layout/TopBarMode.vue" title="顶栏模块"/>

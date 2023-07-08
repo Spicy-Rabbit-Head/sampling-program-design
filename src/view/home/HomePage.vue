@@ -2,24 +2,24 @@
 
 import SideBar from "@/view/home/SideBar.vue";
 
-import {useIpcRenderer} from "@vueuse/electron";
 import {onMounted} from "vue";
 import {useHome} from "@/hooks/useHome.ts";
+import {useIpcSendEvent} from "@/hooks/useIpcSendEvent.ts";
 
 const {
   mainTable,
   selectPass,
   select
 } = useHome();
-const ipcRenderer = useIpcRenderer()
+
+const {RenderThreadInitialization, DLLInitialization} = useIpcSendEvent();
+
 onMounted(() => {
-  ipcRenderer.send('main-send-init')
-  ipcRenderer.send('main-send-dll-init')
+  RenderThreadInitialization();
+  DLLInitialization();
 })
 
 </script>
-
-
 <template>
   <div class="t-h-full t-select-none t-flex t-p-1">
     <div class="t-w-[500px] t-flex-auto t-grid t-grid-cols-32 t-gap-0.5">

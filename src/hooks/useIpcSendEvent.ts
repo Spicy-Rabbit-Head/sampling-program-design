@@ -3,6 +3,16 @@ import {useIpcRenderer} from "@vueuse/electron";
 const {send} = useIpcRenderer()
 
 export function useIpcSendEvent() {
+    // 渲染线程初始化
+    function RenderThreadInitialization() {
+        send('main-send-init');
+    }
+
+    // DLL初始化
+    function DLLInitialization() {
+        send('main-send-dll-init');
+    }
+
     // 开启文件选择对话框-读取QCC文件
     function ReadNumberFile() {
         send('main-send-open-qcc-dialog');
@@ -11,6 +21,24 @@ export function useIpcSendEvent() {
     // 端口选择更新
     function PortUpdate(value: string) {
         send('main-send-set-store', 'currentPort', value);
+    }
+
+    // 窗口功能
+    function TopBarFunction(i: number) {
+        switch (i) {
+            case 0:
+                send('main-send-window-min')
+                break
+            case 1:
+                send('main-send-window-restore')
+                break
+            case 2:
+                send('main-send-window-max')
+                break
+            case 3:
+                send('main-send-window-close')
+                break
+        }
     }
 
     // 校准模式更新
@@ -59,8 +87,11 @@ export function useIpcSendEvent() {
     }
 
     return {
+        RenderThreadInitialization,
+        DLLInitialization,
         ReadNumberFile,
         ReadPortList,
+        TopBarFunction,
         PortUpdate,
         CalibrationModeUpdate,
         ReadIniConfiguration,

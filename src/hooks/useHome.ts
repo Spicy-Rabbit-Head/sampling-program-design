@@ -4,6 +4,13 @@ import type {tab} from "@/type/interface.ts";
 // 主体表格
 const mainTable = reactive<Array<tab>>([]);
 
+// 初始化主体表格
+for (let i = 1; i <= 24; i++) {
+    for (let j = 1; j <= 32; j++) {
+        mainTable.push({path: `${i}-${j}`, class: ""});
+    }
+}
+
 // 料盘选项
 const options = [
     {
@@ -11,13 +18,6 @@ const options = [
         value: 0,
     },
 ]
-
-// 初始化主体表格
-for (let i = 1; i <= 24; i++) {
-    for (let j = 1; j <= 32; j++) {
-        mainTable.push({path: `${i}-${j}`, class: ""});
-    }
-}
 
 // 初始化选项列表
 for (let i = 1; i <= 2; i++) {
