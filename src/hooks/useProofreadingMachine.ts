@@ -7,8 +7,8 @@ const calibrationStatus = ref<boolean>(false);
 // 标品编号
 const standardNumber = ref<string>('2500')
 
-// 自动校对机开启
-function automaticCalibrationStarts() {
+// 自动校对机开始
+function calibrationStarts() {
     calibrationStatus.value = true
 }
 
@@ -228,7 +228,7 @@ export function useProofreadingMachine() {
 
     return {
         calibrationStatus,
-        automaticCalibrationStarts,
+        calibrationStarts,
         automaticCalibrationStop,
         standardNumber,
         logs,

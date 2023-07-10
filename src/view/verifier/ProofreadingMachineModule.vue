@@ -16,7 +16,6 @@ import {useNotification} from "naive-ui";
 // 校对机闭包
 const {
   calibrationStatus,
-  automaticCalibrationStarts,
   automaticCalibrationStop,
   logs,
   standardProducts
@@ -43,10 +42,11 @@ const {
   readPortList,
   standardProductQuery,
   readNumberFile,
+  automaticCalibrationStarts,
 } = useIpcSendEvent();
 
 onMounted(() => {
-  standardProductQuery();
+  standardProductQuery(currentFileName.value);
 })
 
 // 通讯方式
@@ -76,7 +76,7 @@ const visible = ref<boolean>(false);
 // 刷新状态
 function refreshStatus() {
   loading.value = true
-  standardProductQuery();
+  standardProductQuery(currentFileName.value);
   setTimeout(() => {
     loading.value = false
   }, 500)
@@ -102,12 +102,12 @@ function openDialogBox() {
 // 对话框确认
 function handleBeforeOk() {
   if (dockingNumber.value === '' || verificationNumber.value === '') {
+    errorNotification('对机编号和验证编号不能为空');
     return false;
   }
   if (dockingNumber.value === verificationNumber.value) {
+    errorNotification('对机编号和验证编号不能相同');
     return false;
-  } else {
-    console.log(1)
   }
   return true;
 }

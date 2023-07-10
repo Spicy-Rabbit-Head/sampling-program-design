@@ -1,12 +1,10 @@
 import {useIpcRenderer} from "@vueuse/electron";
-import {storeToRefs} from "pinia";
-import {useGlobalStore} from "@/store";
+import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
 
 const {send} = useIpcRenderer();
+const {calibrationStarts} = useProofreadingMachine();
 
 export function useIpcSendEvent() {
-    const {currentFileName} = storeToRefs(useGlobalStore());
-
     // 渲染线程初始化
     function renderThreadInitialization() {
         send('main-send-init');
@@ -86,8 +84,8 @@ export function useIpcSendEvent() {
     }
 
     // 标品数据查询
-    function standardProductQuery() {
-        send('main-send-standard-access-query', currentFileName.value);
+    function standardProductQuery(file: string) {
+        send('main-send-standard-access-query', file);
     }
 
     // 车间列表查询
@@ -99,6 +97,12 @@ export function useIpcSendEvent() {
     function workshopListUpdate(value: any, data: any) {
         send('main-send-set-store', 'currentWorkshop', value);
         send('main-send-set-store', 'location', data.location);
+    }
+
+    // 自动校准开始
+    function automaticCalibrationStarts() {
+        calibrationStarts();
+        send('main-send-auto-calibration-start');
     }
 
     return {
@@ -118,5 +122,6 @@ export function useIpcSendEvent() {
         standardProductQuery,
         workshopListQuery,
         workshopListUpdate,
+        automaticCalibrationStarts,
     }
 }

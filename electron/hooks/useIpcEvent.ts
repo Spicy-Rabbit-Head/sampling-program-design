@@ -228,4 +228,9 @@ export function useIpcEvent(main: BrowserWindow) {
             event.reply('main-receive-standard-query-success', dataList)
         }
     })
+
+    // 自动校准开始
+    ipcMain.on('main-send-auto-calibration-start', function () {
+        console.log(2333)
+    })
 }
