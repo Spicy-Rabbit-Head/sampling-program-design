@@ -1,12 +1,15 @@
 import {BrowserWindow, ipcMain, dialog} from "electron";
 import {useMeasurement} from "./useMeasurement";
 import {SelectOption} from "naive-ui";
+import {Worker} from "worker_threads";
+
 
 const Store = require('electron-store');
-const ini = require('ini');
-const fs = require('fs');
+import ini from 'ini';
+import fs from 'fs';
+import {join, resolve} from "path";
 
-const LocalStoreInterface = {
+type LocalStoreInterface = {
     // 当前QCC文件路径
     filePath: {
         type: 'string',
@@ -56,10 +59,11 @@ const {
     StandardProductQuery,
 } = useMeasurement();
 
+
 // 事件监听
 export function useIpcEvent(main: BrowserWindow) {
     // 本地配置储存
-    const localStore = new Store({LocalStoreInterface});
+    const localStore = new Store();
     console.log(localStore.store)
 
     // 最小化
@@ -221,7 +225,7 @@ export function useIpcEvent(main: BrowserWindow) {
         let path = localStore.get('standardProductPath');
         let location = localStore.get('location');
         let password = localStore.get('standardProductPassword');
-        let dataList = StandardProductQuery(path, pn, location, password);
+        let dataList = StandardProductQuery(path as string, pn, location as string, password as string);
         if (dataList == null) {
             event.reply('main-receive-standard-query-error')
         } else {
@@ -231,6 +235,10 @@ export function useIpcEvent(main: BrowserWindow) {
 
     // 自动校准开始
     ipcMain.on('main-send-auto-calibration-start', function () {
-        console.log(2333)
+        const worker = new Worker(resolve() + '/public/workers/autoCalibration.js');
+
+        worker.on('message', (message) => {
+            console.log(message)
+        });
     })
 }

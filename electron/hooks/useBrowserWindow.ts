@@ -21,6 +21,8 @@ export function useBrowserWindow() {
                 nodeIntegration: true,
                 // 关闭安全警告
                 contextIsolation: false,
+                // 辅助节点集成
+                nodeIntegrationInWorker: true,
             },
             // 标题
             title: 'Vite Electron App',
