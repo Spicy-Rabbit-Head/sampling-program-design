@@ -36,6 +36,13 @@ export default defineConfig({
             compiler: 'vue3'
         })
     ],
+    build: {
+        rollupOptions: {
+            input: {
+                foo: join(__dirname, 'electron/worker/foo.html'),
+            }
+        }
+    },
     resolve: {
         alias: {
             '@': join(__dirname, 'src'),

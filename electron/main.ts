@@ -3,13 +3,14 @@ import {useBrowserWindow} from "./hooks/useBrowserWindow";
 import {useIpcEvent} from "./hooks/useIpcEvent";
 import {useIpcViewportEvent} from "./hooks/useIpcViewportEvent";
 
-const {buildMainWindow} = useBrowserWindow();
+const {buildMainWindow, workerWindow} = useBrowserWindow();
 // 主进程入口
 app.whenReady().then(() => {
     // 窗口建造
     const main = buildMainWindow();
+    const worker = workerWindow();
     // 事件监听
-    useIpcEvent(main)
+    useIpcEvent(main, worker)
     useIpcViewportEvent(main)
 });
 

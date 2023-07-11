@@ -5,104 +5,104 @@ const {send} = useIpcRenderer();
 const {calibrationStarts} = useProofreadingMachine();
 
 export function useIpcSendEvent() {
-    // 渲染线程初始化
+    // 渲染进程初始化
     function renderThreadInitialization() {
-        send('main-send-init');
+        send('render-send-init');
     }
 
-    // DLL初始化
+    // 渲染进程发起DLL初始化
     function dllInitialization() {
-        send('main-send-dll-init');
+        send('render-send-dll-init');
     }
 
     // 开启文件选择对话框-读取QCC文件
     function readNumberFile() {
-        send('main-send-open-qcc-dialog');
+        send('render-send-open-qcc-dialog');
     }
 
     // 端口选择更新
     function portUpdate(value: string) {
-        send('main-send-set-store', 'currentPort', value);
+        send('render-send-set-store', 'currentPort', value);
     }
 
     // 窗口功能
     function topBarFunction(i: number) {
         switch (i) {
             case 0:
-                send('main-send-window-min')
+                send('render-send-window-min')
                 break
             case 1:
-                send('main-send-window-restore')
+                send('render-send-window-restore')
                 break
             case 2:
-                send('main-send-window-max')
+                send('render-send-window-max')
                 break
             case 3:
-                send('main-send-window-close')
+                send('render-send-window-close')
                 break
         }
     }
 
     // 校准模式更新
     function calibrationModeUpdate(value: string) {
-        send('main-send-set-store', 'currentCalibrationMode', value);
+        send('render-send-set-store', 'currentCalibrationMode', value);
     }
 
     // 通讯模式更新
     function communicationModeUpdate(value: string) {
-        send('main-send-set-store', 'communicationMode', value);
+        send('render-send-set-store', 'communicationMode', value);
     }
 
     // 读取串口列表
     function readPortList() {
-        send('main-send-get-port-list');
+        send('render-send-get-port-list');
     }
 
     // 读取250BINI配置
     function readIniConfiguration() {
-        send('main-send-read-ini');
+        send('render-send-read-ini');
     }
 
     // 250BINI配置更新
     function iniConfigurationUpdate() {
-        send('main-send-open-ini-dialog');
+        send('render-send-open-ini-dialog');
     }
 
     // 读取可修改配置
     function readModifiableConfigurations() {
-        send('main-send-read-configuration');
+        send('render-send-read-configuration');
     }
 
     // 标品路径更新
     function standardProductPathUpdate() {
-        send('main-send-open-standard-dialog');
+        send('render-send-open-standard-dialog');
     }
 
     // 标品数据密码更新
     function standardProductPasswordUpdate(value: string) {
-        send('main-send-set-store', 'standardProductPassword', value);
+        send('render-send-set-store', 'standardProductPassword', value);
     }
 
     // 标品数据查询
     function standardProductQuery(file: string) {
-        send('main-send-standard-access-query', file);
+        send('render-send-standard-query', file);
     }
 
     // 车间列表查询
     function workshopListQuery() {
-        send('main-send-workshop-list-query');
+        send('render-send-workshop-list-query');
     }
 
     // 当前车间选项更新
     function workshopListUpdate(value: any, data: any) {
-        send('main-send-set-store', 'currentWorkshop', value);
-        send('main-send-set-store', 'location', data.location);
+        send('render-send-set-store', 'currentWorkshop', value);
+        send('render-send-set-store', 'location', data.location);
     }
 
     // 自动校准开始
     function automaticCalibrationStarts() {
         calibrationStarts();
-        send('main-send-auto-calibration-start');
+        send('render-send-auto-calibration-start');
     }
 
     return {

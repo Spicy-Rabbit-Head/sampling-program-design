@@ -21,7 +21,8 @@
     "pinia": "^2.1.4",
     "vue": "^3.3.4",
     "vue-echarts": "^6.6.0",
-    "vue-router": "^4.2.2"
+    "vue-router": "^4.2.2",
+    "workerpool": "^6.4.0"
   },
   "devDependencies": {
     "@arco-design/web-vue": "^2.47.1",

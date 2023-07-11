@@ -1,4 +1,5 @@
 import {BrowserWindow} from "electron";
+import {posix} from "path"
 
 // 窗口建造
 export function useBrowserWindow() {
@@ -38,7 +39,27 @@ export function useBrowserWindow() {
         return main
     }
 
+    function workerWindow() {
+        const worker = new BrowserWindow({
+            show: false,
+            webPreferences: {
+                // 是否启用node集成
+                nodeIntegration: true,
+                // 关闭安全警告
+                contextIsolation: false,
+                // 辅助节点集成
+                nodeIntegrationInWorker: true,
+            }
+        })
+        if (process.env.VITE_DEV_SERVER_URL) {
+            worker.webContents.toggleDevTools();
+            worker.loadURL(posix.join(process.env.VITE_DEV_SERVER_URL, 'electron/worker', 'foo.html')).then()
+        }
+        return worker;
+    }
+
     return {
-        buildMainWindow
+        buildMainWindow,
+        workerWindow
     }
 }
