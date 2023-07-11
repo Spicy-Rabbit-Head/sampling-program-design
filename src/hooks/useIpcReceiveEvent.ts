@@ -99,4 +99,8 @@ export function useIpcReceiveEvent() {
     on('main-receive-workshop-list-update', (_, workshopList) => {
         addWorkshopOptions(workshopList)
     })
+
+    on('main-receive-auto-calibration-message', (_, data) => {
+        console.log(data)
+    })
 }

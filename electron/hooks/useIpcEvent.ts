@@ -1,13 +1,11 @@
 import {BrowserWindow, ipcMain, dialog} from "electron";
 import {useMeasurement} from "./useMeasurement";
 import {SelectOption} from "naive-ui";
-import {Worker} from "worker_threads";
 
 
 const Store = require('electron-store');
 import ini from 'ini';
 import fs from 'fs';
-import {join, resolve} from "path";
 
 type LocalStoreInterface = {
     // 当前QCC文件路径
@@ -234,11 +232,9 @@ export function useIpcEvent(main: BrowserWindow) {
     })
 
     // 自动校准开始
-    ipcMain.on('main-send-auto-calibration-start', function () {
-        const worker = new Worker(resolve() + '/public/workers/autoCalibration.js');
-
-        worker.on('message', (message) => {
-            console.log(message)
-        });
+    ipcMain.on('main-send-auto-calibration-start', function (event) {
+        const wind = setInterval(() => {
+            event.reply('main-receive-auto-calibration-message', '66666666666')
+        }, 2000)
     })
 }
