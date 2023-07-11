@@ -23,6 +23,7 @@ export function useIpcSendEvent() {
     // 端口选择更新
     function portUpdate(value: string) {
         send('render-send-set-store', 'currentPort', value);
+        send('render-send-serial-port-update', value);
     }
 
     // 窗口功能

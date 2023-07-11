@@ -204,7 +204,7 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
 
     // 渲染进程发起dll初始化
     ipcMain.on('render-send-dll-init', function () {
-        worker.webContents.send('worker-receive-dll-init')
+        worker.webContents.send('worker-receive-dll-init', localStore.get('currentPort'))
     })
 
     // 渲染进程获取串口列表
@@ -222,6 +222,10 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
         render.webContents.send('render-receive-port-list-update', portList)
     })
 
+    // 渲染进程发起串口端口更新
+    ipcMain.on('render-send-serial-port-update', function (_, port) {
+        worker.webContents.send('worker-receive-serial-port-update', port)
+    })
     // 渲染进程发起标品 Access 查询
     ipcMain.on('render-send-standard-query', function (event, pn) {
         let path = localStore.get('standardProductPath');

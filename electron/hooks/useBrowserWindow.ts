@@ -53,7 +53,7 @@ export function useBrowserWindow() {
         })
         if (process.env.VITE_DEV_SERVER_URL) {
             worker.webContents.toggleDevTools();
-            worker.loadURL(posix.join(process.env.VITE_DEV_SERVER_URL, 'electron/worker', 'foo.html')).then()
+            worker.loadURL(posix.join(process.env.VITE_DEV_SERVER_URL, 'electron/worker', 'worker.html')).then()
         }
         return worker;
     }

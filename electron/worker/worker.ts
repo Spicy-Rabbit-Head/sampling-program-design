@@ -32,6 +32,20 @@ const GetSerialPortList = edge.func({
     methodName: "GetSerialPortList",
 })
 
+// 设置串口
+const SetSerialPort = edge.func({
+    assemblyFile: url,
+    typeName: "Measurement.Sa250B",
+    methodName: "SetSerialPort",
+})
+
+// 获取串口
+const GetSerialPort = edge.func({
+    assemblyFile: url,
+    typeName: "Measurement.Sa250B",
+    methodName: "GetSerialPort",
+})
+
 // 标品数据查询
 const GetStandardProductData = edge.func({
     assemblyFile: url,
@@ -46,9 +60,10 @@ const Proofreading = edge.func({
     methodName: "Proofreading",
 })
 
+
 // 服务初始化启动
-function ServiceInit() {
-    Init(null, (error, result) => {
+function ServiceInit(port: string) {
+    Init(port, (error, result) => {
         if (error) {
             console.log(error)
             return
@@ -113,8 +128,6 @@ function CalibrationExecution(step: number, index: number, fixture: string) {
     }
     let status: boolean = true;
     Proofreading(data, (error, result) => {
-        console.log(error)
-        console.log(result)
         if (error) {
             console.log(error)
             status = false;
@@ -134,8 +147,8 @@ on("worker-receive-stop-service", () => {
 })
 
 // 工作进程服务初始化启动
-on("worker-receive-dll-init", () => {
-    ServiceInit()
+on("worker-receive-dll-init", (_, port) => {
+    ServiceInit(port)
 })
 
 // 工作进程串口列表更新
@@ -148,6 +161,17 @@ on("worker-receive-get-port-list", (event) => {
         // 工作进程串口列表更新
         event.sender.send('worker-send-port-list-update', portList)
     }
+})
+
+// 工作进程串口设置
+on("worker-receive-serial-port-update", (_, port) => {
+    SetSerialPort(port, (error, result) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+        console.log(result);
+    })
 })
 
 // 工作进程标品数据查询
@@ -164,13 +188,11 @@ on("worker-receive-standard-query", (event, path, pn, location, password) => {
 
 // 工作进程校准执行
 on("worker-receive-auto-calibration-start", (event, step, fixture) => {
-    let status = CalibrationExecution(step, 0, fixture);
-    if (status) {
-        // 工作进程校准执行成功
-        console.log("校准执行成功")
-    } else {
-        // 工作进程校准执行失败
-        console.log("校准执行失败")
+    for (let i = 0; i < 4; i++) {
+        CalibrationExecution(0, i, fixture);
+        GetSerialPort(null, (error, result) => {
+            console.log(result)
+        })
     }
 })
 

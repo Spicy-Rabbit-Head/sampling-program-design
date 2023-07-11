@@ -39,7 +39,7 @@ export default defineConfig({
     build: {
         rollupOptions: {
             input: {
-                foo: join(__dirname, 'electron/worker/foo.html'),
+                foo: join(__dirname, 'electron/worker/worker.html'),
             }
         }
     },
