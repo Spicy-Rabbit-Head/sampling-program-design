@@ -2,7 +2,7 @@ import {useIpcRenderer} from "@vueuse/electron";
 import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
 
 const {send} = useIpcRenderer();
-const {calibrationStarts} = useProofreadingMachine();
+const {calibrationStarts, step} = useProofreadingMachine();
 
 export function useIpcSendEvent() {
     // 渲染进程初始化
@@ -54,6 +54,12 @@ export function useIpcSendEvent() {
         send('render-send-set-store', 'communicationMode', value);
     }
 
+    // 校准运行模式更新
+    function proofreadingOperationModeUpdate(value: number) {
+        console.log(value)
+        send('render-send-set-store', 'proofreadingOperationMode', value);
+    }
+
     // 读取串口列表
     function readPortList() {
         send('render-send-get-port-list');
@@ -103,7 +109,12 @@ export function useIpcSendEvent() {
     // 自动校准开始
     function automaticCalibrationStarts() {
         calibrationStarts();
-        send('render-send-auto-calibration-start');
+        send('render-send-calibration-short-circuit-start', step.value);
+    }
+
+    // 丝杆动作
+    function screwAction(i: number) {
+        send('render-send-screw-action', i);
     }
 
     return {
@@ -124,5 +135,7 @@ export function useIpcSendEvent() {
         workshopListQuery,
         workshopListUpdate,
         automaticCalibrationStarts,
+        screwAction,
+        proofreadingOperationModeUpdate,
     }
 }

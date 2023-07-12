@@ -7,12 +7,15 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AButton: typeof import('@arco-design/web-vue')['Button']
+    AButtonGroup: typeof import('@arco-design/web-vue')['ButtonGroup']
     ADescriptions: typeof import('@arco-design/web-vue')['Descriptions']
     AInput: typeof import('@arco-design/web-vue')['Input']
     AModal: typeof import('@arco-design/web-vue')['Modal']
     AStep: typeof import('@arco-design/web-vue')['Step']
     ASteps: typeof import('@arco-design/web-vue')['Steps']
     NButton: typeof import('naive-ui')['NButton']
+    NButtonGroup: typeof import('naive-ui')['NButtonGroup']
     NConfigProvider: typeof import('naive-ui')['NConfigProvider']
     NIcon: typeof import('naive-ui')['NIcon']
     NInput: typeof import('naive-ui')['NInput']

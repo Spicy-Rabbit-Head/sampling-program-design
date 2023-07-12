@@ -26,7 +26,7 @@ export function useBrowserWindow() {
                 nodeIntegrationInWorker: true,
             },
             // 标题
-            title: 'Vite Electron App',
+            title: '抽测程式',
         });
         // 环境判断加载页面
         if (process.env.VITE_DEV_SERVER_URL) {
@@ -49,11 +49,14 @@ export function useBrowserWindow() {
                 contextIsolation: false,
                 // 辅助节点集成
                 nodeIntegrationInWorker: true,
-            }
+            },
+            title: '服务程式',
         })
         if (process.env.VITE_DEV_SERVER_URL) {
             worker.webContents.toggleDevTools();
             worker.loadURL(posix.join(process.env.VITE_DEV_SERVER_URL, 'electron/worker', 'worker.html')).then()
+        } else {
+            worker.loadFile('dist/electron/worker/worker.html').then();
         }
         return worker;
     }

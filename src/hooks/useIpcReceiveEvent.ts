@@ -8,7 +8,14 @@ const {on} = useIpcRenderer()
 export function useIpcReceiveEvent() {
     const globalStore = useGlobalStore();
     const configStore = useConfigStore();
-    const {updateStandardStatus} = useProofreadingMachine();
+    const {
+        step,
+        updateStandardStatus,
+        calibrationShortCircuitSuccess,
+        calibrationLoadSuccess,
+        calibrationOpenCircuitSuccess,
+        calibrationFail,
+    } = useProofreadingMachine();
     const {addWorkshopOptions} = useConfig();
 
     // 数据初始化
@@ -18,6 +25,7 @@ export function useIpcReceiveEvent() {
         globalStore.currentCalibrationMode = data.currentCalibrationMode
         globalStore.communicationMode = data.communicationMode
         globalStore.currentAddress = data.currentAddress
+        globalStore.proofreadingOperationMode = data.proofreadingOperationMode
     })
 
     // 读取可修改配置
@@ -105,7 +113,28 @@ export function useIpcReceiveEvent() {
         addWorkshopOptions(workshopList)
     })
 
-    on('render-receive-auto-calibration-message', (_, data) => {
-        console.log(data)
+    // 校准阶段失败
+    on('render-receive-calibration-progress-error', (_, result) => {
+        calibrationFail(result);
+    })
+
+    // 校准阶段成功
+    on('render-receive-calibration-progress-success', (_, result) => {
+        switch (step.value) {
+            case 0:
+                calibrationShortCircuitSuccess(result);
+                break;
+            case 1:
+                calibrationLoadSuccess(result);
+                break;
+            case 2:
+                calibrationOpenCircuitSuccess(result);
+                break;
+        }
+    })
+
+    // 校准步骤完成
+    on('render-receive-step-success', (_, step) => {
+        console.log(step)
     })
 }

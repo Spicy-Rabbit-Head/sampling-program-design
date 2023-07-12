@@ -1,11 +1,18 @@
 import {reactive, ref} from "vue";
 import {Log, Step} from "@/type/interface.ts";
+import dayjs from 'dayjs'
 
 // 校对机开启状态
 const calibrationStatus = ref<boolean>(false);
 
 // 标品编号
 const standardNumber = ref<string>('2500')
+
+// 校机阶段
+const step = ref<number>(0)
+
+// 状态词
+const stateWord = ref<string>('等待开始')
 
 // 自动校对机开始
 function calibrationStarts() {
@@ -54,7 +61,7 @@ const steps: Step[] = reactive<Array<Step>>([])
 for (let i = 0; i < phase.length; i++) {
     steps.push({
         current: 0,
-        currentStatus: 'process',
+        currentStatus: 'wait',
         name: phase[i],
         content: []
     })
@@ -204,6 +211,29 @@ const dataBase = reactive([
     ]
 ]);
 
+// 日志输出
+function logOutput(content: string) {
+    if (logs.length == 500) {
+        logs.splice(0, 300)
+    }
+    logs.push({
+        time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+        content: content
+    })
+}
+
+// 校准状态更新
+function updateCalibrationStatus(index: number, item: number, i: boolean = true) {
+    if (i) {
+        steps[index].current = item
+        steps[index].currentStatus = 'finish'
+        steps[index].content[item].content = '成功'
+    } else {
+        steps[index].current = item
+        steps[index].currentStatus = 'error'
+        steps[index].content[item].content = '失败'
+    }
+}
 
 export function useProofreadingMachine() {
     // 修改颜色
@@ -226,13 +256,39 @@ export function useProofreadingMachine() {
         standardProducts.push(...value)
     }
 
+    // 校准短路阶段成功
+    function calibrationShortCircuitSuccess(item: number) {
+        updateCalibrationStatus(0, item)
+        logOutput(`短路校准 ${item} 成功`)
+    }
+
+    // 校准负载阶段成功
+    function calibrationLoadSuccess(item: number) {
+        updateCalibrationStatus(1, item)
+        logOutput(`负载校准 ${item} 成功`)
+    }
+
+    // 校准开路阶段成功
+    function calibrationOpenCircuitSuccess(item: number) {
+        updateCalibrationStatus(2, item)
+        logOutput(`负载校准 ${item} 成功`)
+    }
+
+    // 校准阶段失败
+    function calibrationFail(item: number) {
+        updateCalibrationStatus(step.value, item, false)
+        logOutput(`阶段 ${step.value} 校准 ${item} 失败`)
+    }
+
     return {
+        stateWord,
         calibrationStatus,
         calibrationStarts,
         automaticCalibrationStop,
         standardNumber,
         logs,
         standardProducts,
+        step,
         steps,
         outputDisplay,
         columns,
@@ -240,5 +296,9 @@ export function useProofreadingMachine() {
         changeColor,
         contextmenuChangeColor,
         updateStandardStatus,
+        calibrationShortCircuitSuccess,
+        calibrationLoadSuccess,
+        calibrationOpenCircuitSuccess,
+        calibrationFail,
     }
 }

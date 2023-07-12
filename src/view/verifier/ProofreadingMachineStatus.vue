@@ -3,6 +3,7 @@ import IconNotoFaceWithMonocle from "~icons/noto/FaceWithMonocle";
 import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
 
 const {
+  stateWord,
   steps,
   outputDisplay,
   columns,
@@ -24,7 +25,7 @@ const {
       <div class="t-flex t-flex-col t-items-center t-justify-center t-gap-2">
         <div class="t-text-6xl t-flex">
           <icon-noto-face-with-monocle/>
-          <span class="t-ml-2">等待开始</span>
+          <span class="t-ml-2">{{ stateWord }}</span>
         </div>
         <a-descriptions :data="outputDisplay" :column="2" bordered/>
       </div>

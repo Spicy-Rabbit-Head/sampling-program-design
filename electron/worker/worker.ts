@@ -1,8 +1,7 @@
-const edge = require("electron-edge-js");
+const edge = require('electron-edge-js');
 import {useIpcRenderer} from "@vueuse/electron";
 
 const url = "D:\\.work_documents\\Syncdisk\\ProjectCode\\C#\\Measurement\\obj\\x86\\Debug\\Measurement.dll"
-
 // 服务方法
 // DLL初始化
 const Init = edge.func({
@@ -58,6 +57,13 @@ const Proofreading = edge.func({
     assemblyFile: url,
     typeName: "Measurement.Sa250B",
     methodName: "Proofreading",
+})
+
+// 丝杆动作
+const ScrewAction = edge.func({
+    assemblyFile: url,
+    typeName: "Measurement.Sa250B",
+    methodName: "ScrewAction",
 })
 
 
@@ -128,22 +134,31 @@ function CalibrationExecution(step: number, index: number, fixture: string) {
     }
     let status: boolean = true;
     Proofreading(data, (error, result) => {
-        if (error) {
-            console.log(error)
+        if (error || result == null) {
             status = false;
             return
         }
-        status = true;
-        console.log(result);
+        status = result
     })
     return status;
+}
+
+// 丝杆动作
+function ScrewActionExecution(action: number) {
+    let i = false;
+    ScrewAction(action, (error, result) => {
+        if (error) return
+        i = result
+    })
+    console.log(i)
 }
 
 const {on} = useIpcRenderer();
 
 // 工作进程服务停止
-on("worker-receive-stop-service", () => {
+on("worker-receive-stop-service", (event) => {
     ServiceStop()
+    event.sender.send('worker-send-close')
 })
 
 // 工作进程服务初始化启动
@@ -187,12 +202,25 @@ on("worker-receive-standard-query", (event, path, pn, location, password) => {
 })
 
 // 工作进程校准执行
-on("worker-receive-auto-calibration-start", (event, step, fixture) => {
+on("worker-receive-calibration-start", (event, step, fixture) => {
+    ScrewActionExecution(0)
     for (let i = 0; i < 4; i++) {
-        CalibrationExecution(0, i, fixture);
-        GetSerialPort(null, (error, result) => {
-            console.log(result)
-        })
+        let n = CalibrationExecution(step, i, fixture);
+        if (n) {
+            event.sender.send('worker-send-calibration-progress-success', i)
+        } else {
+            ScrewActionExecution(0)
+            event.sender.send('worker-send-calibration-progress-error', i)
+            return
+        }
     }
+    ScrewActionExecution(0)
+    ScrewActionExecution(1)
+    event.sender.send('worker-send-step-success', step)
+})
+
+// 工作进程丝杆动作
+on("worker-receive-screw-action", (event, action) => {
+    ScrewActionExecution(action)
 })
 

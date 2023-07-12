@@ -39,6 +39,7 @@ const {
   calibrationModeUpdate,
   readIniConfiguration,
   communicationModeUpdate,
+  proofreadingOperationModeUpdate,
   readPortList,
   standardProductQuery,
   readNumberFile,
@@ -58,6 +59,22 @@ const modes = [
   {
     label: '以太网',
     value: 'ethernet'
+  },
+]
+
+// 运行模式
+const operationMode = [
+  {
+    label: '校机 + 对机',
+    value: 0
+  },
+  {
+    label: "仅校机",
+    value: 1
+  },
+  {
+    label: '仅对机',
+    value: 2
   },
 ]
 
@@ -134,6 +151,13 @@ function handleCancel() {
           <n-button type="error" :disabled="!calibrationStatus" @click.stop="automaticCalibrationStop">
             自动校对机停止
           </n-button>
+          <!--  校对机运行模式  -->
+          <n-input-group class="t-text-center">
+            <n-input-group-label class="t-w-5/12">运行模式 :</n-input-group-label>
+            <n-select class="t-w-7/12" v-model:value="globalStore.proofreadingOperationMode" :options="operationMode"
+                      @update-value="proofreadingOperationModeUpdate" placeholder=""
+                      :disabled="calibrationStatus || autoButton" :consistent-menu-width="false"/>
+          </n-input-group>
           <!-- 通讯方式单选 -->
           <n-radio-group class="t-mx-auto" v-model:value="globalStore.communicationMode"
                          @update-value="communicationModeUpdate" name="radioGroup">

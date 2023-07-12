@@ -37,9 +37,27 @@ export default defineConfig({
         })
     ],
     build: {
+        // css代码分割
+        cssCodeSplit: true,
+        // 源地图
+        sourcemap: false,
+        // 内联动态导入的最大文件大小
+        assetsInlineLimit: 4096,
+        // 打包策略
         rollupOptions: {
+            // 输出
+            output: {
+                // 手动指定
+                manualChunks(id) {
+                    if (id.includes('node_modules')) {
+                        // 根据包名分割
+                        return id.toString().split('node_modules/')[1].split('/')[0].toString()
+                    }
+                },
+            },
             input: {
-                foo: join(__dirname, 'electron/worker/worker.html'),
+                index: join(__dirname, 'index.html'),
+                worker: join(__dirname, 'electron/worker/worker.html'),
             }
         }
     },

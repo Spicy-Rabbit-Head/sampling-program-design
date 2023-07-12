@@ -313,5 +313,5 @@ svg {
 /* 自定义字体 */
 @font-face {
     font-family: NotoSerif;
-    src: url("public/font/NotoSerifSC-Regular.otf");
+    src: url('/public/font/NotoSerifSC-Regular.otf') format('opentype');
 }

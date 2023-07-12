@@ -37,7 +37,7 @@ const routes = [
     // 匹配所有路径,如果没有匹配到,则重定向到404页面
     {
         path: '/:pathMatch(.*)*',
-        redirect: '/null-exception'
+        redirect: '/'
     }
 ]
 
@@ -64,7 +64,7 @@ router.afterEach((to) => {
 router.onError((error) => {
     console.log("路由跳转错误:")
     console.log(error)
-    router.replace({name: 'NullException'}).then()
+    router.replace({name: 'RootPath'}).then()
 })
 
 

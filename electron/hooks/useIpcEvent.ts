@@ -5,54 +5,58 @@ const Store = require('electron-store');
 import ini from 'ini';
 import fs from 'fs';
 
-// type LocalStoreInterface = {
-//     // 当前QCC文件路径
-//     filePath: {
-//         type: 'string',
-//     },
-//     // 当前串口
-//     currentPort: {
-//         type: 'string',
-//     },
-//     // 当前校准模式
-//     currentCalibrationMode: {
-//         type: 'string',
-//     },
-//     // 250B配置文件路径
-//     iniConfiguration: {
-//         type: 'string',
-//     },
-//     // 当前通讯模式
-//     communicationMode: {
-//         type: 'string',
-//     },
-//     // 标品数据路径
-//     standardProductPath: {
-//         type: 'string',
-//     },
-//     // 标品数据密码
-//     standardProductPassword: {
-//         type: 'string',
-//     },
-//     // 权限密码
-//     permissionPassword: {
-//         type: 'string',
-//     },
-//     // 当前车间
-//     currentWorkshop: {
-//         type: 'string',
-//     },
-//     // 当前地址
-//     location: {
-//         type: 'string',
-//     }
-// }
+const LocalStoreInterface = {
+    // 当前QCC文件路径
+    filePath: {
+        type: 'string',
+    },
+    // 当前串口
+    currentPort: {
+        type: 'string',
+    },
+    // 当前校准模式
+    currentCalibrationMode: {
+        type: 'string',
+    },
+    // 250B配置文件路径
+    iniConfiguration: {
+        type: 'string',
+    },
+    // 当前通讯模式
+    communicationMode: {
+        type: 'string',
+    },
+    // 标品数据路径
+    standardProductPath: {
+        type: 'string',
+    },
+    // 标品数据密码
+    standardProductPassword: {
+        type: 'string',
+    },
+    // 权限密码
+    permissionPassword: {
+        type: 'string',
+    },
+    // 当前车间
+    currentWorkshop: {
+        type: 'string',
+    },
+    // 当前地址
+    location: {
+        type: 'string',
+    },
+    // 校对机运行模式
+    proofreadingOperationMode: {
+        type: 'integer',
+    }
+}
 
 
 // 事件监听
 export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     // 本地配置储存
-    const localStore = new Store();
+    const localStore = new Store({LocalStoreInterface});
     console.log(localStore.store)
 
     // 渲染进程最小化
@@ -75,6 +79,10 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
         // 关闭服务
         worker.webContents.send('worker-receive-stop-service')
         render.close()
+    })
+
+    // 工作进程关闭
+    ipcMain.on('worker-send-close', function () {
         worker.close();
     })
 
@@ -226,6 +234,7 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     ipcMain.on('render-send-serial-port-update', function (_, port) {
         worker.webContents.send('worker-receive-serial-port-update', port)
     })
+
     // 渲染进程发起标品 Access 查询
     ipcMain.on('render-send-standard-query', function (event, pn) {
         let path = localStore.get('standardProductPath');
@@ -245,7 +254,26 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     })
 
     // 渲染进程自动校准开始
-    ipcMain.on('render-send-auto-calibration-start', function (_) {
-        worker.webContents.send('worker-receive-auto-calibration-start', 0, localStore.get('currentCalibrationMode'))
+    ipcMain.on('render-send-calibration-short-circuit-start', function (_, step) {
+        worker.webContents.send('worker-receive-calibration-start', step, localStore.get('currentCalibrationMode'))
+    })
+
+    // 接收工作进程自动校准进度失败
+    ipcMain.on('worker-send-calibration-progress-error', function (_, result) {
+        render.webContents.send('render-receive-calibration-progress-error', result)
+    })
+
+    // 接收工作进程自动校准进度成功
+    ipcMain.on('worker-send-calibration-progress-success', function (_, result) {
+        render.webContents.send('render-receive-calibration-progress-success', result)
+    })
+
+    // 工作进程发起阶段完成
+    ipcMain.on('worker-send-step-success', function (_, step) {
+        render.webContents.send('render-receive-step-success', step)
+    })
+    // 渲染进程发起丝杆动作
+    ipcMain.on('render-send-screw-action', function (_, action) {
+        worker.webContents.send('worker-receive-screw-action', action)
     })
 }

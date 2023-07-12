@@ -26,7 +26,9 @@ export const useGlobalStore = defineStore('GlobalStore', {
             // 校准模式
             calibrationMode: [],
             // 当前通讯模式
-            communicationMode: ''
+            communicationMode: '',
+            // 校对机运行模式
+            proofreadingOperationMode: 0,
         }
     },
     getters: {

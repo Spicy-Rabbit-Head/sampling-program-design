@@ -14,6 +14,7 @@ const {
   iniConfigurationUpdate,
   workshopListQuery,
   workshopListUpdate,
+  screwAction,
 } = useIpcSendEvent();
 
 const configStore = useConfigStore();
@@ -57,6 +58,7 @@ function exitPermission() {
 
 <template>
   <div class="t-h-full t-w-full t-flex t-flex-col">
+    <!--  权限  -->
     <div class="t-h-14 t-flex-none t-border t-rounded-md t-m-2 t-px-2 t-flex t-items-center t-gap-2">
       <n-button secondary strong :disabled="changePermission" @click.stop="visible = true">
         <IconAntDesignControlOutlined/>
@@ -67,8 +69,10 @@ function exitPermission() {
         退出权限
       </n-button>
     </div>
+    <!--  配置框  -->
     <div class="t-grid t-grid-cols-2 t-gap-2 t-flex-auto t-px-2">
       <div class="t-flex t-flex-col t-gap-2 t-text-center">
+        <!--  配置250Bini文件地址  -->
         <n-input-group>
           <n-input-group-label class="t-w-1/5">250B配置地址 :</n-input-group-label>
           <n-input readonly placeholder="N/A" class="t-font-mono" v-model:value="configStore.iniConfiguration"/>
@@ -76,6 +80,7 @@ function exitPermission() {
             修改
           </n-button>
         </n-input-group>
+        <!--  配置量测标品数据文件地址  -->
         <n-input-group>
           <n-input-group-label class="t-w-1/5">标品数据地址 :</n-input-group-label>
           <n-input readonly placeholder="N/A" class="t-font-mono" v-model:value="configStore.standardProductPath"/>
@@ -83,6 +88,7 @@ function exitPermission() {
             修改
           </n-button>
         </n-input-group>
+        <!--  配置量测标品数据文件密码  -->
         <n-input-group>
           <n-input-group-label class="t-w-1/5">标品数据密码 :</n-input-group-label>
           <n-input placeholder="N/A" type="password" class="t-font-mono" show-password-on="mousedown"
@@ -91,14 +97,28 @@ function exitPermission() {
                    :disabled="!changePermission"/>
         </n-input-group>
       </div>
-      <div class="t-grid t-grid-cols-3">
-        <n-input-group>
-          <n-input-group-label>环境车间 :</n-input-group-label>
-          <n-select v-model:value="configStore.currentWorkshop" :consistent-menu-width="false"
-                    :options="workshopOptions" @focus="workshopListQuery"
-                    @update-value="workshopListUpdate"
-                    :disabled="!changePermission"/>
-        </n-input-group>
+      <div class="t-grid t-gap-2">
+        <div class="t-grid t-grid-cols-3">
+          <!--  配置查询标品条件  -->
+          <n-input-group>
+            <n-input-group-label>环境车间 :</n-input-group-label>
+            <n-select v-model:value="configStore.currentWorkshop" :consistent-menu-width="false"
+                      :options="workshopOptions" @focus="workshopListQuery"
+                      @update-value="workshopListUpdate"
+                      :disabled="!changePermission"/>
+          </n-input-group>
+        </div>
+        <div>
+          <!--  上下丝杆动作  -->
+          <a-button-group>
+            <a-button type="primary" @click.stop="screwAction(0)" :disabled="!changePermission">
+              上
+            </a-button>
+            <a-button type="primary" @click.stop="screwAction(1)" :disabled="!changePermission">
+              下
+            </a-button>
+          </a-button-group>
+        </div>
       </div>
     </div>
     <a-modal v-model:visible="visible" type="password" :mask-closable="false" title="输入密码" @cancel="handleCancel"
