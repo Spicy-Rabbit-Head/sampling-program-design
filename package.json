@@ -1,7 +1,7 @@
 {
   "name": "sampling-program-design",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "main": "dist-electron/main.js",
   "scripts": {
     "start": "electron .",
@@ -48,8 +48,8 @@
     "mirror": "https://npm.taobao.org/mirrors/electron/"
   },
   "build": {
-    "appId": "com.electron.desktop",
-    "productName": "抽测程式",
+    "appId": "com.zzk.SamplingProgram",
+    "productName": "SamplingProgram",
     "asar": true,
     "copyright": "Copyright © 2023 赵子奎",
     "directories": {
@@ -60,7 +60,7 @@
       "dist-electron/main.js"
     ],
     "mac": {
-      "artifactName": "${productName}_${version}.${ext}",
+      "artifactName": "${productName}-${version}.${ext}",
       "target": [
         "dmg"
       ]
@@ -74,13 +74,24 @@
           ]
         }
       ],
-      "artifactName": "${productName}_${version}.${ext}"
+      "artifactName": "${productName}-${version}.${ext}"
+    },
+    "msi": {
+      "oneClick": false
     },
     "nsis": {
       "oneClick": false,
-      "perMachine": false,
       "allowToChangeInstallationDirectory": true,
-      "deleteAppDataOnUninstall": false
+      "perMachine": true,
+      "allowElevation": true,
+      "deleteAppDataOnUninstall": false,
+      "installerIcon": "public/img/favicon.ico",
+      "uninstallerIcon": "public/img/favicon.ico",
+      "installerHeader": "public/img/favicon.ico",
+      "uninstallDisplayName": "${productName}${version}",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "license": "license.txt"
     },
     "publish": [
       {

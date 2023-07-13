@@ -67,7 +67,7 @@ function tagsToggle(key: string) {
     <div class="t-h-10 t-flex-none t-flex t-items-center t-w-screen t-bg-gray-200">
       <!-- 标题 -->
       <div style="-webkit-app-region: drag" class="t-flex-none t-px-1 t-flex t-items-center t-select-none">
-        <img src="/img/favicon.png" class="t-w-6 t-h-6 t-mr-1" alt=""/>
+        <img src="/img/favicon.ico" class="t-w-6 t-h-6 t-mr-1" alt=""/>
         <span class="t-subpixel-antialiased t-font-semibold">B03抽测程式</span>
       </div>
       <!-- 路由切换 -->
