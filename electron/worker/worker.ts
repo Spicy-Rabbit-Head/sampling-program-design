@@ -1,8 +1,7 @@
 const edge = require('electron-edge-js');
 const {useIpcRenderer} = require("@vueuse/electron")
 const {join} = require('path')
-
-const url = join(__dirname + '../../../dll/Measurement.dll')
+const url = join(__dirname + '../../../../../Measurement.dll')
 
 // 服务方法
 // DLL初始化
@@ -223,6 +222,11 @@ on("worker-receive-calibration-start", (event, step, fixture) => {
     }
     ScrewActionExecution(1)
     event.sender.send('worker-send-step-success', step)
+})
+
+// 工作进程验证执行
+on("worker-receive-validation-start", (event) => {
+
 })
 
 // 工作进程丝杆动作

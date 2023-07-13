@@ -262,7 +262,7 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
                 worker.webContents.send('worker-receive-calibration-start', 0, localStore.get('currentCalibrationMode'))
                 break
             case 2:
-                worker.webContents.send('worker-receive-calibration-start', 3, localStore.get('currentCalibrationMode'))
+                worker.webContents.send('worker-receive-validation-start')
         }
     })
 
