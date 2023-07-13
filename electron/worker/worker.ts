@@ -1,7 +1,9 @@
 const edge = require('electron-edge-js');
-import {useIpcRenderer} from "@vueuse/electron";
+const {useIpcRenderer} = require("@vueuse/electron")
+const {join} = require('path')
 
-const url = "D:\\.work_documents\\Syncdisk\\ProjectCode\\C#\\Measurement\\obj\\x86\\Debug\\Measurement.dll"
+const url = join(__dirname + '../../../dll/Measurement.dll')
+
 // 服务方法
 // DLL初始化
 const Init = edge.func({
@@ -203,7 +205,9 @@ on("worker-receive-standard-query", (event, path, pn, location, password) => {
 
 // 工作进程校准执行
 on("worker-receive-calibration-start", (event, step, fixture) => {
-    ScrewActionExecution(0)
+    if (step != 2) {
+        ScrewActionExecution(0)
+    }
     for (let i = 0; i < 4; i++) {
         let n = CalibrationExecution(step, i, fixture);
         if (n) {
@@ -214,7 +218,9 @@ on("worker-receive-calibration-start", (event, step, fixture) => {
             return
         }
     }
-    ScrewActionExecution(0)
+    if (step != 2) {
+        ScrewActionExecution(0)
+    }
     ScrewActionExecution(1)
     event.sender.send('worker-send-step-success', step)
 })

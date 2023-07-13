@@ -134,7 +134,7 @@ export function useIpcReceiveEvent() {
     })
 
     // 校准步骤完成
-    on('render-receive-step-success', (_, step) => {
+    on('render-receive-step-success', () => {
         console.log(step)
     })
 }

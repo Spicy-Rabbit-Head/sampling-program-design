@@ -280,6 +280,11 @@ export function useProofreadingMachine() {
         logOutput(`阶段 ${step.value} 校准 ${item} 失败`)
     }
 
+    // 校准完成
+    function calibrationSuccess() {
+        logOutput('校准完成')
+    }
+
     return {
         stateWord,
         calibrationStatus,
@@ -300,5 +305,6 @@ export function useProofreadingMachine() {
         calibrationLoadSuccess,
         calibrationOpenCircuitSuccess,
         calibrationFail,
+        calibrationSuccess,
     }
 }

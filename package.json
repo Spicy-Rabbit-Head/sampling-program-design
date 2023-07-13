@@ -6,7 +6,7 @@
   "scripts": {
     "start": "electron .",
     "dev": "chcp 65001 &&  vite",
-    "build": "vue-tsc --noEmit && vite build && electron-builder",
+    "build": "vue-tsc --noEmit && vite build && electron-builder  --win --ia32",
     "preview": "vite preview"
   },
   "config": {
@@ -59,6 +59,12 @@
       "dist",
       "dist-electron/main.js"
     ],
+    "extraResources": [
+      {
+        "from": "public/dll",
+        "to": "dll"
+      }
+    ],
     "mac": {
       "artifactName": "${productName}-${version}.${ext}",
       "target": [
@@ -66,18 +72,16 @@
       ]
     },
     "win": {
+      "icon": "public/img/favicon.ico",
       "target": [
         {
           "target": "nsis",
           "arch": [
-            "x64"
+            "ia32"
           ]
         }
       ],
       "artifactName": "${productName}-${version}.${ext}"
-    },
-    "msi": {
-      "oneClick": false
     },
     "nsis": {
       "oneClick": false,

@@ -2,7 +2,7 @@ import {useIpcRenderer} from "@vueuse/electron";
 import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
 
 const {send} = useIpcRenderer();
-const {calibrationStarts, step} = useProofreadingMachine();
+const {calibrationStarts} = useProofreadingMachine();
 
 export function useIpcSendEvent() {
     // 渲染进程初始化
@@ -109,7 +109,7 @@ export function useIpcSendEvent() {
     // 自动校准开始
     function automaticCalibrationStarts() {
         calibrationStarts();
-        send('render-send-calibration-short-circuit-start', step.value);
+        send('render-send-calibration-short-circuit-start');
     }
 
     // 丝杆动作

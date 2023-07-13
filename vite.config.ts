@@ -34,7 +34,7 @@ export default defineConfig({
         }),
         Icons({
             compiler: 'vue3'
-        })
+        }),
     ],
     build: {
         // css代码分割

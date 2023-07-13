@@ -99,6 +99,7 @@ function refreshStatus() {
   }, 500)
 }
 
+// 错误通知
 function errorNotification(message: string) {
   error({
     title: '错误',

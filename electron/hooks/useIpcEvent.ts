@@ -254,8 +254,16 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     })
 
     // 渲染进程自动校准开始
-    ipcMain.on('render-send-calibration-short-circuit-start', function (_, step) {
-        worker.webContents.send('worker-receive-calibration-start', step, localStore.get('currentCalibrationMode'))
+    ipcMain.on('render-send-calibration-short-circuit-start', function () {
+        let operationMode = localStore.get('proofreadingOperationMode');
+        switch (operationMode) {
+            case 0:
+            case 1:
+                worker.webContents.send('worker-receive-calibration-start', 0, localStore.get('currentCalibrationMode'))
+                break
+            case 2:
+                worker.webContents.send('worker-receive-calibration-start', 3, localStore.get('currentCalibrationMode'))
+        }
     })
 
     // 接收工作进程自动校准进度失败
@@ -270,7 +278,24 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
 
     // 工作进程发起阶段完成
     ipcMain.on('worker-send-step-success', function (_, step) {
-        render.webContents.send('render-receive-step-success', step)
+        switch (localStore.get('proofreadingOperationMode')) {
+            case 0:
+                if (step === 3) {
+                    render.webContents.send('render-receive-step-success')
+                    return
+                }
+                worker.webContents.send('worker-receive-calibration-start', step + 1, localStore.get('currentCalibrationMode'))
+                break
+            case 1:
+                if (step === 2) {
+                    render.webContents.send('render-receive-step-success')
+                    return
+                }
+                worker.webContents.send('worker-receive-calibration-start', step + 1, localStore.get('currentCalibrationMode'))
+                break
+            case 2:
+                render.webContents.send('render-receive-step-success')
+        }
     })
     // 渲染进程发起丝杆动作
     ipcMain.on('render-send-screw-action', function (_, action) {
