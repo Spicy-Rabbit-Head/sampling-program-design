@@ -1,7 +1,14 @@
 const edge = require('electron-edge-js');
 const {useIpcRenderer} = require("@vueuse/electron")
-const {join} = require('path')
-const url = join(__dirname + '../../../../../Measurement.dll')
+const {join, resolve} = require('path')
+
+let environment;
+if (process.env.VITE_DEV_SERVER_URL) {
+    environment = join(resolve() + '/public/dll/Measurement.dll')
+} else {
+    environment = join(__dirname + '../../../../../Measurement.dll')
+}
+const url = environment
 
 // 服务方法
 // DLL初始化
@@ -219,8 +226,10 @@ on("worker-receive-calibration-start", (event, step, fixture) => {
     }
     if (step != 2) {
         ScrewActionExecution(0)
+        if (step != 1) {
+            ScrewActionExecution(1)
+        }
     }
-    ScrewActionExecution(1)
     event.sender.send('worker-send-step-success', step)
 })
 

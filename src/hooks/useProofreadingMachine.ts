@@ -1,5 +1,5 @@
 import {reactive, ref} from "vue";
-import {Log, Step} from "@/type/interface.ts";
+import {Log, StandardProductsInterface, Step} from "@/type/interface.ts";
 import dayjs from 'dayjs'
 
 // 校对机开启状态
@@ -25,27 +25,11 @@ function automaticCalibrationStop() {
 }
 
 // 日志数据
-const logs = reactive<Array<Log>>([
-    {
-        time: '2021-08-12 12:00:00',
-        content: '校对机开启'
-    }
-])
+const logs = reactive<Array<Log>>([])
 
 // 标品状态
-const standardProducts = reactive([
-    {
-        label: '23',
-        value: '2.1',
-    },
-    {
-        label: '24',
-        value: '2.2',
-    },
-    {
-        label: '25',
-        value: '2.3',
-    }
+const standardProducts = reactive<Array<StandardProductsInterface>>([
+    {label: 'N/A', value: '无'}
 ])
 
 // 校机步骤
@@ -58,49 +42,34 @@ const checkTheMachine = ['计算补偿值', '补偿值写入', '验证']
 const steps: Step[] = reactive<Array<Step>>([])
 
 // 初始化校对机步骤数据
-for (let i = 0; i < phase.length; i++) {
-    steps.push({
-        current: 0,
-        currentStatus: 'wait',
-        name: phase[i],
-        content: []
-    })
-    if (i === 3) {
-        checkTheMachine.forEach(item => {
-            steps[i].content.push({
-                name: item,
-                content: '等待中'
-            })
+function initSteps() {
+    steps.length = 0
+    for (let i = 0; i < phase.length; i++) {
+        steps.push({
+            current: 0,
+            currentStatus: 'wait',
+            name: phase[i],
+            content: []
         })
-    } else {
-        for (let j = 1; j <= 4; j++) {
-            steps[i].content.push({
-                name: `A${j}`,
-                content: '等待中'
+        if (i === 3) {
+            checkTheMachine.forEach(item => {
+                steps[i].content.push({
+                    name: item,
+                    content: '等待中'
+                })
             })
+        } else {
+            for (let j = 1; j <= 4; j++) {
+                steps[i].content.push({
+                    name: `A${j}`,
+                    content: '等待中'
+                })
+            }
         }
     }
 }
 
-// 输出展示项
-const outputDisplay = [
-    {
-        label: '对机标品编号 :',
-        value: 'N/A',
-    },
-    {
-        label: '对机标品值 :',
-        value: 'N/A',
-    },
-    {
-        label: '验证标品编号 :',
-        value: 'N/A',
-    },
-    {
-        label: '验证标品值 :',
-        value: 'N/A',
-    }
-];
+initSteps()
 
 // 对机表格项
 const columns = [
@@ -225,11 +194,11 @@ function logOutput(content: string) {
 // 校准状态更新
 function updateCalibrationStatus(index: number, item: number, i: boolean = true) {
     if (i) {
-        steps[index].current = item
+        steps[index].current = item + 1
         steps[index].currentStatus = 'finish'
         steps[index].content[item].content = '成功'
     } else {
-        steps[index].current = item
+        steps[index].current = item + 1
         steps[index].currentStatus = 'error'
         steps[index].content[item].content = '失败'
     }
@@ -280,6 +249,11 @@ export function useProofreadingMachine() {
         logOutput(`阶段 ${step.value} 校准 ${item} 失败`)
     }
 
+    // 校准步骤更新
+    function stepsUpdate(i: number) {
+        step.value = i
+    }
+
     // 校准完成
     function calibrationSuccess() {
         logOutput('校准完成')
@@ -295,7 +269,6 @@ export function useProofreadingMachine() {
         standardProducts,
         step,
         steps,
-        outputDisplay,
         columns,
         dataBase,
         changeColor,
@@ -305,6 +278,8 @@ export function useProofreadingMachine() {
         calibrationLoadSuccess,
         calibrationOpenCircuitSuccess,
         calibrationFail,
+        initSteps,
         calibrationSuccess,
+        stepsUpdate,
     }
 }

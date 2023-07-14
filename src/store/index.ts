@@ -29,6 +29,8 @@ export const useGlobalStore = defineStore('GlobalStore', {
             communicationMode: '',
             // 校对机运行模式
             proofreadingOperationMode: 0,
+            // 校对机数据
+            outputDisplay: [],
         }
     },
     getters: {
@@ -38,7 +40,15 @@ export const useGlobalStore = defineStore('GlobalStore', {
             return str ? str[1] : ''
         }
     },
-    actions: {}
+    actions: {
+        // 校对机数据更新
+        outputDisplayUpdate(data1: any, data2: any) {
+            this.outputDisplay[0].value = data1.label
+            this.outputDisplay[1].value = data1.value
+            this.outputDisplay[2].value = data2.label
+            this.outputDisplay[3].value = data2.value
+        }
+    }
 })
 
 

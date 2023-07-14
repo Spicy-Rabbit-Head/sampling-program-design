@@ -15,6 +15,7 @@ export function useIpcReceiveEvent() {
         calibrationLoadSuccess,
         calibrationOpenCircuitSuccess,
         calibrationFail,
+        stepsUpdate,
     } = useProofreadingMachine();
     const {addWorkshopOptions} = useConfig();
 
@@ -26,14 +27,39 @@ export function useIpcReceiveEvent() {
         globalStore.communicationMode = data.communicationMode
         globalStore.currentAddress = data.currentAddress
         globalStore.proofreadingOperationMode = data.proofreadingOperationMode
+        globalStore.outputDisplay = data.outputDisplay
+        if (data.outputDisplay == undefined) {
+            globalStore.outputDisplay = [
+                {
+                    label: '对机标品编号 :',
+                    value: 'N/A',
+                },
+                {
+                    label: '对机标品值 :',
+                    value: 'N/A',
+                },
+                {
+                    label: '验证标品编号 :',
+                    value: 'N/A',
+                },
+                {
+                    label: '验证标品值 :',
+                    value: 'N/A',
+                }
+            ]
+        }
     })
 
     // 读取可修改配置
-    on('render-receive-read-configuration', (_, data: any) => {
+    on('render-receive-read-configuration', (event, data: any) => {
         configStore.iniConfiguration = data.iniConfiguration
         configStore.standardProductPath = data.standardProductPath
         configStore.standardProductPassword = data.standardProductPassword
         configStore.permissionPassword = data.permissionPassword
+        if (data.permissionPassword == undefined) {
+            configStore.permissionPassword = '666666'
+            event.sender.send('render-send-set-store', 'permissionPassword', '666666')
+        }
         configStore.currentWorkshop = data.currentWorkshop
     })
 
@@ -133,8 +159,13 @@ export function useIpcReceiveEvent() {
         }
     })
 
+    // 校准步骤更新
+    on('render-receive-step-update', (_, step) => {
+        stepsUpdate(step)
+    })
+
     // 校准步骤完成
-    on('render-receive-step-success', () => {
-        console.log(step)
+    on('render-receive-calibration-step-success', () => {
+
     })
 }

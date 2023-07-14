@@ -10,7 +10,7 @@ import {storeToRefs} from "pinia";
 import {useIpcSendEvent} from "@/hooks/useIpcSendEvent.ts";
 import {onMounted, ref} from "vue";
 import {useHome} from "@/hooks/useHome.ts";
-import {useNotification} from "naive-ui";
+import {SelectOption, useNotification} from "naive-ui";
 
 
 // 校对机闭包
@@ -18,14 +18,20 @@ const {
   calibrationStatus,
   automaticCalibrationStop,
   logs,
-  standardProducts
+  standardProducts,
 } = useProofreadingMachine();
 
 // 全局状态
 const globalStore = useGlobalStore();
 
 // 全局状态只读
-const {currentFileName, portSelection, calibrationMode, communicationMode} = storeToRefs(globalStore);
+const {
+  currentFileName,
+  portSelection,
+  calibrationMode,
+  communicationMode,
+  proofreadingOperationMode,
+} = storeToRefs(globalStore);
 
 // 运行状态
 const {autoButton} = useHome();
@@ -79,10 +85,10 @@ const operationMode = [
 ]
 
 // 对机标品编号
-const dockingNumber = ref<string>('');
+const dockingNumber = ref<SelectOption>({});
 
 // 验证标品编号
-const verificationNumber = ref<string>('');
+const verificationNumber = ref<SelectOption>({});
 
 // 刷新动画
 const loading = ref<boolean>(false);
@@ -119,22 +125,33 @@ function openDialogBox() {
 
 // 对话框确认
 function handleBeforeOk() {
-  if (dockingNumber.value === '' || verificationNumber.value === '') {
+  if (proofreadingOperationMode.value === 1) return true;
+  if (dockingNumber.value.label === undefined || verificationNumber.value.label === undefined) {
     errorNotification('对机编号和验证编号不能为空');
     return false;
   }
-  if (dockingNumber.value === verificationNumber.value) {
+  if (dockingNumber.value.label === verificationNumber.value.label) {
     errorNotification('对机编号和验证编号不能相同');
     return false;
   }
+  globalStore.outputDisplayUpdate(dockingNumber.value, verificationNumber.value);
   return true;
 }
 
 // 对话框取消
 function handleCancel() {
   visible.value = false;
-  dockingNumber.value = '';
-  verificationNumber.value = '';
+  dockingNumber.value = {};
+  verificationNumber.value = {};
+}
+
+// 选择赋值
+function DockingUpdate(_: any, option: SelectOption) {
+  dockingNumber.value = option;
+}
+
+function VerificationUpdate(_: any, option: SelectOption) {
+  verificationNumber.value = option;
 }
 
 </script>
@@ -248,7 +265,7 @@ function handleCancel() {
             </div>
           </div>
           <!-- 日志主体 -->
-          <div class="t-flex-auto t-px-1 t-break-words">
+          <div class="t-flex-auto t-px-1 t-break-words t-overflow-y-auto">
             <div v-for="item in logs">
               {{ item.time }} :
               <p>{{ item.content }}</p>
@@ -265,11 +282,13 @@ function handleCancel() {
       <div class="t-grid t-grid-cols-2">
         <div>
           <span>选择对机标品编号 :</span>
-          <n-select v-model:value="dockingNumber" :options="standardProducts"/>
+          <n-select :options="standardProducts" @update-value="DockingUpdate"
+                    :disabled="proofreadingOperationMode == 1"/>
         </div>
         <div>
           <span>选择验证标品编号 :</span>
-          <n-select v-model:value="verificationNumber" :options="standardProducts"/>
+          <n-select :options="standardProducts" @update-value="VerificationUpdate"
+                    :disabled="proofreadingOperationMode == 1"/>
         </div>
       </div>
     </a-modal>

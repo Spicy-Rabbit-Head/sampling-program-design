@@ -63,6 +63,10 @@
       {
         "from": "public/dll/Measurement.dll",
         "to": "Measurement.dll"
+      },
+      {
+        "from": "public/customConfig.ini",
+        "to": "customConfig.ini"
       }
     ],
     "mac": {

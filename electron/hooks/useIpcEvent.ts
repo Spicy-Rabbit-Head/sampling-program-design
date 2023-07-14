@@ -4,6 +4,7 @@ import {SelectOption} from "naive-ui";
 const Store = require('electron-store');
 import ini from 'ini';
 import fs from 'fs';
+import {join} from "path";
 
 const LocalStoreInterface = {
     // 当前QCC文件路径
@@ -125,7 +126,14 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     ipcMain.on('render-send-workshop-list-query', function (event) {
         try {
             // 自定义配置文件读取
-            let iniRead = ini.parse(fs.readFileSync(__dirname + '../../customConfig.ini', 'utf8'));
+            let pathName;
+            if (process.env.VITE_DEV_SERVER_URL) {
+                pathName = __dirname + '../../public/customConfig.ini'
+            } else {
+                pathName = join(__dirname, '../../customConfig.ini')
+            }
+            console.log(pathName)
+            let iniRead = ini.parse(fs.readFileSync(pathName, 'utf8'));
             let calibrationList: Array<SelectOption> = [];
             for (let key in iniRead.WORKSHOP) {
                 calibrationList.push({
@@ -255,8 +263,7 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
 
     // 渲染进程自动校准开始
     ipcMain.on('render-send-calibration-short-circuit-start', function () {
-        let operationMode = localStore.get('proofreadingOperationMode');
-        switch (operationMode) {
+        switch (localStore.get('proofreadingOperationMode')) {
             case 0:
             case 1:
                 worker.webContents.send('worker-receive-calibration-start', 0, localStore.get('currentCalibrationMode'))
@@ -278,24 +285,13 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
 
     // 工作进程发起阶段完成
     ipcMain.on('worker-send-step-success', function (_, step) {
-        switch (localStore.get('proofreadingOperationMode')) {
-            case 0:
-                if (step === 3) {
-                    render.webContents.send('render-receive-step-success')
-                    return
-                }
-                worker.webContents.send('worker-receive-calibration-start', step + 1, localStore.get('currentCalibrationMode'))
-                break
-            case 1:
-                if (step === 2) {
-                    render.webContents.send('render-receive-step-success')
-                    return
-                }
-                worker.webContents.send('worker-receive-calibration-start', step + 1, localStore.get('currentCalibrationMode'))
-                break
-            case 2:
-                render.webContents.send('render-receive-step-success')
+        if (step === 2) {
+            worker.webContents.send('worker-receive-validation-start')
+            // render.webContents.send('render-receive-calibration-step-success')
+            return
         }
+        render.webContents.send('render-receive-step-update', step + 1)
+        worker.webContents.send('worker-receive-calibration-start', step + 1, localStore.get('currentCalibrationMode'))
     })
     // 渲染进程发起丝杆动作
     ipcMain.on('render-send-screw-action', function (_, action) {

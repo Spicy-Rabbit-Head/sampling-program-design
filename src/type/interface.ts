@@ -57,6 +57,7 @@ export type GlobalStoreInterface = {
     calibrationMode: Array<SelectOption>
     communicationMode: string,
     proofreadingOperationMode: number,
+    outputDisplay: Array<OutputDisplayInterface>
 }
 
 // 配置文件
@@ -66,4 +67,16 @@ export type ConfigStoreInterface = {
     standardProductPassword: string,
     permissionPassword: string,
     currentWorkshop: string,
+}
+
+// 标品状态
+export type StandardProductsInterface = {
+    label: string,
+    value: string,
+}
+
+// 输出展示
+export  type OutputDisplayInterface = {
+    label: string,
+    value: string,
 }
