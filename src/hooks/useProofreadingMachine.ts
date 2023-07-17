@@ -22,6 +22,7 @@ function calibrationStarts() {
 // 自动校对机停止
 function automaticCalibrationStop() {
     calibrationStatus.value = false
+    step.value = 0
 }
 
 // 日志数据
@@ -95,91 +96,6 @@ const columns = [
     },
 ];
 
-// 对机表格数据
-const dataBase = reactive([
-    [
-        {
-            key: 'title1',
-            value: '修改前测量',
-            style: ''
-        },
-        {
-            key: 'beforePost1',
-            value: '0.1',
-            style: ''
-        },
-        {
-            key: 'beforePost2',
-            value: '0.2',
-            style: ''
-        },
-        {
-            key: 'beforePost3',
-            value: '0.4',
-            style: ''
-        },
-        {
-            key: 'beforePost4',
-            value: '0.2',
-            style: ''
-        }
-    ],
-    [
-        {
-            key: 'title1',
-            value: '补正值',
-            style: ''
-        },
-        {
-            key: 'editPost1',
-            value: '0.21',
-            style: ''
-        },
-        {
-            key: 'editPost2',
-            value: '0.25',
-            style: ''
-        },
-        {
-            key: 'editPost3',
-            value: '0.42',
-            style: ''
-        },
-        {
-            key: 'editPost4',
-            value: '0.12',
-            style: ''
-        }
-    ],
-    [
-        {
-            key: 'title1',
-            value: '修改后测量',
-            style: ''
-        },
-        {
-            key: 'afterPost1',
-            value: '0.15',
-            style: ''
-        },
-        {
-            key: 'afterPost2',
-            value: '0.22',
-            style: ''
-        },
-        {
-            key: 'afterPost3',
-            value: '0.44',
-            style: ''
-        },
-        {
-            key: 'afterPost4',
-            value: '0.112',
-            style: ''
-        }
-    ]
-]);
-
 // 日志输出
 function logOutput(content: string) {
     if (logs.length == 500) {
@@ -205,20 +121,6 @@ function updateCalibrationStatus(index: number, item: number, i: boolean = true)
 }
 
 export function useProofreadingMachine() {
-    // 修改颜色
-    function changeColor(i1: number, i2: number) {
-        if (i2) {
-            dataBase[i1][i2].style = 't-bg-red-500'
-        }
-    }
-
-    // 右键菜单修改颜色
-    function contextmenuChangeColor(i1: number, i2: number) {
-        if (i2) {
-            dataBase[i1][i2].style = 't-bg-green-500'
-        }
-    }
-
     // 标品状态更新
     function updateStandardStatus(value: any) {
         standardProducts.length = 0
@@ -247,6 +149,7 @@ export function useProofreadingMachine() {
     function calibrationFail(item: number) {
         updateCalibrationStatus(step.value, item, false)
         logOutput(`阶段 ${phase[step.value]} : 校准 A${item + 1} 失败`)
+        automaticCalibrationStop()
     }
 
     // 校准步骤更新
@@ -257,6 +160,12 @@ export function useProofreadingMachine() {
     // 校准完成
     function calibrationSuccess() {
         logOutput('校准完成')
+        automaticCalibrationStop()
+    }
+
+    // 对机步骤失败
+    function checkTheMachineFail(item: number) {
+        updateCalibrationStatus(step.value, item, false)
     }
 
     return {
@@ -270,9 +179,6 @@ export function useProofreadingMachine() {
         step,
         steps,
         columns,
-        dataBase,
-        changeColor,
-        contextmenuChangeColor,
         updateStandardStatus,
         calibrationShortCircuitSuccess,
         calibrationLoadSuccess,
@@ -281,5 +187,6 @@ export function useProofreadingMachine() {
         initSteps,
         calibrationSuccess,
         stepsUpdate,
+        checkTheMachineFail,
     }
 }

@@ -47,11 +47,11 @@ const SetSerialPort = edge.func({
 })
 
 // 获取串口
-const GetSerialPort = edge.func({
-    assemblyFile: url,
-    typeName: "Measurement.Sa250B",
-    methodName: "GetSerialPort",
-})
+// const GetSerialPort = edge.func({
+//     assemblyFile: url,
+//     typeName: "Measurement.Sa250B",
+//     methodName: "GetSerialPort",
+// })
 
 // 标品数据查询
 const GetStandardProductData = edge.func({
@@ -74,6 +74,12 @@ const ScrewAction = edge.func({
     methodName: "ScrewAction",
 })
 
+// 一组测试
+const TestOneGroup = edge.func({
+    assemblyFile: url,
+    typeName: "Measurement.Sa250B",
+    methodName: "TestOneGroup",
+})
 
 // 服务初始化启动
 function ServiceInit(port: string) {
@@ -158,7 +164,7 @@ function ScrewActionExecution(action: number) {
         if (error) return
         i = result
     })
-    console.log(i)
+    console.log('丝杆动作' + i)
 }
 
 const {on} = useIpcRenderer();
@@ -235,7 +241,15 @@ on("worker-receive-calibration-start", (event, step, fixture) => {
 
 // 工作进程验证执行
 on("worker-receive-validation-start", (event) => {
-
+    ScrewActionExecution(0)
+    TestOneGroup(null, (error, result) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+        event.sender.send('worker-send-docking-data', result)
+    })
+    ScrewActionExecution(0)
 })
 
 // 工作进程丝杆动作

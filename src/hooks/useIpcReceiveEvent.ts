@@ -16,6 +16,9 @@ export function useIpcReceiveEvent() {
         calibrationOpenCircuitSuccess,
         calibrationFail,
         stepsUpdate,
+        calibrationSuccess,
+        automaticCalibrationStop,
+        checkTheMachineFail,
     } = useProofreadingMachine();
     const {addWorkshopOptions} = useConfig();
 
@@ -27,7 +30,6 @@ export function useIpcReceiveEvent() {
         globalStore.communicationMode = data.communicationMode
         globalStore.currentAddress = data.currentAddress
         globalStore.proofreadingOperationMode = data.proofreadingOperationMode
-        globalStore.outputDisplay = JSON.parse(data.outputDisplay)
         if (data.outputDisplay == undefined) {
             globalStore.outputDisplay = [
                 {
@@ -46,6 +48,93 @@ export function useIpcReceiveEvent() {
                     label: '验证标品值 :',
                     value: 'N/A',
                 }
+            ]
+        } else {
+            globalStore.outputDisplay = JSON.parse(data.outputDisplay)
+        }
+        if (data.dataBase == undefined) {
+            globalStore.dataBase = [
+                [
+                    {
+                        key: 'title1',
+                        value: '修改前测量',
+                        style: ''
+                    },
+                    {
+                        key: 'beforePost1',
+                        value: 'N/A',
+                        style: ''
+                    },
+                    {
+                        key: 'beforePost2',
+                        value: 'N/A',
+                        style: ''
+                    },
+                    {
+                        key: 'beforePost3',
+                        value: 'N/A',
+                        style: ''
+                    },
+                    {
+                        key: 'beforePost4',
+                        value: 'N/A',
+                        style: ''
+                    }
+                ],
+                [
+                    {
+                        key: 'title1',
+                        value: '补正值',
+                        style: ''
+                    },
+                    {
+                        key: 'editPost1',
+                        value: 'N/A',
+                        style: ''
+                    },
+                    {
+                        key: 'editPost2',
+                        value: 'N/A',
+                        style: ''
+                    },
+                    {
+                        key: 'editPost3',
+                        value: 'N/A',
+                        style: ''
+                    },
+                    {
+                        key: 'editPost4',
+                        value: 'N/A',
+                        style: ''
+                    }
+                ],
+                [
+                    {
+                        key: 'title1',
+                        value: '修改后测量',
+                        style: ''
+                    },
+                    {
+                        key: 'afterPost1',
+                        value: 'N/A',
+                        style: ''
+                    },
+                    {
+                        key: 'afterPost2',
+                        value: 'N/A',
+                        style: ''
+                    },
+                    {
+                        key: 'afterPost3',
+                        value: 'N/A',
+                        style: ''
+                    },
+                    {
+                        key: 'afterPost4',
+                        value: 'N/A',
+                        style: ''
+                    }
+                ]
             ]
         }
     })
@@ -166,6 +255,23 @@ export function useIpcReceiveEvent() {
 
     // 校准步骤完成
     on('render-receive-calibration-step-success', () => {
+        calibrationSuccess()
+    })
 
+    // 对机数据
+    on('render-receive-docking-data', (event, data) => {
+        stepsUpdate(3)
+        for (let i = 0; i < data.length; i++) {
+            if (Number(data[i]) > 10000) {
+                globalStore.updateDataBase(0, i + 1, false, data[i])
+                // checkTheMachineFail(0)
+                // automaticCalibrationStop()
+                // return
+            } else {
+                globalStore.updateDataBase(0, i, true, data[i])
+            }
+        }
+        // TODO: 计算补正值
+        globalStore.calculatedComplement(data)
     })
 }

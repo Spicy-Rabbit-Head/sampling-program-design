@@ -57,7 +57,8 @@ export type GlobalStoreInterface = {
     calibrationMode: Array<SelectOption>
     communicationMode: string,
     proofreadingOperationMode: number,
-    outputDisplay: Array<SelectOption>
+    outputDisplay: Array<OutputDisplayInterface>,
+    dataBase: Array<Array<DataBaseInterface>>,
 }
 
 // 配置文件
@@ -79,4 +80,11 @@ export type StandardProductsInterface = {
 export  type OutputDisplayInterface = {
     label: string,
     value: string,
+}
+
+// 表格数据
+export type DataBaseInterface = {
+    key: string,
+    value: string,
+    style: string,
 }

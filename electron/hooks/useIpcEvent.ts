@@ -287,14 +287,20 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     ipcMain.on('worker-send-step-success', function (_, step) {
         if (step === 2) {
             worker.webContents.send('worker-receive-validation-start')
-            // render.webContents.send('render-receive-calibration-step-success')
+            render.webContents.send('render-receive-calibration-step-success')
             return
         }
         render.webContents.send('render-receive-step-update', step + 1)
         worker.webContents.send('worker-receive-calibration-start', step + 1, localStore.get('currentCalibrationMode'))
     })
+
     // 渲染进程发起丝杆动作
     ipcMain.on('render-send-screw-action', function (_, action) {
         worker.webContents.send('worker-receive-screw-action', action)
+    })
+
+    // 工作进程发起对机数据更新
+    ipcMain.on('worker-send-docking-data', function (_, data) {
+        render.webContents.send('render-receive-docking-data', data)
     })
 }

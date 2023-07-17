@@ -33,6 +33,8 @@ export const useGlobalStore = defineStore('GlobalStore', {
             proofreadingOperationMode: 0,
             // 校对机数据
             outputDisplay: [],
+            // 对机表格数据
+            dataBase: [],
         }
     },
     getters: {
@@ -50,6 +52,26 @@ export const useGlobalStore = defineStore('GlobalStore', {
             this.outputDisplay[2].value = data2.label
             this.outputDisplay[3].value = data2.value
             standardProductUpdate(this.outputDisplay)
+        },
+
+        // 对机表格数据更新
+        updateDataBase(i1: number, i2: number, i3: boolean, value: string) {
+            if (i3) {
+                this.dataBase[i1][i2].style = 't-bg-green-500'
+                this.dataBase[i1][i2].value = value
+            } else {
+                this.dataBase[i1][i2].style = 't-bg-red-500'
+                this.dataBase[i1][i2].value = value
+            }
+        },
+
+        // 计算补偿值
+        calculatedComplement(data: Array<string>) {
+            for (let i = 0; i < 4; i++) {
+                let value = (parseFloat(this.outputDisplay[1].value) - parseFloat(data[i])).toFixed(2)
+                this.updateDataBase(1, i + 1, true, value)
+                console.log(value)
+            }
         }
     }
 })

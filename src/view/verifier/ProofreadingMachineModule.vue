@@ -135,6 +135,7 @@ function handleBeforeOk() {
     return false;
   }
   globalStore.outputDisplayUpdate(dockingNumber.value, verificationNumber.value);
+  handleCancel();
   return true;
 }
 

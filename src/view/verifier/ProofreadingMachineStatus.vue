@@ -8,16 +8,13 @@ const {
   stateWord,
   steps,
   columns,
-  dataBase,
-  changeColor,
-  contextmenuChangeColor
 } = useProofreadingMachine();
-const {outputDisplay} = storeToRefs(useGlobalStore());
+const {outputDisplay, dataBase} = storeToRefs(useGlobalStore());
 
 </script>
 
 <template>
-  <div class="t-flex-auto t-py-2 t-px-10 t-flex t-flex-col t-select-none">
+  <div class="t-w-4/5 t-flex-auto t-py-2 t-px-10 t-flex t-flex-col t-select-none">
     <div class="t-h-[500px] t-flex-none t-grid t-grid-cols-1 t-content-evenly">
       <a-steps v-for="(item1,index1) in steps" :key="index1" :current="item1.current" :status="item1.currentStatus">
         <a-step v-for="item2 in item1.content" :description="item2.content">{{ item1.name + item2.name }}</a-step>
@@ -32,14 +29,13 @@ const {outputDisplay} = storeToRefs(useGlobalStore());
         <a-descriptions :data="outputDisplay" :column="2" bordered/>
       </div>
       <div class="t-p-2 t-m-2 t-text-center">
-        <table class="t-w-full t-h-full t-border-2 t-rounded-md">
-          <tr class="t-bg-gray-200">
+        <table class="t-w-[96%] t-h-full t-border-2 t-rounded-md t-table-fixed">
+          <tr class="t-bg-gray-200 t-w-1/5">
             <th v-for="item in columns" :key="item.dataIndex">{{ item.title }}</th>
           </tr>
           <tr v-for="(item1,index1) in dataBase" :key="index1">
-            <td class="t-border-2" :class="item2.style" v-for="(item2,index2) in item1" :key="item2.key"
-                @click.stop="changeColor(index1,index2)"
-                @contextmenu.prevent.stop="contextmenuChangeColor(index1,index2)">
+            <td class="t-border-2 t-truncate t-px-1" :class="item2.style" v-for="(item2) in item1"
+                :key="item2.key">
               {{ item2.value }}
             </td>
           </tr>
