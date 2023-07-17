@@ -27,7 +27,7 @@ export function useIpcReceiveEvent() {
         globalStore.communicationMode = data.communicationMode
         globalStore.currentAddress = data.currentAddress
         globalStore.proofreadingOperationMode = data.proofreadingOperationMode
-        globalStore.outputDisplay = data.outputDisplay
+        globalStore.outputDisplay = JSON.parse(data.outputDisplay)
         if (data.outputDisplay == undefined) {
             globalStore.outputDisplay = [
                 {

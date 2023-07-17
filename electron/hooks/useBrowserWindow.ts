@@ -53,7 +53,7 @@ export function useBrowserWindow() {
             title: '服务程式',
         })
         if (process.env.VITE_DEV_SERVER_URL) {
-            worker.webContents.toggleDevTools();
+            // worker.webContents.toggleDevTools();
             worker.loadURL(posix.join(process.env.VITE_DEV_SERVER_URL, 'electron/worker', 'worker.html')).then()
         } else {
             worker.loadFile('dist/electron/worker/worker.html').then();

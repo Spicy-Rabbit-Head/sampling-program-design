@@ -1,7 +1,9 @@
 import {defineStore} from "pinia";
 import {ConfigStoreInterface, GlobalStoreInterface} from "@/type/interface.ts";
+import {useIpcSendEvent} from "@/hooks/useIpcSendEvent.ts";
 // 当前文件正则
 const regex: RegExp = /\\([^\\.]+)\./;
+const {standardProductUpdate} = useIpcSendEvent();
 
 export const useGlobalStore = defineStore('GlobalStore', {
     state: (): GlobalStoreInterface => {
@@ -47,6 +49,7 @@ export const useGlobalStore = defineStore('GlobalStore', {
             this.outputDisplay[1].value = data1.value
             this.outputDisplay[2].value = data2.label
             this.outputDisplay[3].value = data2.value
+            standardProductUpdate(this.outputDisplay)
         }
     }
 })

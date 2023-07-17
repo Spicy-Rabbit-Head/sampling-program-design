@@ -90,6 +90,11 @@ export function useIpcSendEvent() {
         send('render-send-set-store', 'standardProductPassword', value);
     }
 
+    // 校对机标品数据
+    function standardProductUpdate(value: any) {
+        send('render-send-set-store', 'outputDisplay', JSON.stringify(value));
+    }
+
     // 标品数据查询
     function standardProductQuery(file: string) {
         send('render-send-standard-query', file);
@@ -134,6 +139,7 @@ export function useIpcSendEvent() {
         iniConfigurationUpdate,
         standardProductQuery,
         workshopListQuery,
+        standardProductUpdate,
         workshopListUpdate,
         automaticCalibrationStarts,
         screwAction,

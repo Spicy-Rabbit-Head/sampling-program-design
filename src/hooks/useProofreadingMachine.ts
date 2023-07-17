@@ -246,7 +246,7 @@ export function useProofreadingMachine() {
     // 校准阶段失败
     function calibrationFail(item: number) {
         updateCalibrationStatus(step.value, item, false)
-        logOutput(`阶段 ${step.value} 校准 ${item} 失败`)
+        logOutput(`阶段 ${phase[step.value]} : 校准 A${item + 1} 失败`)
     }
 
     // 校准步骤更新
