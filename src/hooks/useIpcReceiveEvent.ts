@@ -19,6 +19,7 @@ export function useIpcReceiveEvent() {
         calibrationSuccess,
         automaticCalibrationStop,
         checkTheMachineFail,
+        checkTheMachineSuccess,
     } = useProofreadingMachine();
     const {addWorkshopOptions} = useConfig();
 
@@ -271,7 +272,15 @@ export function useIpcReceiveEvent() {
                 globalStore.updateDataBase(0, i, true, data[i])
             }
         }
-        // TODO: 计算补正值
-        globalStore.calculatedComplement(data)
+        // 计算补正值
+        let amend = globalStore.calculatedComplement(data)
+        if (amend == null) {
+            checkTheMachineFail(0)
+            automaticCalibrationStop()
+            return
+        } else {
+            checkTheMachineSuccess(0)
+            event.sender.send('render-send-write-compensation', amend)
+        }
     })
 }

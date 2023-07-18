@@ -303,4 +303,9 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     ipcMain.on('worker-send-docking-data', function (_, data) {
         render.webContents.send('render-receive-docking-data', data)
     })
+
+    // 渲染进程发起写入补偿
+    ipcMain.on('render-send-write-compensation', function (_, data) {
+
+    })
 }

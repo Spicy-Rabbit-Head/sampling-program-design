@@ -168,6 +168,11 @@ export function useProofreadingMachine() {
         updateCalibrationStatus(step.value, item, false)
     }
 
+    // 对机步骤成功
+    function checkTheMachineSuccess(item: number) {
+        updateCalibrationStatus(step.value, item)
+    }
+
     return {
         stateWord,
         calibrationStatus,
@@ -188,5 +193,6 @@ export function useProofreadingMachine() {
         calibrationSuccess,
         stepsUpdate,
         checkTheMachineFail,
+        checkTheMachineSuccess,
     }
 }

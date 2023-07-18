@@ -8,7 +8,7 @@ import ProofreadingMachineStatus from "@/view/verifier/ProofreadingMachineStatus
 import {useGlobalStore} from "@/store";
 import {storeToRefs} from "pinia";
 import {useIpcSendEvent} from "@/hooks/useIpcSendEvent.ts";
-import {onMounted, ref} from "vue";
+import {onMounted, ref, reactive} from "vue";
 import {useHome} from "@/hooks/useHome.ts";
 import {SelectOption, useNotification} from "naive-ui";
 
@@ -90,6 +90,12 @@ const dockingNumber = ref<SelectOption>({});
 // 验证标品编号
 const verificationNumber = ref<SelectOption>({});
 
+// 临时
+const temporarily = reactive({
+  value1: '',
+  value2: '',
+});
+
 // 刷新动画
 const loading = ref<boolean>(false);
 
@@ -144,6 +150,8 @@ function handleCancel() {
   visible.value = false;
   dockingNumber.value = {};
   verificationNumber.value = {};
+  temporarily.value1 = '';
+  temporarily.value2 = '';
 }
 
 // 选择赋值
@@ -283,12 +291,12 @@ function VerificationUpdate(_: any, option: SelectOption) {
       <div class="t-grid t-grid-cols-2">
         <div>
           <span>选择对机标品编号 :</span>
-          <n-select :options="standardProducts" @update-value="DockingUpdate"
+          <n-select v-model:value="temporarily.value1" :options="standardProducts" @update-value="DockingUpdate"
                     :disabled="proofreadingOperationMode == 1"/>
         </div>
         <div>
           <span>选择验证标品编号 :</span>
-          <n-select :options="standardProducts" @update-value="VerificationUpdate"
+          <n-select v-model:value="temporarily.value2" :options="standardProducts" @update-value="VerificationUpdate"
                     :disabled="proofreadingOperationMode == 1"/>
         </div>
       </div>

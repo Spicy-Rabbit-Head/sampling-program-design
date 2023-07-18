@@ -66,12 +66,19 @@ export const useGlobalStore = defineStore('GlobalStore', {
         },
 
         // 计算补偿值
-        calculatedComplement(data: Array<string>) {
+        calculatedComplement(data: Array<string>): Array<string> | null {
+            let list: Array<string> | null = []
             for (let i = 0; i < 4; i++) {
                 let value = (parseFloat(this.outputDisplay[1].value) - parseFloat(data[i])).toFixed(2)
-                this.updateDataBase(1, i + 1, true, value)
-                console.log(value)
+                if (value.length > 2) {
+                    this.updateDataBase(1, i + 1, false, value)
+                    return null
+                } else {
+                    this.updateDataBase(1, i + 1, true, value)
+                }
+                list.push(value)
             }
+            return list
         }
     }
 })
