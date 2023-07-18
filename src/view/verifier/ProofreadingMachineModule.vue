@@ -12,13 +12,13 @@ import {onMounted, ref, reactive} from "vue";
 import {useHome} from "@/hooks/useHome.ts";
 import {SelectOption, useNotification} from "naive-ui";
 
-
 // 校对机闭包
 const {
   calibrationStatus,
   automaticCalibrationStop,
   logs,
   standardProducts,
+  outputDisplayUpdate,
 } = useProofreadingMachine();
 
 // 全局状态
@@ -140,7 +140,7 @@ function handleBeforeOk() {
     errorNotification('对机编号和验证编号不能相同');
     return false;
   }
-  globalStore.outputDisplayUpdate(dockingNumber.value, verificationNumber.value);
+  outputDisplayUpdate(dockingNumber.value, verificationNumber.value);
   handleCancel();
   return true;
 }
@@ -161,6 +161,18 @@ function DockingUpdate(_: any, option: SelectOption) {
 
 function VerificationUpdate(_: any, option: SelectOption) {
   verificationNumber.value = option;
+}
+
+// 日志滚动 DOM
+const logsScroll = ref<HTMLDivElement | null>(null);
+
+function logScrollStart(i: boolean) {
+  if (logsScroll.value == null) return;
+  if (i) {
+    logsScroll.value.scrollTop = 0;
+  } else {
+    logsScroll.value.scrollTop = logsScroll.value.scrollHeight;
+  }
 }
 
 </script>
@@ -249,7 +261,7 @@ function VerificationUpdate(_: any, option: SelectOption) {
                           table-layout="fixed"
                           layout="vertical"/>
         </div>
-        <n-button type="error" dashed class="t-w-20 t-mt-2 t-ml-auto">
+        <n-button type="error" dashed class="t-w-20 t-mt-2 t-ml-auto" @click.stop="logs.length = 0">
           清除记录
         </n-button>
         <!-- 日志框 -->
@@ -257,24 +269,25 @@ function VerificationUpdate(_: any, option: SelectOption) {
           <!-- 日志顶栏 -->
           <div class="t-border-b-2 t-h-12 t-flex t-justify-between t-items-center t-px-1">
             <span>日志记录框</span>
-            <span>{{ logs.length + ' : 500' }}</span>
+            <span>{{ logs.length + ' : 200' }}</span>
             <div class="t-cursor-pointer">
               <n-popover trigger="hover" placement="right">
                 <template #trigger>
-                  <icon-ant-design-caret-up-outlined/>
+                  <icon-ant-design-caret-up-outlined @click.stop="logScrollStart(true)"/>
                 </template>
                 <span>滚动到顶部</span>
               </n-popover>
               <n-popover trigger="hover" placement="right">
                 <template #trigger>
-                  <icon-ant-design-caret-down-outlined/>
+                  <icon-ant-design-caret-down-outlined @click.stop="logScrollStart(false)"/>
                 </template>
                 <span>滚动到底部</span>
               </n-popover>
             </div>
           </div>
           <!-- 日志主体 -->
-          <div class="t-flex-auto t-px-1 t-break-words t-overflow-y-auto">
+          <div ref="logsScroll"
+               class="t-h-0 t-grow t-px-1 t-break-words t-overflow-y-auto t-scroll-smooth t-overflow-hidden">
             <div v-for="item in logs">
               {{ item.time }} :
               <p>{{ item.content }}</p>

@@ -9,6 +9,7 @@ export function useIpcReceiveEvent() {
     const globalStore = useGlobalStore();
     const configStore = useConfigStore();
     const {
+        init,
         step,
         updateStandardStatus,
         calibrationShortCircuitSuccess,
@@ -20,6 +21,9 @@ export function useIpcReceiveEvent() {
         automaticCalibrationStop,
         checkTheMachineFail,
         checkTheMachineSuccess,
+        calculatedComplement,
+        calculateDifference,
+        updateDataBase,
     } = useProofreadingMachine();
     const {addWorkshopOptions} = useConfig();
 
@@ -31,113 +35,6 @@ export function useIpcReceiveEvent() {
         globalStore.communicationMode = data.communicationMode
         globalStore.currentAddress = data.currentAddress
         globalStore.proofreadingOperationMode = data.proofreadingOperationMode
-        if (data.outputDisplay == undefined) {
-            globalStore.outputDisplay = [
-                {
-                    label: '对机标品编号 :',
-                    value: 'N/A',
-                },
-                {
-                    label: '对机标品值 :',
-                    value: 'N/A',
-                },
-                {
-                    label: '验证标品编号 :',
-                    value: 'N/A',
-                },
-                {
-                    label: '验证标品值 :',
-                    value: 'N/A',
-                }
-            ]
-        } else {
-            globalStore.outputDisplay = JSON.parse(data.outputDisplay)
-        }
-        if (data.dataBase == undefined) {
-            globalStore.dataBase = [
-                [
-                    {
-                        key: 'title1',
-                        value: '修改前测量',
-                        style: ''
-                    },
-                    {
-                        key: 'beforePost1',
-                        value: 'N/A',
-                        style: ''
-                    },
-                    {
-                        key: 'beforePost2',
-                        value: 'N/A',
-                        style: ''
-                    },
-                    {
-                        key: 'beforePost3',
-                        value: 'N/A',
-                        style: ''
-                    },
-                    {
-                        key: 'beforePost4',
-                        value: 'N/A',
-                        style: ''
-                    }
-                ],
-                [
-                    {
-                        key: 'title1',
-                        value: '补正值',
-                        style: ''
-                    },
-                    {
-                        key: 'editPost1',
-                        value: 'N/A',
-                        style: ''
-                    },
-                    {
-                        key: 'editPost2',
-                        value: 'N/A',
-                        style: ''
-                    },
-                    {
-                        key: 'editPost3',
-                        value: 'N/A',
-                        style: ''
-                    },
-                    {
-                        key: 'editPost4',
-                        value: 'N/A',
-                        style: ''
-                    }
-                ],
-                [
-                    {
-                        key: 'title1',
-                        value: '修改后测量',
-                        style: ''
-                    },
-                    {
-                        key: 'afterPost1',
-                        value: 'N/A',
-                        style: ''
-                    },
-                    {
-                        key: 'afterPost2',
-                        value: 'N/A',
-                        style: ''
-                    },
-                    {
-                        key: 'afterPost3',
-                        value: 'N/A',
-                        style: ''
-                    },
-                    {
-                        key: 'afterPost4',
-                        value: 'N/A',
-                        style: ''
-                    }
-                ]
-            ]
-        }
     })
 
     // 读取可修改配置
@@ -151,6 +48,11 @@ export function useIpcReceiveEvent() {
             event.sender.send('render-send-set-store', 'permissionPassword', '666666')
         }
         configStore.currentWorkshop = data.currentWorkshop
+    })
+
+    // 读取缓存配置
+    on('render-receive-read-store', (_, data: any) => {
+        init(JSON.parse(data))
     })
 
     // 读取250BINI配置
@@ -269,16 +171,16 @@ export function useIpcReceiveEvent() {
         }
         for (let i = 0; i < data.length; i++) {
             if (Number(data[i]) > 10000) {
-                globalStore.updateDataBase(0, i + 1, false, data[i])
+                updateDataBase(0, i + 1, false, data[i])
                 checkTheMachineFail(0)
                 automaticCalibrationStop()
                 return
             } else {
-                globalStore.updateDataBase(0, i, true, data[i])
+                updateDataBase(0, i, true, data[i])
             }
         }
         // 计算补正值
-        let amend = globalStore.calculatedComplement(data)
+        let amend = calculatedComplement(data)
         if (amend == null) {
             checkTheMachineFail(0)
             automaticCalibrationStop()
@@ -308,7 +210,7 @@ export function useIpcReceiveEvent() {
             automaticCalibrationStop()
             return
         }
-        if (globalStore.calculateDifference(data) == null) {
+        if (calculateDifference(data) == null) {
             checkTheMachineFail(2)
             automaticCalibrationStop()
             return

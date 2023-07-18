@@ -1,6 +1,9 @@
 import {reactive, ref} from "vue";
-import {Log, StandardProductsInterface, Step} from "@/type/interface.ts";
+import {DataBaseInterface, Log, OutputDisplayInterface, StandardProductsInterface, Step} from "@/type/interface.ts";
 import dayjs from 'dayjs'
+import {useIpcSendEvent} from "@/hooks/useIpcSendEvent.ts";
+
+const {standardProductUpdate, cacheDataSave} = useIpcSendEvent();
 
 // 校对机开启状态
 const calibrationStatus = ref<boolean>(false);
@@ -23,6 +26,13 @@ function calibrationStarts() {
 function automaticCalibrationStop() {
     calibrationStatus.value = false
     step.value = 0
+    // 持久化数据
+    let data = {
+        steps: steps,
+        outputDisplay: outputDisplay,
+        dataBase: dataBase
+    }
+    cacheDataSave(JSON.stringify(data));
 }
 
 // 日志数据
@@ -41,6 +51,22 @@ const checkTheMachine = ['计算补偿值', '补偿值写入', '验证']
 
 // 校对机步骤数据
 const steps: Step[] = reactive<Array<Step>>([])
+
+// 校对机数据
+const outputDisplay = reactive<Array<OutputDisplayInterface>>([])
+
+// 对机表格数据
+const dataBase = reactive<Array<Array<DataBaseInterface>>>([])
+
+// 初始化
+function init(data: any) {
+    steps.length = 0
+    outputDisplay.length = 0
+    dataBase.length = 0
+    steps.push(...data.steps)
+    outputDisplay.push(...data.outputDisplay)
+    dataBase.push(...data.dataBase)
+}
 
 // 初始化校对机步骤数据
 function initSteps() {
@@ -98,8 +124,8 @@ const columns = [
 
 // 日志输出
 function logOutput(content: string) {
-    if (logs.length == 500) {
-        logs.splice(0, 300)
+    if (logs.length == 200) {
+        logs.splice(0, 150)
     }
     logs.push({
         time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
@@ -118,6 +144,57 @@ function updateCalibrationStatus(index: number, item: number, i: boolean = true)
         steps[index].currentStatus = 'error'
         steps[index].content[item].content = '失败'
     }
+}
+
+// 校对机数据更新
+function outputDisplayUpdate(data1: any, data2: any) {
+    outputDisplay[0].value = data1.label
+    outputDisplay[1].value = data1.value
+    outputDisplay[2].value = data2.label
+    outputDisplay[3].value = data2.value
+    standardProductUpdate(outputDisplay)
+}
+
+// 对机表格数据更新
+function updateDataBase(i1: number, i2: number, i3: boolean, value: string) {
+    if (i3) {
+        dataBase[i1][i2].style = 't-bg-green-500'
+        dataBase[i1][i2].value = value
+    } else {
+        dataBase[i1][i2].style = 't-bg-red-500'
+        dataBase[i1][i2].value = value
+    }
+}
+
+// 计算补偿值
+function calculatedComplement(data: Array<string>): Array<string> | null {
+    let list: Array<string> | null = []
+    for (let i = 0; i < 4; i++) {
+        let value = (parseFloat(outputDisplay[1].value) - parseFloat(data[i])).toFixed(2)
+        if (value.length > 2) {
+            updateDataBase(1, i + 1, false, value)
+            return null
+        } else {
+            updateDataBase(1, i + 1, true, value)
+        }
+        list.push(value)
+    }
+    return list
+}
+
+// 计算差值判断
+function calculateDifference(data: Array<string>) {
+    for (let i = 1; i < 5; i++) {
+        // 计算两个数之间的差值（取绝对值）
+        let difference = Math.abs(Number(dataBase[2][i].value) - Number(data[i - 1]));
+        if (difference >= 1) {
+            updateDataBase(2, i, false, data[i - 1])
+            return null
+        } else {
+            updateDataBase(2, i, true, data[i - 1])
+        }
+    }
+    return true
 }
 
 export function useProofreadingMachine() {
@@ -150,6 +227,7 @@ export function useProofreadingMachine() {
         updateCalibrationStatus(step.value, item, false)
         logOutput(`阶段 ${phase[step.value]} : 校准 A${item + 1} 失败`)
         automaticCalibrationStop()
+
     }
 
     // 校准步骤更新
@@ -174,6 +252,7 @@ export function useProofreadingMachine() {
     }
 
     return {
+        init,
         stateWord,
         calibrationStatus,
         calibrationStarts,
@@ -194,5 +273,11 @@ export function useProofreadingMachine() {
         stepsUpdate,
         checkTheMachineFail,
         checkTheMachineSuccess,
+        outputDisplayUpdate,
+        calculatedComplement,
+        calculateDifference,
+        updateDataBase,
+        outputDisplay,
+        dataBase,
     }
 }

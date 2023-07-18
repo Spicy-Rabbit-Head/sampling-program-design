@@ -2,7 +2,7 @@ import {useIpcRenderer} from "@vueuse/electron";
 import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
 
 const {send} = useIpcRenderer();
-const {calibrationStarts, initSteps} = useProofreadingMachine();
+const {calibrationStarts, initSteps,} = useProofreadingMachine();
 
 export function useIpcSendEvent() {
     // 渲染进程初始化
@@ -123,6 +123,16 @@ export function useIpcSendEvent() {
         send('render-send-screw-action', i);
     }
 
+    // 缓存数据保存
+    function cacheDataSave(s: string) {
+        send('render-send-cache-data-save', s);
+    }
+
+    // 缓存数据读取
+    function cacheDataRead() {
+        send('render-send-cache-data-read');
+    }
+
     return {
         renderThreadInitialization,
         dllInitialization,
@@ -144,5 +154,7 @@ export function useIpcSendEvent() {
         automaticCalibrationStarts,
         screwAction,
         proofreadingOperationModeUpdate,
+        cacheDataSave,
+        cacheDataRead,
     }
 }

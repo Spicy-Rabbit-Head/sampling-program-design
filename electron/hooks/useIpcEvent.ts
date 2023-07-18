@@ -127,13 +127,10 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     ipcMain.on('render-send-workshop-list-query', function (event) {
         try {
             // 自定义配置文件读取
-            let pathName;
+            let pathName = join(__dirname, '../../customConfig.ini');
             if (process.env.VITE_DEV_SERVER_URL) {
-                pathName = __dirname + '../../public/customConfig.ini'
-            } else {
-                pathName = join(__dirname, '../../customConfig.ini')
+                pathName = join(__dirname + '../../public/customConfig.ini')
             }
-            console.log(pathName)
             let iniRead = ini.parse(fs.readFileSync(pathName, 'utf8'));
             let calibrationList: Array<SelectOption> = [];
             for (let key in iniRead.WORKSHOP) {
@@ -329,5 +326,33 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     // 工作进程发起验证结果
     ipcMain.on('worker-send-verification-result', function (_, result) {
         render.webContents.send('render-receive-verification-result', result)
+    })
+
+    // 渲染进程发起缓存数据保存
+    ipcMain.on('render-send-cache-data-save', function (_, data) {
+        let path = join(__dirname, '../../cache.json');
+        if (process.env.VITE_DEV_SERVER_URL) {
+            path = join(__dirname + '../../public/cache.json')
+        }
+        fs.writeFile(path, data, 'utf8', function (err) {
+            if (err) {
+                console.log(err)
+            }
+        })
+    })
+
+    // 渲染进程发起缓存数据读取
+    ipcMain.on('render-send-cache-data-read', function (event) {
+        let path = join(__dirname, '../../cache.json');
+        if (process.env.VITE_DEV_SERVER_URL) {
+            path = join(__dirname + '../../public/cache.json')
+        }
+        fs.readFile(path, 'utf8', function (err, data) {
+            if (err) {
+                console.log(err)
+            } else {
+                event.reply('render-receive-read-store', data)
+            }
+        })
     })
 }

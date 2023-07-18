@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import IconNotoFaceWithMonocle from "~icons/noto/FaceWithMonocle";
 import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
-import {useGlobalStore} from "@/store";
-import {storeToRefs} from "pinia";
 
 const {
   stateWord,
   steps,
   columns,
+  outputDisplay,
+  dataBase
 } = useProofreadingMachine();
-const {outputDisplay, dataBase} = storeToRefs(useGlobalStore());
 
 </script>
 
