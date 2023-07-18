@@ -81,6 +81,13 @@ const TestOneGroup = edge.func({
     methodName: "TestOneGroup",
 })
 
+// 写入补偿值
+const WriteStandardProduct = edge.func({
+    assemblyFile: url,
+    typeName: "Measurement.Sa250B",
+    methodName: "WriteStandardProduct",
+})
+
 // 服务初始化启动
 function ServiceInit(port: string) {
     Init(port, (error, result) => {
@@ -167,6 +174,19 @@ function ScrewActionExecution(action: number) {
     console.log('丝杆动作' + i)
 }
 
+// 一组测试
+function TestOneGroupExecution() {
+    let i;
+    TestOneGroup(null, (error, result) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+        i = result;
+    })
+    return i;
+}
+
 const {on} = useIpcRenderer();
 
 // 工作进程服务停止
@@ -242,18 +262,34 @@ on("worker-receive-calibration-start", (event, step, fixture) => {
 // 工作进程验证执行
 on("worker-receive-validation-start", (event) => {
     ScrewActionExecution(0)
-    TestOneGroup(null, (error, result) => {
-        if (error) {
-            console.log(error)
-            return
-        }
-        event.sender.send('worker-send-docking-data', result)
-    })
+    event.sender.send('worker-send-docking-data', TestOneGroupExecution())
     ScrewActionExecution(0)
 })
 
 // 工作进程丝杆动作
 on("worker-receive-screw-action", (event, action) => {
     ScrewActionExecution(action)
+})
+
+// 工作进程写入补偿值
+on("worker-receive-write-compensation", (event, data) => {
+    WriteStandardProduct(data, (error, result) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+        if (result == null) {
+            event.sender.send('worker-send-write-compensation-error', error)
+        } else {
+            event.sender.send('worker-send-write-compensation-success')
+        }
+    })
+})
+
+// 工作进验证补偿
+on("worker-receive-verification-compensation", (event) => {
+    ScrewActionExecution(0)
+    event.sender.send('worker-send-verification-result', TestOneGroupExecution())
+    ScrewActionExecution(0)
 })
 

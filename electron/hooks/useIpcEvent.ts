@@ -79,6 +79,7 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     ipcMain.on('render-send-window-close', function () {
         // 关闭服务
         worker.webContents.send('worker-receive-stop-service')
+
         render.close()
     })
 
@@ -306,6 +307,27 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
 
     // 渲染进程发起写入补偿
     ipcMain.on('render-send-write-compensation', function (_, data) {
+        worker.webContents.send('worker-receive-write-compensation', data)
+    })
 
+    // 工作进程发起写入补偿失败
+    ipcMain.on('worker-send-write-compensation-error', function (_, error) {
+        console.log(error)
+        render.webContents.send('render-receive-write-compensation-error')
+    })
+
+    // 工作进程发起写入补偿成功
+    ipcMain.on('worker-send-write-compensation-success', function () {
+        render.webContents.send('render-receive-write-compensation-success')
+    })
+
+    // 渲染进程发起验证补偿
+    ipcMain.on('render-send-verification-compensation', function () {
+        worker.webContents.send('worker-receive-verification-compensation')
+    })
+
+    // 工作进程发起验证结果
+    ipcMain.on('worker-send-verification-result', function (_, result) {
+        render.webContents.send('render-receive-verification-result', result)
     })
 }

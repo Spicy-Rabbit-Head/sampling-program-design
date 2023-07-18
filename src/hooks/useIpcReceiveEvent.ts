@@ -262,12 +262,17 @@ export function useIpcReceiveEvent() {
     // 对机数据
     on('render-receive-docking-data', (event, data) => {
         stepsUpdate(3)
+        if (data == null) {
+            checkTheMachineFail(0)
+            automaticCalibrationStop()
+            return
+        }
         for (let i = 0; i < data.length; i++) {
             if (Number(data[i]) > 10000) {
                 globalStore.updateDataBase(0, i + 1, false, data[i])
-                // checkTheMachineFail(0)
-                // automaticCalibrationStop()
-                // return
+                checkTheMachineFail(0)
+                automaticCalibrationStop()
+                return
             } else {
                 globalStore.updateDataBase(0, i, true, data[i])
             }
@@ -281,6 +286,35 @@ export function useIpcReceiveEvent() {
         } else {
             checkTheMachineSuccess(0)
             event.sender.send('render-send-write-compensation', amend)
+        }
+    })
+
+    // 写入补正值成功
+    on('render-receive-write-compensation-success', (event) => {
+        checkTheMachineSuccess(1)
+        event.sender.send('render-send-verification-compensation')
+    })
+
+    // 写入补正值失败
+    on('render-receive-write-compensation-error', () => {
+        checkTheMachineFail(1)
+        automaticCalibrationStop()
+    })
+
+    // 验证结果
+    on('render-receive-verification-result', (_, data) => {
+        if (data == null) {
+            checkTheMachineFail(2)
+            automaticCalibrationStop()
+            return
+        }
+        if (globalStore.calculateDifference(data) == null) {
+            checkTheMachineFail(2)
+            automaticCalibrationStop()
+            return
+        } else {
+            checkTheMachineSuccess(2)
+            automaticCalibrationStop()
         }
     })
 }

@@ -79,6 +79,21 @@ export const useGlobalStore = defineStore('GlobalStore', {
                 list.push(value)
             }
             return list
+        },
+
+        // 计算差值判断
+        calculateDifference(data: Array<string>) {
+            for (let i = 1; i < 5; i++) {
+                // 计算两个数之间的差值（取绝对值）
+                let difference = Math.abs(Number(this.dataBase[2][i].value) - Number(data[i - 1]));
+                if (difference >= 1) {
+                    this.updateDataBase(2, i, false, data[i - 1])
+                    return null
+                } else {
+                    this.updateDataBase(2, i, true, data[i - 1])
+                }
+            }
+            return true
         }
     }
 })
