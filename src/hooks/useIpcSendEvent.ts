@@ -2,7 +2,7 @@ import {useIpcRenderer} from "@vueuse/electron";
 import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
 
 const {send} = useIpcRenderer();
-const {calibrationStarts, initSteps,} = useProofreadingMachine();
+const {calibrationStarts, initSteps} = useProofreadingMachine();
 
 export function useIpcSendEvent() {
     // 渲染进程初始化

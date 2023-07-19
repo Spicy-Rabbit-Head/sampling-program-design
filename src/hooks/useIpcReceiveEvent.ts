@@ -21,8 +21,6 @@ export function useIpcReceiveEvent() {
         automaticCalibrationStop,
         checkTheMachineFail,
         checkTheMachineSuccess,
-        calculatedComplement,
-        calculateDifference,
         updateDataBase,
     } = useProofreadingMachine();
     const {addWorkshopOptions} = useConfig();
@@ -35,6 +33,16 @@ export function useIpcReceiveEvent() {
         globalStore.communicationMode = data.communicationMode
         globalStore.currentAddress = data.currentAddress
         globalStore.proofreadingOperationMode = data.proofreadingOperationMode
+        if (data.outputDisplay == undefined) {
+            globalStore.outputDisplay.push(
+                {label: "对机标品编号 :", value: "13"},
+                {label: "对机标:", value: "-1.54"},
+                {label: "验证标品编号 :", value: "97"},
+                {label: "验验标品值 :", value: "-1.68"}
+            )
+        } else {
+            globalStore.outputDisplay = JSON.parse(data.outputDisplay)
+        }
     })
 
     // 读取可修改配置
@@ -180,7 +188,7 @@ export function useIpcReceiveEvent() {
             }
         }
         // 计算补正值
-        let amend = calculatedComplement(data)
+        let amend = globalStore.calculatedComplement(data)
         if (amend == null) {
             checkTheMachineFail(0)
             automaticCalibrationStop()
@@ -210,7 +218,7 @@ export function useIpcReceiveEvent() {
             automaticCalibrationStop()
             return
         }
-        if (calculateDifference(data) == null) {
+        if (globalStore.calculateDifference(data) == null) {
             checkTheMachineFail(2)
             automaticCalibrationStop()
             return

@@ -1,7 +1,12 @@
 import {defineStore} from "pinia";
 import {ConfigStoreInterface, GlobalStoreInterface} from "@/type/interface.ts";
+import {useIpcSendEvent} from "@/hooks/useIpcSendEvent.ts";
+import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
 // 当前文件正则
 const regex: RegExp = /\\([^\\.]+)\./;
+
+const {standardProductUpdate} = useIpcSendEvent();
+const {updateDataBase} = useProofreadingMachine();
 export const useGlobalStore = defineStore('GlobalStore', {
     state: (): GlobalStoreInterface => {
         return {
@@ -28,6 +33,8 @@ export const useGlobalStore = defineStore('GlobalStore', {
             communicationMode: '',
             // 校对机运行模式
             proofreadingOperationMode: 0,
+            // 校对机数据
+            outputDisplay: []
         }
     },
     getters: {
@@ -37,7 +44,45 @@ export const useGlobalStore = defineStore('GlobalStore', {
             return str ? str[1] : ''
         }
     },
-    actions: {}
+    actions: {
+        // 校对机数据更新
+        outputDisplayUpdate(data1: any, data2: any) {
+            this.outputDisplay[0].value = data1.label
+            this.outputDisplay[1].value = data1.value
+            this.outputDisplay[2].value = data2.label
+            this.outputDisplay[3].value = data2.value
+            standardProductUpdate(this.outputDisplay)
+        },
+        // 计算补偿值
+        calculatedComplement(data: Array<string>): Array<string> | null {
+            let list: Array<string> | null = []
+            for (let i = 0; i < 4; i++) {
+                let value = (parseFloat(this.outputDisplay[1].value) - parseFloat(data[i])).toFixed(2)
+                if (value.length > 2) {
+                    updateDataBase(1, i + 1, false, value)
+                    return null
+                } else {
+                    updateDataBase(1, i + 1, true, value)
+                }
+                list.push(value)
+            }
+            return list
+        },
+        // 计算差值判断
+        calculateDifference(data: Array<string>) {
+            for (let i = 0; i < 4; i++) {
+                // 计算两个数之间的差值（取绝对值）
+                let difference = Math.abs(Number(this.outputDisplay[2].value) - Number(data[i]));
+                if (difference >= 1) {
+                    updateDataBase(2, i + 1, false, data[i])
+                    return null
+                } else {
+                    updateDataBase(2, i + 1, true, data[i])
+                }
+            }
+            return true
+        }
+    },
 })
 
 

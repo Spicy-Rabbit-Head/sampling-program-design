@@ -57,6 +57,7 @@ export type GlobalStoreInterface = {
     calibrationMode: Array<SelectOption>
     communicationMode: string,
     proofreadingOperationMode: number,
+    outputDisplay: Array<OutputDisplayInterface>
 }
 
 // 配置文件

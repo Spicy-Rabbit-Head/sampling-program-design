@@ -20,8 +20,10 @@ use([
     MarkLineComponent
 ]);
 
+// 随机数据
 const data = ref([[0, 0]])
 
+// 添加随机数据
 function addData() {
     let s = Math.floor((Math.random() * (3 - -3) + -3) * 10) / 10;
     let index = data.value.findIndex(item => item[0] === s)
@@ -37,6 +39,7 @@ setInterval(() => {
     addData()
 }, 1000)
 
+// echarts配置
 const option = computed(() => {
     return {
         tooltip: {

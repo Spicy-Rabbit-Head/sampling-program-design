@@ -18,7 +18,6 @@ const {
   automaticCalibrationStop,
   logs,
   standardProducts,
-  outputDisplayUpdate,
 } = useProofreadingMachine();
 
 // 全局状态
@@ -140,7 +139,7 @@ function handleBeforeOk() {
     errorNotification('对机编号和验证编号不能相同');
     return false;
   }
-  outputDisplayUpdate(dockingNumber.value, verificationNumber.value);
+  globalStore.outputDisplayUpdate(dockingNumber.value, verificationNumber.value);
   handleCancel();
   return true;
 }
@@ -258,8 +257,7 @@ function logScrollStart(i: boolean) {
             </n-tooltip>
           </div>
           <a-descriptions :value-style="{padding:'4px 2px'}" align="center" :data="standardProducts" bordered
-                          table-layout="fixed"
-                          layout="vertical"/>
+                          table-layout="fixed" layout="vertical"/>
         </div>
         <n-button type="error" dashed class="t-w-20 t-mt-2 t-ml-auto" @click.stop="logs.length = 0">
           清除记录
