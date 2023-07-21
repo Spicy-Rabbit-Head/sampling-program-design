@@ -165,7 +165,10 @@ export function useIpcReceiveEvent() {
     })
 
     // 校准步骤完成
-    on('render-receive-calibration-step-success', () => {
+    on('render-receive-calibration-step-success', (_, i) => {
+        if (i == true) {
+            return
+        }
         calibrationSuccess()
     })
 

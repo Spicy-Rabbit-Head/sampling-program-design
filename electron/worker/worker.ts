@@ -14,78 +14,85 @@ const url = environment
 // DLL初始化
 const Init = edge.func({
     assemblyFile: url,
-    typeName: "Measurement.Sa250B",
+    typeName: "Measurement.Entrance",
     methodName: "Init",
 })
 
 // 启动250B
 const OpenMeasuringProgram = edge.func({
     assemblyFile: url,
-    typeName: "Measurement.Sa250B",
+    typeName: "Measurement.Entrance",
     methodName: "OpenMeasuringProgram",
 })
 
 // 关闭250B
 const CloseMeasuringProgram = edge.func({
     assemblyFile: url,
-    typeName: "Measurement.Sa250B",
+    typeName: "Measurement.Entrance",
     methodName: "CloseMeasuringProgram",
 })
 
 // 获取串口列表
 const GetSerialPortList = edge.func({
     assemblyFile: url,
-    typeName: "Measurement.Sa250B",
+    typeName: "Measurement.Entrance",
     methodName: "GetSerialPortList",
 })
 
 // 设置串口
 const SetSerialPort = edge.func({
     assemblyFile: url,
-    typeName: "Measurement.Sa250B",
+    typeName: "Measurement.Entrance",
     methodName: "SetSerialPort",
 })
 
 // 获取串口
 // const GetSerialPort = edge.func({
 //     assemblyFile: url,
-//     typeName: "Measurement.Sa250B",
+//     typeName: "Measurement.Entrance",
 //     methodName: "GetSerialPort",
 // })
 
 // 标品数据查询
 const GetStandardProductData = edge.func({
     assemblyFile: url,
-    typeName: "Measurement.Sa250B",
+    typeName: "Measurement.Entrance",
     methodName: "GetStandardProductData",
 })
 
 // 校机
 const Proofreading = edge.func({
     assemblyFile: url,
-    typeName: "Measurement.Sa250B",
+    typeName: "Measurement.Entrance",
     methodName: "Proofreading",
 })
 
 // 丝杆动作
 const ScrewAction = edge.func({
     assemblyFile: url,
-    typeName: "Measurement.Sa250B",
+    typeName: "Measurement.Entrance",
     methodName: "ScrewAction",
 })
 
 // 一组测试
 const TestOneGroup = edge.func({
     assemblyFile: url,
-    typeName: "Measurement.Sa250B",
+    typeName: "Measurement.Entrance",
     methodName: "TestOneGroup",
 })
 
 // 写入补偿值
 const WriteStandardProduct = edge.func({
     assemblyFile: url,
-    typeName: "Measurement.Sa250B",
+    typeName: "Measurement.Entrance",
     methodName: "WriteStandardProduct",
+})
+
+// 获取丝杆位置
+const GetScrewState = edge.func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "GetScrewState",
 })
 
 // 服务初始化启动
@@ -187,6 +194,23 @@ function TestOneGroupExecution() {
     return i;
 }
 
+function ScrewState(i: number) {
+    let state;
+    for (let j = 0; j < 5; j++) {
+        GetScrewState(i, (error, result) => {
+            if (error) {
+                console.log(error)
+                return
+            }
+            if (result) {
+                state = result;
+                return
+            }
+        })
+    }
+    return state;
+}
+
 const {on} = useIpcRenderer();
 
 // 工作进程服务停止
@@ -239,7 +263,13 @@ on("worker-receive-standard-query", (event, path, pn, location, password) => {
 on("worker-receive-calibration-start", (event, step, fixture) => {
     if (step != 2) {
         ScrewActionExecution(0)
+        if (!ScrewState(1)) {
+            event.sender.send('worker-send-calibration-progress-error', 0)
+            console.log('无法执行')
+            return
+        }
     }
+    console.log('执行了')
     for (let i = 0; i < 4; i++) {
         let n = CalibrationExecution(step, i, fixture);
         if (n) {
@@ -262,6 +292,10 @@ on("worker-receive-calibration-start", (event, step, fixture) => {
 // 工作进程验证执行
 on("worker-receive-validation-start", (event) => {
     ScrewActionExecution(0)
+    if (!ScrewState(1)) {
+        console.log('无法执行')
+        return
+    }
     event.sender.send('worker-send-docking-data', TestOneGroupExecution())
     ScrewActionExecution(0)
 })

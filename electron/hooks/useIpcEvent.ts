@@ -78,9 +78,9 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     // 渲染进程关闭窗口
     ipcMain.on('render-send-window-close', function () {
         // 关闭服务
-        worker.webContents.send('worker-receive-stop-service')
-
+        worker.webContents.send('worker-receive-stop-service');
         render.close()
+        worker.close()
     })
 
     // 工作进程关闭
@@ -284,8 +284,9 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     // 工作进程发起阶段完成
     ipcMain.on('worker-send-step-success', function (_, step) {
         if (step === 2) {
-            worker.webContents.send('worker-receive-validation-start')
-            render.webContents.send('render-receive-calibration-step-success')
+            if (localStore.get('proofreadingOperationMode'))
+                worker.webContents.send('worker-receive-validation-start')
+            render.webContents.send('render-receive-calibration-step-success',true)
             return
         }
         render.webContents.send('render-receive-step-update', step + 1)
