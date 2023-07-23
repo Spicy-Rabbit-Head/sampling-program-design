@@ -35,6 +35,11 @@ const menuOptions = reactive<Array<MenuOptions>>([
     class: ''
   },
   {
+    label: '测试图',
+    key: 'Display',
+    class: ''
+  },
+  {
     label: '刹车点',
     key: 'test2',
     class: ''

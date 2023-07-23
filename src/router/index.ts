@@ -3,6 +3,7 @@ import {createRouter, createWebHistory, Router, RouteRecordRaw} from 'vue-router
 
 const Home = () => import('@/view/home/HomePage.vue')
 const Verifier = () => import('@/view/verifier/ProofreadingMachineModule.vue')
+const Display = () => import('@/view/display/DisplayPage.vue')
 const test2 = () => import('@/view/test/test2.vue')
 const ConfigurationPage = () => import('@/view/configuration/ConfigurationPage.vue')
 
@@ -23,6 +24,11 @@ const routes = [
         path: '/verifier',
         name: 'Verifier',
         component: Verifier,
+    },
+    {
+        path: '/display',
+        name: 'Display',
+        component: Display,
     },
     {
         path: '/test2',

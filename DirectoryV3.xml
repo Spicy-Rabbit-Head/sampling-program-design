@@ -32,4 +32,5 @@
     <tree path="/src/view/configuration/ConfigurationPage.vue" title="配置页"/>
     <tree path="/src/hooks/useConfig.ts" title="配置闭包"/>
     <tree path="/electron/workerThread" title="工作线程"/>
+    <tree path="/src/view/display" title="展示"/>
 </trees>
