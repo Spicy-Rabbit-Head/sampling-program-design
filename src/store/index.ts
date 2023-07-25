@@ -28,7 +28,9 @@ export const useGlobalStore = defineStore('GlobalStore', {
             // 校对机运行模式
             proofreadingOperationMode: 0,
             // 校对机数据
-            outputDisplay: []
+            outputDisplay: [],
+            // 关闭前对话框
+            beforeClosingDialogue: false,
         }
     },
     getters: {

@@ -12,4 +12,9 @@ export function useIpcViewportEvent(main: BrowserWindow) {
     main.on('unmaximize', () => {
         main.webContents.send('render-receive-min-windows')
     })
+
+    // 主窗口关闭
+    main.on('close', () => {
+        console.log('关闭窗口')
+    })
 }

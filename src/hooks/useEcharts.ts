@@ -106,6 +106,7 @@ const globalOptions = computed(() => {
 
 export function useEcharts() {
     return {
+        data,
         resetData,
         replaceData,
         globalOptions

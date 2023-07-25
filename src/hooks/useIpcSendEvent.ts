@@ -38,6 +38,11 @@ export function useIpcSendEvent() {
         }
     }
 
+    // 确认关闭窗口
+    function closeWindow() {
+        send('render-send-close-server')
+    }
+
     // 校准模式更新
     function calibrationModeUpdate(value: string) {
         send('render-send-set-store', 'currentCalibrationMode', value);
@@ -138,5 +143,6 @@ export function useIpcSendEvent() {
         proofreadingOperationModeUpdate,
         cacheDataSave,
         cacheDataRead,
+        closeWindow,
     }
 }

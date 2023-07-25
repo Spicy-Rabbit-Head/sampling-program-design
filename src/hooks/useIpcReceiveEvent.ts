@@ -73,6 +73,16 @@ export function useIpcReceiveEvent() {
         init(JSON.parse(data))
     })
 
+    // 显示关闭前确认对话框
+    on('render-receive-show-close-confirm-dialog', () => {
+        globalStore.beforeClosingDialogue = true
+    })
+
+    // 关闭前数据保存
+    on('render-receive-save-data', (event) => {
+        event.sender.send('render-send-found-data-table', false)
+    })
+
     // 读取250BINI配置
     on('render-receive-read-ini', (_, data: any) => {
         globalStore.calibrationMode.length = 0
@@ -100,7 +110,7 @@ export function useIpcReceiveEvent() {
     on('render-receive-qcc-select-file', (event, path: string) => {
         globalStore.filePath = path
         event.sender.send('render-send-standard-query', globalStore.currentFileName)
-        event.sender.send('render-send-found-data-table', globalStore.currentFileName)
+        event.sender.send('render-send-found-data-table', true, globalStore.currentFileName)
     })
 
     // 选择文件-INI
@@ -225,6 +235,6 @@ export function useIpcReceiveEvent() {
 
     // 读取数据表
     on('render-receive-read-data-table', (_, data) => {
-        replaceData(data)
+        replaceData(JSON.parse(data))
     })
 }

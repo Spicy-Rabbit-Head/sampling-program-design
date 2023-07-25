@@ -72,12 +72,21 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
         render.maximize()
     })
 
-    // 渲染进程关闭窗口
-    ipcMain.on('render-send-window-close', function () {
+    // 渲染进程通知窗口关闭(保存数据)
+    ipcMain.on('render-send-window-close', function (event: any) {
+        event.reply('render-receive-show-close-confirm-dialog')
+        // 进行数据保存
+        event.reply('render-receive-save-data')
         // 关闭服务
+        // worker.webContents.send('worker-receive-stop-service');
+        // 保存数据
+        // render.close()
+    })
+
+    // 渲染进程通知窗口关闭(等待数据保存)
+    ipcMain.on('render-send-close-server', function () {
         worker.webContents.send('worker-receive-stop-service');
         // 保存数据
-
         render.close()
     })
 
@@ -340,9 +349,9 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
 
     // 渲染进程发起数据表读取
     ipcMain.on('render-send-read-data-table', function (event, pathName) {
-        let path = join(__dirname, '../../data', pathName, '.json');
+        let path = join(__dirname, '../../data', pathName);
         if (process.env.VITE_DEV_SERVER_URL) {
-            path = join(__dirname + '../../public/data', pathName, '.json')
+            path = join(__dirname + '../../public/data', pathName)
         }
         fs.readFile(path, 'utf8', function (err, data) {
             if (err) {
@@ -354,11 +363,19 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     })
 
     // 渲染进程发起数据表创建
-    ipcMain.on('render-send-found-data-table', function (event, pathName) {
-        let path = join(__dirname, '../../data', pathName + '_' + dayjs().format('YYYY_MM_DD_HH_mm_ss') + '.json');
-        if (process.env.VITE_DEV_SERVER_URL) {
-            path = join(__dirname + '../../public/data', pathName + '_' + dayjs().format('YYYY_MM_DD_HH_mm_ss') + '.json');
+    ipcMain.on('render-send-found-data-table', function (_, i: boolean, pathName) {
+        let name: string;
+        if (i) {
+            name = pathName + '_' + dayjs().format('YYYY_MM_DD_HH_mm_ss') + '.json'
+            localStore.set('dataTable', name)
+        } else {
+            name = localStore.get('dataTable')
         }
+        let path = join(__dirname, '../../data', name);
+        if (process.env.VITE_DEV_SERVER_URL) {
+            path = join(__dirname + '../../public/data', name);
+        }
+
         fs.writeFile(path, JSON.stringify([[[]]], null), 'utf8', function (err) {
             if (err) console.log(err)
         })

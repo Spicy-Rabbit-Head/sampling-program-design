@@ -3,8 +3,13 @@ import TopBarMode from "@/view/layout/TopBarMode.vue";
 import {zhCN, dateZhCN} from "naive-ui";
 import {onMounted} from "vue";
 import {useRouter} from "vue-router";
+import {storeToRefs} from "pinia";
+import {useGlobalStore} from "@/store";
+import {useIpcSendEvent} from "@/hooks/useIpcSendEvent.ts";
 
 const router = useRouter()
+const {beforeClosingDialogue} = storeToRefs(useGlobalStore())
+const {closeWindow} = useIpcSendEvent();
 onMounted(() => {
   router.replace({name: 'RootPath'})
 })
@@ -27,6 +32,14 @@ onMounted(() => {
         </top-bar-mode>
       </n-notification-provider>
     </n-config-provider>
+    <a-modal v-model:visible="beforeClosingDialogue" @ok="closeWindow">
+      <template #title>
+        关闭前确认
+      </template>
+      <div>
+        <p class="t-text-2xl">确定要关闭吗？</p>
+      </div>
+    </a-modal>
   </div>
 </template>
 
