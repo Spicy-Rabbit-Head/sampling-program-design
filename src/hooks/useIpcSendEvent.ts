@@ -2,7 +2,7 @@ import {useIpcRenderer} from "@vueuse/electron";
 import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
 
 const {send} = useIpcRenderer();
-const {calibrationStarts, initSteps} = useProofreadingMachine();
+const {calibrationStarts, initSteps, initDataBase} = useProofreadingMachine();
 
 export function useIpcSendEvent() {
     // 渲染进程初始化
@@ -18,12 +18,6 @@ export function useIpcSendEvent() {
     // 开启文件选择对话框-读取QCC文件
     function readNumberFile() {
         send('render-send-open-qcc-dialog');
-    }
-
-    // 端口选择更新
-    function portUpdate(value: string) {
-        send('render-send-set-store', 'currentPort', value);
-        send('render-send-serial-port-update', value);
     }
 
     // 窗口功能
@@ -49,20 +43,10 @@ export function useIpcSendEvent() {
         send('render-send-set-store', 'currentCalibrationMode', value);
     }
 
-    // 通讯模式更新
-    function communicationModeUpdate(value: string) {
-        send('render-send-set-store', 'communicationMode', value);
-    }
-
     // 校准运行模式更新
     function proofreadingOperationModeUpdate(value: number) {
         console.log(value)
         send('render-send-set-store', 'proofreadingOperationMode', value);
-    }
-
-    // 读取串口列表
-    function readPortList() {
-        send('render-send-get-port-list');
     }
 
     // 读取250BINI配置
@@ -114,8 +98,9 @@ export function useIpcSendEvent() {
     // 自动校准开始
     function automaticCalibrationStarts() {
         calibrationStarts();
-        send('render-send-calibration-short-circuit-start');
         initSteps();
+        initDataBase();
+        send('render-send-calibration-short-circuit-start');
     }
 
     // 丝杆动作
@@ -137,12 +122,9 @@ export function useIpcSendEvent() {
         renderThreadInitialization,
         dllInitialization,
         readNumberFile,
-        readPortList,
         topBarFunction,
-        portUpdate,
         calibrationModeUpdate,
         readIniConfiguration,
-        communicationModeUpdate,
         readModifiableConfigurations,
         standardProductPathUpdate,
         standardProductPasswordUpdate,

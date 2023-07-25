@@ -41,7 +41,7 @@ const menuOptions = reactive<Array<MenuOptions>>([
   },
   {
     label: '刹车点',
-    key: 'test2',
+    key: 'TestTuning',
     class: ''
   },
   {

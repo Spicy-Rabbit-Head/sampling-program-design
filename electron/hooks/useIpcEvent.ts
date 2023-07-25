@@ -5,14 +5,11 @@ const Store = require('electron-store');
 import ini from 'ini';
 import fs from 'fs';
 import {join} from "path";
+import dayjs from "dayjs";
 
 const LocalStoreInterface = {
     // 当前QCC文件路径
     filePath: {
-        type: 'string',
-    },
-    // 当前串口
-    currentPort: {
         type: 'string',
     },
     // 当前校准模式
@@ -21,10 +18,6 @@ const LocalStoreInterface = {
     },
     // 250B配置文件路径
     iniConfiguration: {
-        type: 'string',
-    },
-    // 当前通讯模式
-    communicationMode: {
         type: 'string',
     },
     // 标品数据路径
@@ -50,6 +43,10 @@ const LocalStoreInterface = {
     // 校对机运行模式
     proofreadingOperationMode: {
         type: 'integer',
+    },
+    // 数据表
+    dataTable: {
+        type: 'string',
     }
 }
 
@@ -79,8 +76,9 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     ipcMain.on('render-send-window-close', function () {
         // 关闭服务
         worker.webContents.send('worker-receive-stop-service');
+        // 保存数据
+
         render.close()
-        worker.close()
     })
 
     // 工作进程关闭
@@ -106,13 +104,13 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     // 渲染进程250B配置文件读取
     ipcMain.on('render-send-read-ini', function (event) {
         try {
-            let iniRead = ini.parse(fs.readFileSync(localStore.get('iniConfiguration'), 'utf16le'));
+            let {NETWORKS} = ini.parse(fs.readFileSync(localStore.get('iniConfiguration'), 'utf16le'));
             let calibrationList: Array<SelectOption> = [];
-            for (let key in iniRead.NETWORKS) {
+            for (let key in NETWORKS) {
                 if (key === 'Number Of Fixtures To Display') continue;
                 calibrationList.push({
-                    label: iniRead.NETWORKS[key],
-                    value: iniRead.NETWORKS[key]
+                    label: NETWORKS[key],
+                    value: NETWORKS[key]
                 })
             }
             // 渲染进程接收250B配置
@@ -131,13 +129,13 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
             if (process.env.VITE_DEV_SERVER_URL) {
                 pathName = join(__dirname + '../../public/customConfig.ini')
             }
-            let iniRead = ini.parse(fs.readFileSync(pathName, 'utf8'));
+            let {WORKSHOP} = ini.parse(fs.readFileSync(pathName, 'utf8'));
             let calibrationList: Array<SelectOption> = [];
-            for (let key in iniRead.WORKSHOP) {
+            for (let key in WORKSHOP) {
                 calibrationList.push({
                     label: key,
                     value: key,
-                    location: iniRead.WORKSHOP[key]
+                    location: WORKSHOP[key]
                 })
             }
             // 渲染进程接收车间列表更新
@@ -221,28 +219,8 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
         worker.webContents.send('worker-receive-dll-init', localStore.get('currentPort'))
     })
 
-    // 渲染进程获取串口列表
-    ipcMain.on('render-send-get-port-list', function () {
-        worker.webContents.send('worker-receive-get-port-list')
-    })
-
-    // 工作进程获取串口列表失败
-    ipcMain.on('worker-send-port-list-error', function (_, error) {
-        render.webContents.send('render-receive-port-list-error', error)
-    })
-
-    // 工作进程获取串口列表成功
-    ipcMain.on('worker-send-port-list-update', function (_, portList) {
-        render.webContents.send('render-receive-port-list-update', portList)
-    })
-
-    // 渲染进程发起串口端口更新
-    ipcMain.on('render-send-serial-port-update', function (_, port) {
-        worker.webContents.send('worker-receive-serial-port-update', port)
-    })
-
     // 渲染进程发起标品 Access 查询
-    ipcMain.on('render-send-standard-query', function (event, pn) {
+    ipcMain.on('render-send-standard-query', function (_, pn) {
         let path = localStore.get('standardProductPath');
         let location = localStore.get('location');
         let password = localStore.get('standardProductPassword');
@@ -265,9 +243,10 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
             case 0:
             case 1:
                 worker.webContents.send('worker-receive-calibration-start', 0, localStore.get('currentCalibrationMode'))
-                break
+                break;
             case 2:
                 worker.webContents.send('worker-receive-validation-start')
+                break;
         }
     })
 
@@ -284,9 +263,11 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     // 工作进程发起阶段完成
     ipcMain.on('worker-send-step-success', function (_, step) {
         if (step === 2) {
-            if (localStore.get('proofreadingOperationMode'))
+            if (localStore.get('proofreadingOperationMode') == 0) {
                 worker.webContents.send('worker-receive-validation-start')
-            render.webContents.send('render-receive-calibration-step-success',true)
+                return;
+            }
+            render.webContents.send('render-receive-calibration-step-success')
             return
         }
         render.webContents.send('render-receive-step-update', step + 1)
@@ -354,6 +335,32 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
             } else {
                 event.reply('render-receive-read-store', data)
             }
+        })
+    })
+
+    // 渲染进程发起数据表读取
+    ipcMain.on('render-send-read-data-table', function (event, pathName) {
+        let path = join(__dirname, '../../data', pathName, '.json');
+        if (process.env.VITE_DEV_SERVER_URL) {
+            path = join(__dirname + '../../public/data', pathName, '.json')
+        }
+        fs.readFile(path, 'utf8', function (err, data) {
+            if (err) {
+                console.log(err)
+            } else {
+                event.reply('render-receive-read-data-table', data)
+            }
+        })
+    })
+
+    // 渲染进程发起数据表创建
+    ipcMain.on('render-send-found-data-table', function (event, pathName) {
+        let path = join(__dirname, '../../data', pathName + '_' + dayjs().format('YYYY_MM_DD_HH_mm_ss') + '.json');
+        if (process.env.VITE_DEV_SERVER_URL) {
+            path = join(__dirname + '../../public/data', pathName + '_' + dayjs().format('YYYY_MM_DD_HH_mm_ss') + '.json');
+        }
+        fs.writeFile(path, JSON.stringify([[[]]], null), 'utf8', function (err) {
+            if (err) console.log(err)
         })
     })
 }

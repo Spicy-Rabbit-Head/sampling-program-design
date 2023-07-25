@@ -31,8 +31,8 @@ const routes = [
         component: Display,
     },
     {
-        path: '/test2',
-        name: 'test2',
+        path: '/testTuning',
+        name: 'TestTuning',
         component: test2,
     },
     {

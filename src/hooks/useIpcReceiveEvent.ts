@@ -2,6 +2,7 @@ import {useConfigStore, useGlobalStore} from "@/store";
 import {useIpcRenderer} from "@vueuse/electron";
 import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
 import {useConfig} from "@/hooks/useConfig.ts";
+import {useEcharts} from "@/hooks/useEcharts.ts";
 
 const {on} = useIpcRenderer()
 
@@ -24,24 +25,33 @@ export function useIpcReceiveEvent() {
         updateDataBase,
     } = useProofreadingMachine();
     const {addWorkshopOptions} = useConfig();
+    const {resetData, replaceData} = useEcharts();
 
     // 数据初始化
-    on('render-receive-init', (_, data: any) => {
-        globalStore.filePath = data.filePath
-        globalStore.currentPort = data.currentPort
-        globalStore.currentCalibrationMode = data.currentCalibrationMode
-        globalStore.communicationMode = data.communicationMode
-        globalStore.currentAddress = data.currentAddress
-        globalStore.proofreadingOperationMode = data.proofreadingOperationMode
-        if (data.outputDisplay == undefined) {
+    on('render-receive-init', (event, {
+        currentCalibrationMode,
+        dataTable,
+        filePath,
+        outputDisplay,
+        proofreadingOperationMode
+    }: any) => {
+        globalStore.filePath = filePath
+        globalStore.currentCalibrationMode = currentCalibrationMode
+        globalStore.proofreadingOperationMode = proofreadingOperationMode
+        if (outputDisplay == undefined) {
             globalStore.outputDisplay.push(
-                {label: "对机标品编号 :", value: "13"},
-                {label: "对机标:", value: "-1.54"},
-                {label: "验证标品编号 :", value: "97"},
-                {label: "验验标品值 :", value: "-1.68"}
+                {label: "对机标品编号 :", value: "N/A"},
+                {label: "对机标:", value: "N/A"},
+                {label: "验证标品编号 :", value: "N/A"},
+                {label: "验验标品值 :", value: "N/A"}
             )
         } else {
-            globalStore.outputDisplay = JSON.parse(data.outputDisplay)
+            globalStore.outputDisplay = JSON.parse(outputDisplay)
+        }
+        if (dataTable == undefined || filePath == undefined) {
+            resetData()
+        } else {
+            event.sender.send('render-send-read-data-table', dataTable)
         }
     })
 
@@ -86,26 +96,11 @@ export function useIpcReceiveEvent() {
         globalStore.topBarWindowState[2] = true
     })
 
-    // 串口列表更新
-    on('render-receive-port-list-update', (_, portList: Array<string>) => {
-        globalStore.portSelection.length = 0
-        portList.forEach((value) => {
-            globalStore.portSelection.push({
-                label: value,
-                value: value
-            })
-        })
-    })
-
-    // 串口列表更新失败
-    on('render-receive-port-list-error', (_, error: any) => {
-        console.log(error)
-    })
-
     // 选择文件-QCC
     on('render-receive-qcc-select-file', (event, path: string) => {
         globalStore.filePath = path
         event.sender.send('render-send-standard-query', globalStore.currentFileName)
+        event.sender.send('render-send-found-data-table', globalStore.currentFileName)
     })
 
     // 选择文件-INI
@@ -165,10 +160,7 @@ export function useIpcReceiveEvent() {
     })
 
     // 校准步骤完成
-    on('render-receive-calibration-step-success', (_, i) => {
-        if (i == true) {
-            return
-        }
+    on('render-receive-calibration-step-success', () => {
         calibrationSuccess()
     })
 
@@ -229,5 +221,10 @@ export function useIpcReceiveEvent() {
             checkTheMachineSuccess(2)
             automaticCalibrationStop()
         }
+    })
+
+    // 读取数据表
+    on('render-receive-read-data-table', (_, data) => {
+        replaceData(data)
     })
 }

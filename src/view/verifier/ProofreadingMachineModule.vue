@@ -26,10 +26,9 @@ const globalStore = useGlobalStore();
 // 全局状态只读
 const {
   currentFileName,
-  portSelection,
   calibrationMode,
-  communicationMode,
-  proofreadingOperationMode,
+  currentAddress,
+  proofreadingOperationMode
 } = storeToRefs(globalStore);
 
 // 运行状态
@@ -40,32 +39,17 @@ const {error} = useNotification();
 
 // IPC 事件
 const {
-  portUpdate,
   calibrationModeUpdate,
   readIniConfiguration,
-  communicationModeUpdate,
   proofreadingOperationModeUpdate,
-  readPortList,
   standardProductQuery,
   readNumberFile,
-  automaticCalibrationStarts,
+  automaticCalibrationStarts
 } = useIpcSendEvent();
 
 onMounted(() => {
   standardProductQuery(currentFileName.value);
 })
-
-// 通讯方式
-const modes = [
-  {
-    label: "串口",
-    value: "serialPort"
-  },
-  {
-    label: '以太网',
-    value: 'ethernet'
-  },
-]
 
 // 运行模式
 const operationMode = [
@@ -196,21 +180,10 @@ function logScrollStart(i: boolean) {
                       @update-value="proofreadingOperationModeUpdate" placeholder=""
                       :disabled="calibrationStatus || autoButton" :consistent-menu-width="false"/>
           </n-input-group>
-          <!-- 通讯方式单选 -->
-          <n-radio-group class="t-mx-auto" v-model:value="globalStore.communicationMode"
-                         @update-value="communicationModeUpdate" name="radioGroup">
-            <n-radio v-for="song in modes" :disabled="calibrationStatus || autoButton" :key="song.value"
-                     :value="song.value">
-              {{ song.label }}
-            </n-radio>
-          </n-radio-group>
           <!-- 当前通讯方式端口选择 -->
           <n-input-group class="t-text-center">
             <n-input-group-label class="t-w-5/12">当前端口 :</n-input-group-label>
-            <n-select class="t-w-7/12" v-if="communicationMode != 'ethernet'" v-model:value="globalStore.currentPort"
-                      @focus="readPortList" @update-value="portUpdate" :options="portSelection"
-                      :disabled="calibrationStatus || autoButton" placeholder=""/>
-            <n-input v-else v-model:value="globalStore.currentAddress" readonly placeholder=""/>
+            <n-input :value="currentAddress" readonly placeholder=""/>
           </n-input-group>
           <!-- 校准模式选择 -->
           <n-input-group class="t-text-center">

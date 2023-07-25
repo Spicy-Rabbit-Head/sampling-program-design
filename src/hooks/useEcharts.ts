@@ -1,4 +1,4 @@
-import {computed, ref} from "vue";
+import {computed, reactive} from "vue";
 import {use} from "echarts/core";
 import {CanvasRenderer} from "echarts/renderers";
 import {BarChart} from "echarts/charts";
@@ -21,26 +21,41 @@ use([
 ]);
 
 // 随机数据
-const data = ref([[0, 0]])
+// const data = ref([[[0, 0], [1, 1]], [[0, 0], [1, 1]]])
+const data: Array<Array<Array<number>>> = reactive([])
 
-// 添加随机数据
-function addData() {
-    let s = Math.floor((Math.random() * (3 - -3) + -3) * 10) / 10;
-    let index = data.value.findIndex(item => item[0] === s)
-    console.log(s)
-    if (index && index !== -1 || index === 0) {
-        data.value[index][1] += 1
-    } else {
-        data.value.push([Number(s), 1])
+// 重置数据
+function resetData() {
+    data.length = 0
+    for (let i = 0; i < 24; i++) {
+        data.push([[]])
     }
 }
 
-setInterval(() => {
-    addData()
-}, 1000)
+// 替代数据
+function replaceData(value: any) {
+    data.length = 0;
+    data.push(...value)
+}
+
+// 添加随机数据
+// function addData() {
+//     let s = Math.floor((Math.random() * (3 - -3) + -3) * 10) / 10;
+//     let index = data.value.findIndex(item => item[0] === s)
+//     console.log(s)
+//     if (index && index !== -1 || index === 0) {
+//         data.value[index][1] += 1
+//     } else {
+//         data.value.push([Number(s), 1])
+//     }
+// }
+
+// setInterval(() => {
+//     addData()
+// }, 1000)
 
 // echarts配置
-const option = computed(() => {
+const globalOptions = computed(() => {
     return {
         tooltip: {
             trigger: "axis",
@@ -64,7 +79,7 @@ const option = computed(() => {
             {
                 type: "bar",
                 barWidth: 6,
-                data: data.value,
+                data: data[0],
                 markLine: {
                     symbol: 'none',
                     data: [
@@ -91,7 +106,9 @@ const option = computed(() => {
 
 export function useEcharts() {
     return {
-        option
+        resetData,
+        replaceData,
+        globalOptions
     }
 }
 

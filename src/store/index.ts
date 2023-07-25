@@ -19,18 +19,12 @@ export const useGlobalStore = defineStore('GlobalStore', {
             ],
             // 当前文件路径
             filePath: '',
-            // 当前端口
-            currentPort: '',
             // 当前地址
-            currentAddress: '',
-            // 通讯端口选择
-            portSelection: [],
+            currentAddress: '150.110.60.6',
             // 当前校准模式
             currentCalibrationMode: '',
             // 校准模式
             calibrationMode: [],
-            // 当前通讯模式
-            communicationMode: '',
             // 校对机运行模式
             proofreadingOperationMode: 0,
             // 校对机数据

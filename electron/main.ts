@@ -15,6 +15,5 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
-    console.log('window-all-closed')
     app.quit();
 });

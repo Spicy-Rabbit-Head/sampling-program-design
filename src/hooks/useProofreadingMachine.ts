@@ -103,6 +103,15 @@ function initSteps() {
 
 initSteps()
 
+function initDataBase() {
+    for (let i = 0; i < dataBase.length; i++) {
+        for (let j = 1; j < 5; j++) {
+            dataBase[i][j].value = 'N/A'
+            dataBase[i][j].style = ''
+        }
+    }
+}
+
 // 对机表格项
 const columns = [
     {
@@ -229,5 +238,6 @@ export function useProofreadingMachine() {
         checkTheMachineSuccess,
         dataBase,
         updateDataBase,
+        initDataBase,
     }
 }
