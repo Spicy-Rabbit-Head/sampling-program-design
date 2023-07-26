@@ -25,7 +25,7 @@ export function useIpcReceiveEvent() {
         updateDataBase,
     } = useProofreadingMachine();
     const {addWorkshopOptions} = useConfig();
-    const {resetData, replaceData} = useEcharts();
+    const {resetData, replaceData, data} = useEcharts();
 
     // 数据初始化
     on('render-receive-init', (event, {
@@ -80,7 +80,7 @@ export function useIpcReceiveEvent() {
 
     // 关闭前数据保存
     on('render-receive-save-data', (event) => {
-        event.sender.send('render-send-found-data-table', false)
+        event.sender.send('render-send-found-data-table', false, JSON.stringify(data))
     })
 
     // 读取250BINI配置
@@ -189,7 +189,7 @@ export function useIpcReceiveEvent() {
                 automaticCalibrationStop()
                 return
             } else {
-                updateDataBase(0, i, true, data[i])
+                updateDataBase(0, i + 1, true, data[i])
             }
         }
         // 计算补正值

@@ -67,6 +67,10 @@
       {
         "from": "public/customConfig.ini",
         "to": "customConfig.ini"
+      },
+      {
+        "from": "public/cache.json",
+        "to": "cache.json"
       }
     ],
     "mac": {

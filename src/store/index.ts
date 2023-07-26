@@ -54,7 +54,7 @@ export const useGlobalStore = defineStore('GlobalStore', {
             let list: Array<string> | null = []
             for (let i = 0; i < 4; i++) {
                 let value = (parseFloat(this.outputDisplay[1].value) - parseFloat(data[i])).toFixed(2)
-                if (value.length > 2) {
+                if (value.length > 5) {
                     updateDataBase(1, i + 1, false, value)
                     return null
                 } else {
@@ -69,7 +69,7 @@ export const useGlobalStore = defineStore('GlobalStore', {
             for (let i = 0; i < 4; i++) {
                 // 计算两个数之间的差值（取绝对值）
                 let difference = Math.abs(Number(this.outputDisplay[2].value) - Number(data[i]));
-                if (difference >= 1) {
+                if (difference >= 100) {
                     updateDataBase(2, i + 1, false, data[i])
                     return null
                 } else {

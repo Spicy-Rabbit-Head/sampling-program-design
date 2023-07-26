@@ -211,13 +211,14 @@ on("worker-receive-standard-query", (event: any, path: any, pn: any, location: a
 
 // 工作进程校准执行
 on("worker-receive-calibration-start", (event: any, step: any, fixture: any) => {
+    console.log(step)
     if (step != 2) {
         ScrewActionExecution(0)
-        if (!ScrewState(1)) {
-            event.sender.send('worker-send-calibration-progress-error', 0)
-            console.log('无法执行')
-            return
-        }
+        // if (!ScrewState(1)) {
+        //     event.sender.send('worker-send-calibration-progress-error', 0)
+        //     console.log('无法执行')
+        //     return
+        // }
     }
     for (let i = 0; i < 4; i++) {
         let n = CalibrationExecution(step, i, fixture);
@@ -241,10 +242,10 @@ on("worker-receive-calibration-start", (event: any, step: any, fixture: any) => 
 // 工作进程验证执行
 on("worker-receive-validation-start", (event: any) => {
     ScrewActionExecution(0)
-    if (!ScrewState(1)) {
-        console.log('无法执行')
-        return
-    }
+    // if (!ScrewState(1)) {
+    //     console.log('无法执行')
+    //     return
+    // }
     event.sender.send('worker-send-docking-data', TestOneGroupExecution())
     ScrewActionExecution(0)
 })
@@ -261,6 +262,7 @@ on("worker-receive-write-compensation", (event: any, data: any) => {
             console.log(error)
             return
         }
+        console.log(result)
         if (result == null) {
             event.sender.send('worker-send-write-compensation-error', error)
         } else {

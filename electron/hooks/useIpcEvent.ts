@@ -76,7 +76,7 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     ipcMain.on('render-send-window-close', function (event: any) {
         event.reply('render-receive-show-close-confirm-dialog')
         // 进行数据保存
-        event.reply('render-receive-save-data')
+        // event.reply('render-receive-save-data')
         // 关闭服务
         // worker.webContents.send('worker-receive-stop-service');
         // 保存数据
@@ -294,7 +294,7 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     })
 
     // 渲染进程发起写入补偿
-    ipcMain.on('render-send-write-compensation', function (_, data) {
+    ipcMain.on('render-send-write-compensation', function (_, data: any) {
         worker.webContents.send('worker-receive-write-compensation', data)
     })
 
@@ -363,20 +363,21 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     })
 
     // 渲染进程发起数据表创建
-    ipcMain.on('render-send-found-data-table', function (_, i: boolean, pathName) {
+    ipcMain.on('render-send-found-data-table', function (_, i: boolean, data) {
         let name: string;
+        let database: string = JSON.stringify([[[]]]);
         if (i) {
-            name = pathName + '_' + dayjs().format('YYYY_MM_DD_HH_mm_ss') + '.json'
+            name = data + '_' + dayjs().format('YYYY_MM_DD_HH_mm_ss') + '.json'
             localStore.set('dataTable', name)
         } else {
             name = localStore.get('dataTable')
+            database = data
         }
         let path = join(__dirname, '../../data', name);
         if (process.env.VITE_DEV_SERVER_URL) {
             path = join(__dirname + '../../public/data', name);
         }
-
-        fs.writeFile(path, JSON.stringify([[[]]], null), 'utf8', function (err) {
+        fs.writeFile(path, database, 'utf8', function (err) {
             if (err) console.log(err)
         })
     })

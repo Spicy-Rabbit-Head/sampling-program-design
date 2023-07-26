@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import SideBarFunctionalBlock from "@/view/home/SideBarFunctionalBlock.vue";
 import SideBarDataBlock from "@/view/home/SideBarDataBlock.vue";
-import SideBarExhibitionBlock from "@/view/home/SideBarExhibitionBlock.vue";
+// import SideBarExhibitionBlock from "@/view/home/SideBarExhibitionBlock.vue";
 import VChart from "vue-echarts";
 import {useEcharts} from "@/hooks/useEcharts.ts";
 

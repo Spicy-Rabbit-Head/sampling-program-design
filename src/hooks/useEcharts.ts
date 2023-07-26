@@ -34,6 +34,7 @@ function resetData() {
 
 // 替代数据
 function replaceData(value: any) {
+    console.log(value)
     data.length = 0;
     data.push(...value)
 }
