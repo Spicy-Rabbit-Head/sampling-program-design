@@ -54,6 +54,11 @@ function exitPermission() {
   changePermission.value = false
 }
 
+const readyPosition: Array<string> = []
+for (let i = 0; i < 7; i++) {
+  readyPosition.push(`准备位置 ${i}`)
+}
+
 </script>
 
 <template>
@@ -108,16 +113,49 @@ function exitPermission() {
                       :disabled="!changePermission"/>
           </n-input-group>
         </div>
-        <div>
+        <div class="t-p-2 t-m-2 t-border t-rounded-lg t-grid t-grid-cols-3">
           <!--  上下丝杆动作  -->
-          <a-button-group>
-            <a-button type="primary" @click.stop="screwAction(0)" :disabled="!changePermission">
-              上
+          <div class="t-col-span-2">
+            <p class="t-mb-1">测试头动作 :</p>
+            <a-button-group>
+              <a-button type="primary" @click.stop="screwAction(0)" :disabled="!changePermission">
+                测试头上位
+              </a-button>
+              <a-button type="primary" @click.stop="screwAction(1)" :disabled="!changePermission">
+                测试头下位
+              </a-button>
+              <a-button type="primary" @click.stop="screwAction(2)" :disabled="!changePermission">
+                测试头间距移动
+              </a-button>
+            </a-button-group>
+          </div>
+          <!-- 移动到准备位置 -->
+          <div>
+            <p class="t-mb-1">回原点 :</p>
+            <a-button type="primary" status="warning" :disabled="!changePermission">
+              原点归复
             </a-button>
-            <a-button type="primary" @click.stop="screwAction(1)" :disabled="!changePermission">
-              下
-            </a-button>
-          </a-button-group>
+          </div>
+          <div class="t-col-span-2">
+            <p class="t-mb-1">移动到准备位置 :</p>
+            <a-button-group>
+              <a-select :options="readyPosition" default-value="准备位置 0" :disabled="!changePermission"/>
+              <a-button type="primary" status="success" :disabled="!changePermission">
+                移动到位置
+              </a-button>
+            </a-button-group>
+          </div>
+          <div>
+            <p class="t-mb-1">位置移动 :</p>
+            <a-button-group>
+              <a-button type="primary" :disabled="!changePermission">
+                校机位置
+              </a-button>
+              <a-button type="primary" :disabled="!changePermission">
+                对机位置
+              </a-button>
+            </a-button-group>
+          </div>
         </div>
       </div>
     </div>

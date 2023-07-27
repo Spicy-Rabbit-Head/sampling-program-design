@@ -3,12 +3,13 @@ import {useBrowserWindow} from "./hooks/useBrowserWindow";
 import {useIpcEvent} from "./hooks/useIpcEvent";
 import {useIpcViewportEvent} from "./hooks/useIpcViewportEvent";
 
-const {buildMainWindow, workerWindow} = useBrowserWindow();
+const {buildMainWindow, workerWindow, sqliteWindow} = useBrowserWindow();
 // 主进程入口
 app.whenReady().then(() => {
     // 窗口建造
     const main = buildMainWindow();
     const worker = workerWindow();
+    // const sqlite = sqliteWindow();
     // 事件监听
     useIpcEvent(main, worker)
     useIpcViewportEvent(main)

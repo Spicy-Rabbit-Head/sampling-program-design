@@ -39,6 +39,7 @@ export function useBrowserWindow() {
         return main
     }
 
+    // 建造工作进程
     function workerWindow() {
         const worker = new BrowserWindow({
             show: false,
@@ -50,7 +51,7 @@ export function useBrowserWindow() {
                 // 辅助节点集成
                 nodeIntegrationInWorker: true,
             },
-            title: '服务程式',
+            title: '服务进程',
         })
         if (process.env.VITE_DEV_SERVER_URL) {
             worker.webContents.toggleDevTools();
@@ -61,8 +62,32 @@ export function useBrowserWindow() {
         return worker;
     }
 
+    // 建造sqlite进程
+    function sqliteWindow() {
+        const sqlite = new BrowserWindow({
+            show: false,
+            webPreferences: {
+                // 是否启用node集成
+                nodeIntegration: true,
+                // 关闭安全警告
+                contextIsolation: false,
+                // 辅助节点集成
+                nodeIntegrationInWorker: true,
+            },
+            title: 'sqlite进程',
+        })
+        if (process.env.VITE_DEV_SERVER_URL) {
+            sqlite.webContents.toggleDevTools();
+            sqlite.loadURL(posix.join(process.env.VITE_DEV_SERVER_URL, 'electron/sqlite', 'sqlite.html')).then()
+        } else {
+            sqlite.loadFile('dist/electron/sqlite/sqlite.html').then();
+        }
+        return sqlite;
+    }
+
     return {
         buildMainWindow,
-        workerWindow
+        workerWindow,
+        sqliteWindow
     }
 }

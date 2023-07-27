@@ -1,4 +1,4 @@
-import {computed, reactive} from "vue";
+import {computed, reactive, ref} from "vue";
 import {use} from "echarts/core";
 import {CanvasRenderer} from "echarts/renderers";
 import {BarChart} from "echarts/charts";
@@ -22,7 +22,9 @@ use([
 
 // 随机数据
 // const data = ref([[[0, 0], [1, 1]], [[0, 0], [1, 1]]])
-const data: Array<Array<Array<number>>> = reactive([])
+const data: Array<Array<Array<number>>> = reactive([[[0, 1]], [[1, 3]], [[-1, 2]]])
+// 查看的行号
+const lineNumber = ref<number>(0);
 
 // 重置数据
 function resetData() {
@@ -39,23 +41,7 @@ function replaceData(value: any) {
     data.push(...value)
 }
 
-// 添加随机数据
-// function addData() {
-//     let s = Math.floor((Math.random() * (3 - -3) + -3) * 10) / 10;
-//     let index = data.value.findIndex(item => item[0] === s)
-//     console.log(s)
-//     if (index && index !== -1 || index === 0) {
-//         data.value[index][1] += 1
-//     } else {
-//         data.value.push([Number(s), 1])
-//     }
-// }
-
-// setInterval(() => {
-//     addData()
-// }, 1000)
-
-// echarts配置
+// 全局echarts配置
 const globalOptions = computed(() => {
     return {
         tooltip: {
@@ -105,12 +91,64 @@ const globalOptions = computed(() => {
     };
 })
 
+// 分项echarts配置
+const subitemOptions = computed(() => {
+    return {
+        tooltip: {
+            trigger: "axis",
+            axisPointer: {
+                type: "shadow"
+            }
+        },
+        xAxis: [
+            {
+                type: "value",
+                min: -10,
+                max: 10,
+            }
+        ],
+        yAxis: [
+            {
+                type: "value",
+            },
+        ],
+        series: [
+            {
+                type: "bar",
+                barWidth: 6,
+                data: data[lineNumber.value],
+                markLine: {
+                    symbol: 'none',
+                    data: [
+                        {
+                            lineStyle: {
+                                type: "dashed",
+                                color: "rgb(236,39,89)"
+                            },
+                            xAxis: -5
+                        },
+                        {
+                            lineStyle: {
+                                type: "dashed",
+                                color: "rgb(236,39,89)"
+                            },
+                            xAxis: 5
+                        }
+                    ]
+                }
+            }
+        ]
+    };
+})
+
 export function useEcharts() {
     return {
+        lineNumber,
         data,
         resetData,
         replaceData,
-        globalOptions
+        globalOptions,
+        subitemOptions,
     }
 }
 

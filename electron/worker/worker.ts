@@ -1,6 +1,10 @@
+// const {func} = require('electron-edge-js');
+// const {useIpcRenderer} = require("@vueuse/electron")
+// const {join, resolve} = require('path');
 const {func} = require('electron-edge-js');
-const {useIpcRenderer} = require("@vueuse/electron")
-const {join, resolve} = require('path')
+const {join, resolve} = require('path');
+import {useIpcRenderer} from "@vueuse/electron";
+
 
 let environment: any;
 if (process.env.VITE_DEV_SERVER_URL) {
@@ -167,6 +171,20 @@ function TestOneGroupExecution() {
     return i;
 }
 
+// 写入补偿值
+function WriteStandardProductExecution(data: Array<string>) {
+    let str = data.join('_')
+    let b: boolean;
+    WriteStandardProduct(str, (error: any, result: any) => {
+        if (error) {
+            b = false
+            return
+        }
+        b = result
+    })
+    return b;
+}
+
 function ScrewState(i: number) {
     let state: any;
     for (let j = 0; j < 10; j++) {
@@ -246,7 +264,12 @@ on("worker-receive-validation-start", (event: any) => {
     //     console.log('无法执行')
     //     return
     // }
-    event.sender.send('worker-send-docking-data', TestOneGroupExecution())
+    if (WriteStandardProductExecution(['0', '0', '0', '0'])) {
+        event.sender.send('worker-send-docking-data', TestOneGroupExecution())
+        ScrewActionExecution(0)
+        return
+    }
+    // TODO 写入补偿值失败
     ScrewActionExecution(0)
 })
 
@@ -257,18 +280,11 @@ on("worker-receive-screw-action", (_: any, action: any) => {
 
 // 工作进程写入补偿值
 on("worker-receive-write-compensation", (event: any, data: any) => {
-    WriteStandardProduct(data, (error: any, result: any) => {
-        if (error) {
-            console.log(error)
-            return
-        }
-        console.log(result)
-        if (result == null) {
-            event.sender.send('worker-send-write-compensation-error', error)
-        } else {
-            event.sender.send('worker-send-write-compensation-success')
-        }
-    })
+    if (WriteStandardProductExecution(data)) {
+        event.sender.send('worker-send-write-compensation-success')
+        return
+    }
+    event.sender.send('worker-send-write-compensation-error')
 })
 
 // 工作进验证补偿

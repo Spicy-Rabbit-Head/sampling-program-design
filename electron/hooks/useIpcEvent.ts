@@ -2,53 +2,11 @@ import {BrowserWindow, ipcMain, dialog} from "electron";
 import {SelectOption} from "naive-ui";
 
 const Store = require('electron-store');
-import ini from 'ini';
+const ini = require('ini');
 import fs from 'fs';
 import {join} from "path";
 import dayjs from "dayjs";
-
-const LocalStoreInterface = {
-    // 当前QCC文件路径
-    filePath: {
-        type: 'string',
-    },
-    // 当前校准模式
-    currentCalibrationMode: {
-        type: 'string',
-    },
-    // 250B配置文件路径
-    iniConfiguration: {
-        type: 'string',
-    },
-    // 标品数据路径
-    standardProductPath: {
-        type: 'string',
-    },
-    // 标品数据密码
-    standardProductPassword: {
-        type: 'string',
-    },
-    // 权限密码
-    permissionPassword: {
-        type: 'string',
-    },
-    // 当前车间
-    currentWorkshop: {
-        type: 'string',
-    },
-    // 当前地址
-    location: {
-        type: 'string',
-    },
-    // 校对机运行模式
-    proofreadingOperationMode: {
-        type: 'integer',
-    },
-    // 数据表
-    dataTable: {
-        type: 'string',
-    }
-}
+import {LocalStoreInterface} from "../interface";
 
 
 // 事件监听
@@ -347,38 +305,38 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
         })
     })
 
-    // 渲染进程发起数据表读取
-    ipcMain.on('render-send-read-data-table', function (event, pathName) {
-        let path = join(__dirname, '../../data', pathName);
-        if (process.env.VITE_DEV_SERVER_URL) {
-            path = join(__dirname + '../../public/data', pathName)
-        }
-        fs.readFile(path, 'utf8', function (err, data) {
-            if (err) {
-                console.log(err)
-            } else {
-                event.reply('render-receive-read-data-table', data)
-            }
-        })
-    })
+    // // 渲染进程发起数据表读取
+    // ipcMain.on('render-send-read-data-table', function (event, pathName) {
+    //     let path = join(__dirname, '../../data', pathName);
+    //     if (process.env.VITE_DEV_SERVER_URL) {
+    //         path = join(__dirname + '../../public/data', pathName)
+    //     }
+    //     fs.readFile(path, 'utf8', function (err, data) {
+    //         if (err) {
+    //             console.log(err)
+    //         } else {
+    //             event.reply('render-receive-read-data-table', data)
+    //         }
+    //     })
+    // })
 
     // 渲染进程发起数据表创建
-    ipcMain.on('render-send-found-data-table', function (_, i: boolean, data) {
-        let name: string;
-        let database: string = JSON.stringify([[[]]]);
-        if (i) {
-            name = data + '_' + dayjs().format('YYYY_MM_DD_HH_mm_ss') + '.json'
-            localStore.set('dataTable', name)
-        } else {
-            name = localStore.get('dataTable')
-            database = data
-        }
-        let path = join(__dirname, '../../data', name);
-        if (process.env.VITE_DEV_SERVER_URL) {
-            path = join(__dirname + '../../public/data', name);
-        }
-        fs.writeFile(path, database, 'utf8', function (err) {
-            if (err) console.log(err)
-        })
-    })
+    // ipcMain.on('render-send-found-data-table', function (_, i: boolean, data) {
+    //     let name: string;
+    //     let database: string = JSON.stringify([[[]]]);
+    //     if (i) {
+    //         name = data + '_' + dayjs().format('YYYY_MM_DD_HH_mm_ss') + '.json'
+    //         localStore.set('dataTable', name)
+    //     } else {
+    //         name = localStore.get('dataTable')
+    //         database = data
+    //     }
+    //     let path = join(__dirname, '../../data', name);
+    //     if (process.env.VITE_DEV_SERVER_URL) {
+    //         path = join(__dirname + '../../public/data', name);
+    //     }
+    //     fs.writeFile(path, database, 'utf8', function (err) {
+    //         if (err) console.log(err)
+    //     })
+    // })
 }

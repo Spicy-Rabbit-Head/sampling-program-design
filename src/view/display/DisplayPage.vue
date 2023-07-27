@@ -2,22 +2,28 @@
 import VChart from "vue-echarts";
 import {useEcharts} from "@/hooks/useEcharts.ts";
 import {ref} from "vue";
+import {SelectOptionData} from "@arco-design/web-vue";
 
-const lineNumber = ref<number>();
-const {globalOptions} = useEcharts();
+const lineOption: Array<SelectOptionData> = [];
+for (let i = 0; i < 24; i++) {
+  lineOption.push({
+    label: `第 ${i + 1} 行`,
+    value: i
+  });
+}
+
+const {globalOptions, subitemOptions, lineNumber} = useEcharts();
+// 图表实例
 const globalChart = ref<any>(null);
 const assemblyChart = ref<any>(null);
 // 监听视口大小变化，实时更新图表高度
 window.addEventListener('resize', handleResize);
 
+// 图表大小变化
 function handleResize() {
   // 0.3秒后更新图表高度
   globalChart.value.resize();
   assemblyChart.value.resize();
-}
-
-function toggle(value: any) {
-  console.log(value);
 }
 
 </script>
@@ -28,11 +34,9 @@ function toggle(value: any) {
       <v-chart ref="globalChart" :option="globalOptions"/>
     </div>
     <div class="t-flex t-flex-col t-items-center">
-      <a-select :model-value="lineNumber" default-value="1" placeholder="选择行数" @change="toggle"
-                class="t-my-1 !t-w-1/3">
-        <a-option v-for="i in 24" :key="i" :value="i">第 {{ i }} 行</a-option>
-      </a-select>
-      <v-chart ref="assemblyChart" :option="globalOptions"/>
+      <a-select v-model:model-value="lineNumber" default-value="第 1 行" placeholder="选择行数"
+                class="t-my-1 !t-w-1/3" :options="lineOption"/>
+      <v-chart ref="assemblyChart" :option="subitemOptions"/>
     </div>
   </div>
 </template>

@@ -2,7 +2,7 @@ import {useConfigStore, useGlobalStore} from "@/store";
 import {useIpcRenderer} from "@vueuse/electron";
 import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
 import {useConfig} from "@/hooks/useConfig.ts";
-import {useEcharts} from "@/hooks/useEcharts.ts";
+// import {useEcharts} from "@/hooks/useEcharts.ts";
 
 const {on} = useIpcRenderer()
 
@@ -25,12 +25,11 @@ export function useIpcReceiveEvent() {
         updateDataBase,
     } = useProofreadingMachine();
     const {addWorkshopOptions} = useConfig();
-    const {resetData, replaceData, data} = useEcharts();
+    // const {resetData} = useEcharts();
 
     // 数据初始化
-    on('render-receive-init', (event, {
+    on('render-receive-init', (_, {
         currentCalibrationMode,
-        dataTable,
         filePath,
         outputDisplay,
         proofreadingOperationMode
@@ -48,11 +47,12 @@ export function useIpcReceiveEvent() {
         } else {
             globalStore.outputDisplay = JSON.parse(outputDisplay)
         }
-        if (dataTable == undefined || filePath == undefined) {
-            resetData()
-        } else {
-            event.sender.send('render-send-read-data-table', dataTable)
-        }
+        // resetData()
+        // if (dataTable == undefined || filePath == undefined) {
+        //
+        // } else {
+        //     event.sender.send('render-send-read-data-table', dataTable)
+        // }
     })
 
     // 读取可修改配置
@@ -79,8 +79,8 @@ export function useIpcReceiveEvent() {
     })
 
     // 关闭前数据保存
-    on('render-receive-save-data', (event) => {
-        event.sender.send('render-send-found-data-table', false, JSON.stringify(data))
+    on('render-receive-save-data', () => {
+        // event.sender.send('render-send-found-data-table', false)
     })
 
     // 读取250BINI配置
@@ -110,7 +110,7 @@ export function useIpcReceiveEvent() {
     on('render-receive-qcc-select-file', (event, path: string) => {
         globalStore.filePath = path
         event.sender.send('render-send-standard-query', globalStore.currentFileName)
-        event.sender.send('render-send-found-data-table', true, globalStore.currentFileName)
+        // event.sender.send('render-send-found-data-table', true, globalStore.currentFileName)
     })
 
     // 选择文件-INI
@@ -233,8 +233,8 @@ export function useIpcReceiveEvent() {
         }
     })
 
-    // 读取数据表
-    on('render-receive-read-data-table', (_, data) => {
-        replaceData(JSON.parse(data))
-    })
+    // // 读取数据表
+    // on('render-receive-read-data-table', (_, data) => {
+    //     replaceData(JSON.parse(data))
+    // })
 }
