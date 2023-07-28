@@ -2,7 +2,7 @@ import {useConfigStore, useGlobalStore} from "@/store";
 import {useIpcRenderer} from "@vueuse/electron";
 import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
 import {useConfig} from "@/hooks/useConfig.ts";
-// import {useEcharts} from "@/hooks/useEcharts.ts";
+import {useEcharts} from "@/hooks/useEcharts.ts";
 
 const {on} = useIpcRenderer()
 
@@ -25,7 +25,7 @@ export function useIpcReceiveEvent() {
         updateDataBase,
     } = useProofreadingMachine();
     const {addWorkshopOptions} = useConfig();
-    // const {resetData} = useEcharts();
+    const {updateLimitData} = useEcharts();
 
     // 数据初始化
     on('render-receive-init', (_, {
@@ -56,15 +56,10 @@ export function useIpcReceiveEvent() {
     })
 
     // 读取可修改配置
-    on('render-receive-read-configuration', (event, data: any) => {
+    on('render-receive-read-configuration', (_, data: any) => {
         configStore.iniConfiguration = data.iniConfiguration
         configStore.standardProductPath = data.standardProductPath
         configStore.standardProductPassword = data.standardProductPassword
-        configStore.permissionPassword = data.permissionPassword
-        if (data.permissionPassword == undefined) {
-            configStore.permissionPassword = '666666'
-            event.sender.send('render-send-set-store', 'permissionPassword', '666666')
-        }
         configStore.currentWorkshop = data.currentWorkshop
     })
 
@@ -231,6 +226,11 @@ export function useIpcReceiveEvent() {
             checkTheMachineSuccess(2)
             automaticCalibrationStop()
         }
+    })
+
+    // 读取测试上下限
+    on('render-receive-brake-limit', (_, data) => {
+        updateLimitData(data)
     })
 
     // // 读取数据表

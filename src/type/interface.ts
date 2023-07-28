@@ -63,7 +63,6 @@ export type ConfigStoreInterface = {
     iniConfiguration: string,
     standardProductPath: string,
     standardProductPassword: string,
-    permissionPassword: string,
     currentWorkshop: string,
 }
 

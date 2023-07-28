@@ -4,7 +4,9 @@ import {createRouter, createWebHistory, Router, RouteRecordRaw} from 'vue-router
 const Home = () => import('@/view/home/HomePage.vue')
 const Verifier = () => import('@/view/verifier/ProofreadingMachineModule.vue')
 const Display = () => import('@/view/display/DisplayPage.vue')
-const test2 = () => import('@/view/test/test2.vue')
+
+const Brake = () => import('@/view/brake/TrialSetting.vue')
+
 const ConfigurationPage = () => import('@/view/configuration/ConfigurationPage.vue')
 
 // 定义路由
@@ -33,7 +35,7 @@ const routes = [
     {
         path: '/testTuning',
         name: 'TestTuning',
-        component: test2,
+        component: Brake,
     },
     {
         path: '/configuration',

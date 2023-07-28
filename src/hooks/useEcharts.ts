@@ -2,13 +2,7 @@ import {computed, reactive, ref} from "vue";
 import {use} from "echarts/core";
 import {CanvasRenderer} from "echarts/renderers";
 import {BarChart} from "echarts/charts";
-import {
-    TitleComponent,
-    TooltipComponent,
-    LegendComponent,
-    GridComponent,
-    MarkLineComponent
-} from "echarts/components";
+import {GridComponent, LegendComponent, MarkLineComponent, TitleComponent, TooltipComponent} from "echarts/components";
 
 use([
     CanvasRenderer,
@@ -20,9 +14,19 @@ use([
     MarkLineComponent
 ]);
 
-// 随机数据
-// const data = ref([[[0, 0], [1, 1]], [[0, 0], [1, 1]]])
-const data: Array<Array<Array<number>>> = reactive([[[0, 1]], [[1, 3]], [[-1, 2]]])
+// 数据
+const data: Array<Array<Array<number>>> = reactive([]);
+// 测试上下限
+const testLimit = reactive([5, -5])
+// 平整后的数据
+const flattenedData = computed(() => {
+    const list: Array<Array<number>> = [];
+    data.forEach((item) => {
+        list.push(...item);
+    })
+    return list;
+})
+
 // 查看的行号
 const lineNumber = ref<number>(0);
 
@@ -34,6 +38,8 @@ function resetData() {
     }
 }
 
+resetData()
+
 // 替代数据
 function replaceData(value: any) {
     console.log(value)
@@ -41,9 +47,18 @@ function replaceData(value: any) {
     data.push(...value)
 }
 
+// 限制数据更新
+function updateLimitData(list: Array<any>) {
+    testLimit.length = 0
+    testLimit.push(...list)
+}
+
 // 全局echarts配置
 const globalOptions = computed(() => {
     return {
+        title: {
+            text: '全局数据'
+        },
         tooltip: {
             trigger: "axis",
             axisPointer: {
@@ -53,8 +68,8 @@ const globalOptions = computed(() => {
         xAxis: [
             {
                 type: "value",
-                min: -10,
-                max: 10,
+                max: testLimit[0] + 5,
+                min: testLimit[1] - 5,
             }
         ],
         yAxis: [
@@ -66,7 +81,7 @@ const globalOptions = computed(() => {
             {
                 type: "bar",
                 barWidth: 6,
-                data: data[0],
+                data: flattenedData.value,
                 markLine: {
                     symbol: 'none',
                     data: [
@@ -75,14 +90,14 @@ const globalOptions = computed(() => {
                                 type: "dashed",
                                 color: "rgb(236,39,89)"
                             },
-                            xAxis: -5
+                            xAxis: testLimit[0]
                         },
                         {
                             lineStyle: {
                                 type: "dashed",
                                 color: "rgb(236,39,89)"
                             },
-                            xAxis: 5
+                            xAxis: testLimit[1]
                         }
                     ]
                 }
@@ -94,6 +109,9 @@ const globalOptions = computed(() => {
 // 分项echarts配置
 const subitemOptions = computed(() => {
     return {
+        title: {
+            text: `第${lineNumber.value + 1}行数据`,
+        },
         tooltip: {
             trigger: "axis",
             axisPointer: {
@@ -103,8 +121,8 @@ const subitemOptions = computed(() => {
         xAxis: [
             {
                 type: "value",
-                min: -10,
-                max: 10,
+                max: testLimit[0] + 5,
+                min: testLimit[1] - 5,
             }
         ],
         yAxis: [
@@ -125,14 +143,14 @@ const subitemOptions = computed(() => {
                                 type: "dashed",
                                 color: "rgb(236,39,89)"
                             },
-                            xAxis: -5
+                            xAxis: testLimit[0]
                         },
                         {
                             lineStyle: {
                                 type: "dashed",
                                 color: "rgb(236,39,89)"
                             },
-                            xAxis: 5
+                            xAxis: testLimit[1]
                         }
                     ]
                 }
@@ -145,8 +163,8 @@ export function useEcharts() {
     return {
         lineNumber,
         data,
-        resetData,
         replaceData,
+        updateLimitData,
         globalOptions,
         subitemOptions,
     }

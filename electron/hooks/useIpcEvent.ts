@@ -134,6 +134,8 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
             } else {
                 // 渲染进程接收QCC文件路径并持久化
                 event.reply('render-receive-qcc-select-file', r.filePaths[0])
+                // 通知工作进程读取QCC文件
+                worker.webContents.send('worker-receive-change-file', r.filePaths[0])
                 localStore.set('filePath', r.filePaths[0])
             }
         }).catch(err => {
@@ -303,6 +305,21 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
                 event.reply('render-receive-read-store', data)
             }
         })
+    })
+
+    // 渲染进程发起测试数据上下限
+    ipcMain.on('render-send-update-limit', function () {
+        worker.webContents.send('worker-receive-update-limit')
+    })
+
+    // 工作进程发起测试数据上下限
+    ipcMain.on('worker-send-brake-limit', function (_, data) {
+        render.webContents.send('render-receive-brake-limit', data)
+    })
+
+    // 更改文件成功
+    ipcMain.on('worker-send-change-file-success', function () {
+        worker.webContents.send('worker-receive-update-limit')
     })
 
     // // 渲染进程发起数据表读取

@@ -85,6 +85,20 @@ const GetScrewState = func({
     methodName: "GetScrewState",
 })
 
+// 获取测试上下限
+const GetTestLimit = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "GetTestRestrict",
+})
+
+// 改变文件
+const ChangeFile = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "ChangeFile",
+})
+
 // 服务初始化启动
 function ServiceInit(port: string) {
     Init(port, (error: any, result: any) => {
@@ -113,7 +127,7 @@ function ServiceStop() {
 
 // 标品数据查询
 function StandardProductQuery(path: string, pn: string, location: string, password: string) {
-    let portList: Array<string> = [];
+    let portList = [];
     let data = {
         path: path,
         pn: pn,
@@ -293,4 +307,40 @@ on("worker-receive-verification-compensation", (event: any) => {
     event.sender.send('worker-send-verification-result', TestOneGroupExecution())
     ScrewActionExecution(0)
 })
+
+// 工作进程测试上下限
+on("worker-receive-update-limit", (event: any) => {
+    let limit: any;
+    GetTestLimit(null, (error: any, result: any) => {
+        if (error) {
+            console.log(error)
+            limit = null
+            return
+        }
+        limit = result
+    })
+    event.sender.send('worker-send-brake-limit', limit)
+})
+
+// 工作进程更改文件
+on("worker-receive-change-file", (event: any, path: any) => {
+    ServiceStop()
+    let b: boolean;
+    OpenMeasuringProgram(null, (error: any, result: any) => {
+        if (error) throw error;
+        b = result;
+    })
+    if (!b) return;
+    ChangeFile(path, (error: any, result: any) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+        b = result
+    })
+    if (!b) return;
+    event.sender.send('worker-send-change-file-success')
+})
+
+
 

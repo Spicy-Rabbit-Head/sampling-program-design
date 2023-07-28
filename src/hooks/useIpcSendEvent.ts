@@ -123,6 +123,11 @@ export function useIpcSendEvent() {
         send('render-send-cache-data-read');
     }
 
+    // 更新测试数据上下限
+    function updateTestDataLimit() {
+        send('render-send-update-limit');
+    }
+
     return {
         renderThreadInitialization,
         dllInitialization,
@@ -144,5 +149,6 @@ export function useIpcSendEvent() {
         cacheDataSave,
         cacheDataRead,
         closeWindow,
+        updateTestDataLimit,
     }
 }

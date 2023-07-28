@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import IconAntDesignControlOutlined from "~icons/ant-design/control-outlined"
 import IconAntDesignDeleteRowOutlined from "~icons/ant-design/delete-row-outlined"
-import {onMounted, ref} from "vue";
-import {useConfigStore} from "@/store";
+import {onMounted, ref, watch} from "vue";
 import {useIpcSendEvent} from "@/hooks/useIpcSendEvent.ts";
 import {useConfig} from "@/hooks/useConfig.ts";
+import {useHome} from "@/hooks/useHome.ts";
+import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
+import {useConfigStore} from "@/store";
 
-const changePermission = ref<boolean>(false)
 const {
   readModifiableConfigurations,
   standardProductPathUpdate,
@@ -17,47 +18,49 @@ const {
   screwAction,
 } = useIpcSendEvent();
 
+
+const {
+  workshopOptions,
+  changePermission,
+  comparisonSuccess,
+  exitPermission,
+  visible,
+  passwordComparison,
+  password,
+  handleCancel,
+} = useConfig();
+const {autoButton} = useHome();
+const {calibrationStatus} = useProofreadingMachine();
 const configStore = useConfigStore();
-const {workshopOptions} = useConfig();
+
 onMounted(() => {
   readModifiableConfigurations()
 })
-// 密码输入框是否显示
-const visible = ref(false)
-// 密码
-const password = ref("")
-
-// 取消按钮
-function handleCancel() {
-  visible.value = false
-  password.value = ""
-}
-
-// 密码比对
-function passwordComparison() {
-  if (password.value === configStore.permissionPassword) {
-    password.value = ""
-    return true
-  } else {
-    return false
-  }
-}
-
-// 比对成功
-function comparisonSuccess() {
-  changePermission.value = true
-  visible.value = false
-}
-
-// 退出权限
-function exitPermission() {
-  changePermission.value = false
-}
 
 const readyPosition: Array<string> = []
 for (let i = 0; i < 7; i++) {
   readyPosition.push(`准备位置 ${i}`)
 }
+
+// 密码输入框
+const passwordInput = ref();
+
+// 获取焦点
+function gainFocus() {
+  passwordInput.value.focus();
+}
+
+watch(autoButton, (value) => {
+  if (value) {
+    exitPermission()
+  }
+})
+
+watch(calibrationStatus, (value) => {
+  if (value) {
+    exitPermission()
+  }
+})
 
 </script>
 
@@ -65,7 +68,8 @@ for (let i = 0; i < 7; i++) {
   <div class="t-h-full t-w-full t-flex t-flex-col">
     <!--  权限  -->
     <div class="t-h-14 t-flex-none t-border t-rounded-md t-m-2 t-px-2 t-flex t-items-center t-gap-2">
-      <n-button secondary strong :disabled="changePermission" @click.stop="visible = true">
+      <n-button secondary strong :disabled="changePermission || calibrationStatus || autoButton"
+                @click.stop="visible = true">
         <IconAntDesignControlOutlined/>
         获取权限
       </n-button>
@@ -160,8 +164,8 @@ for (let i = 0; i < 7; i++) {
       </div>
     </div>
     <a-modal v-model:visible="visible" type="password" :mask-closable="false" title="输入密码" @cancel="handleCancel"
-             :on-before-ok="passwordComparison" @ok="comparisonSuccess">
-      <a-input v-model="password"/>
+             :on-before-ok="passwordComparison" @ok="comparisonSuccess" @open="gainFocus">
+      <a-input ref="passwordInput" v-model="password"/>
     </a-modal>
   </div>
 </template>
