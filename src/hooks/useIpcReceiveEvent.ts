@@ -23,6 +23,8 @@ export function useIpcReceiveEvent() {
         checkTheMachineFail,
         checkTheMachineSuccess,
         updateDataBase,
+        initLogs,
+        logs
     } = useProofreadingMachine();
     const {addWorkshopOptions} = useConfig();
     const {updateLimitData} = useEcharts();
@@ -74,8 +76,8 @@ export function useIpcReceiveEvent() {
     })
 
     // 关闭前数据保存
-    on('render-receive-save-data', () => {
-        // event.sender.send('render-send-found-data-table', false)
+    on('render-receive-save-data', (event) => {
+        event.sender.send('render-send-save-log', JSON.stringify(logs))
     })
 
     // 读取250BINI配置
@@ -233,6 +235,10 @@ export function useIpcReceiveEvent() {
         updateLimitData(data)
     })
 
+    // 读取日志
+    on('render-receive-read-log', (_, data) => {
+        initLogs(JSON.parse(data))
+    })
     // // 读取数据表
     // on('render-receive-read-data-table', (_, data) => {
     //     replaceData(JSON.parse(data))

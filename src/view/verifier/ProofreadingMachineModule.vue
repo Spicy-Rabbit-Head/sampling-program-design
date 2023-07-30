@@ -8,9 +8,10 @@ import ProofreadingMachineStatus from "@/view/verifier/ProofreadingMachineStatus
 import {useGlobalStore} from "@/store";
 import {storeToRefs} from "pinia";
 import {useIpcSendEvent} from "@/hooks/useIpcSendEvent.ts";
-import {onMounted, ref, reactive} from "vue";
+import {onMounted, ref} from "vue";
 import {useHome} from "@/hooks/useHome.ts";
 import {SelectOption, useNotification} from "naive-ui";
+import {useConfig} from "@/hooks/useConfig.ts";
 
 // 校对机闭包
 const {
@@ -46,6 +47,7 @@ const {
   readNumberFile,
   automaticCalibrationStarts
 } = useIpcSendEvent();
+const {exitPermission} = useConfig();
 
 onMounted(() => {
   standardProductQuery(currentFileName.value);
@@ -72,12 +74,6 @@ const dockingNumber = ref<SelectOption>({});
 
 // 验证标品编号
 const verificationNumber = ref<SelectOption>({});
-
-// 临时
-const temporarily = reactive({
-  value1: '',
-  value2: '',
-});
 
 // 刷新动画
 const loading = ref<boolean>(false);
@@ -109,6 +105,7 @@ function openDialogBox() {
     errorNotification('当前料号未检测到标品数据');
     return;
   }
+  exitPermission();
   visible.value = true;
 }
 
@@ -124,17 +121,12 @@ function handleBeforeOk() {
     return false;
   }
   globalStore.outputDisplayUpdate(dockingNumber.value, verificationNumber.value);
-  handleCancel();
   return true;
 }
 
 // 对话框取消
 function handleCancel() {
   visible.value = false;
-  dockingNumber.value = {};
-  verificationNumber.value = {};
-  temporarily.value1 = '';
-  temporarily.value2 = '';
 }
 
 // 选择赋值
@@ -275,12 +267,12 @@ function logScrollStart(i: boolean) {
       <div class="t-grid t-grid-cols-2">
         <div>
           <span>选择对机标品编号 :</span>
-          <n-select v-model:value="temporarily.value1" :options="standardProducts" @update-value="DockingUpdate"
+          <n-select :options="standardProducts" @update-value="DockingUpdate"
                     :disabled="proofreadingOperationMode == 1"/>
         </div>
         <div>
           <span>选择验证标品编号 :</span>
-          <n-select v-model:value="temporarily.value2" :options="standardProducts" @update-value="VerificationUpdate"
+          <n-select :options="standardProducts" @update-value="VerificationUpdate"
                     :disabled="proofreadingOperationMode == 1"/>
         </div>
       </div>

@@ -12,13 +12,14 @@ const {
   select
 } = useHome();
 
-const {renderThreadInitialization, dllInitialization, cacheDataRead, updateTestDataLimit} = useIpcSendEvent();
+const {renderThreadInitialization, dllInitialization, cacheDataRead, updateTestDataLimit, initLog} = useIpcSendEvent();
 
 onMounted(() => {
   renderThreadInitialization();
   dllInitialization();
   cacheDataRead();
   updateTestDataLimit();
+  initLog();
 })
 
 </script>

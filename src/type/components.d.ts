@@ -11,6 +11,8 @@ declare module 'vue' {
     AButtonGroup: typeof import('@arco-design/web-vue')['ButtonGroup']
     ADescriptions: typeof import('@arco-design/web-vue')['Descriptions']
     AInput: typeof import('@arco-design/web-vue')['Input']
+    AInputGroup: typeof import('@arco-design/web-vue')['InputGroup']
+    AInputNumber: typeof import('@arco-design/web-vue')['InputNumber']
     AModal: typeof import('@arco-design/web-vue')['Modal']
     ASelect: typeof import('@arco-design/web-vue')['Select']
     AStep: typeof import('@arco-design/web-vue')['Step']

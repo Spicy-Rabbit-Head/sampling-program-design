@@ -128,6 +128,11 @@ export function useIpcSendEvent() {
         send('render-send-update-limit');
     }
 
+    // 初始化日志
+    function initLog() {
+        send('render-send-init-log');
+    }
+
     return {
         renderThreadInitialization,
         dllInitialization,
@@ -150,5 +155,6 @@ export function useIpcSendEvent() {
         cacheDataRead,
         closeWindow,
         updateTestDataLimit,
+        initLog
     }
 }

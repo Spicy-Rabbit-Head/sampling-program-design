@@ -51,9 +51,14 @@ export function useHome() {
         mainTable[i].class = "t-bg-green-600";
     }
 
-    // 启动状态反转
+    // 启动
     function startSwitch() {
-        autoButton.value = !autoButton.value;
+        autoButton.value = true
+    }
+
+    // 关闭
+    function stopSwitch() {
+        autoButton.value = false
     }
 
     return {
@@ -65,5 +70,6 @@ export function useHome() {
         options,
         optionsValue,
         optionsExhibition,
+        stopSwitch,
     }
 }

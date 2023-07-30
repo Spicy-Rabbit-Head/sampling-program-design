@@ -50,11 +50,11 @@ function gainFocus() {
   passwordInput.value.focus();
 }
 
-watch(autoButton, (value) => {
-  if (value) {
-    exitPermission()
-  }
-})
+// watch(autoButton, (value) => {
+//   if (value) {
+//     exitPermission()
+//   }
+// })
 
 watch(calibrationStatus, (value) => {
   if (value) {

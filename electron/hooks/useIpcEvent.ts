@@ -5,7 +5,6 @@ const Store = require('electron-store');
 const ini = require('ini');
 import fs from 'fs';
 import {join} from "path";
-import dayjs from "dayjs";
 import {LocalStoreInterface} from "../interface";
 
 
@@ -34,7 +33,7 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     ipcMain.on('render-send-window-close', function (event: any) {
         event.reply('render-receive-show-close-confirm-dialog')
         // 进行数据保存
-        // event.reply('render-receive-save-data')
+        event.reply('render-receive-save-data')
         // 关闭服务
         // worker.webContents.send('worker-receive-stop-service');
         // 保存数据
@@ -320,6 +319,34 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     // 更改文件成功
     ipcMain.on('worker-send-change-file-success', function () {
         worker.webContents.send('worker-receive-update-limit')
+    })
+
+    // 初始化日志
+    ipcMain.on('render-send-init-log', function (event) {
+        let path = join(__dirname, '../../log.json');
+        if (process.env.VITE_DEV_SERVER_URL) {
+            path = join(__dirname + '../../public/log.json')
+        }
+        fs.readFile(path, 'utf8', function (err, data) {
+            if (err) {
+                console.log(err)
+            } else {
+                event.reply('render-receive-read-log', data)
+            }
+        })
+    })
+
+    // 保存日志
+    ipcMain.on('render-send-save-log', function (_, data) {
+        let path = join(__dirname, '../../log.json');
+        if (process.env.VITE_DEV_SERVER_URL) {
+            path = join(__dirname + '../../public/log.json')
+        }
+        fs.writeFile(path, data, function (err) {
+            if (err) {
+                console.log(err)
+            }
+        })
     })
 
     // // 渲染进程发起数据表读取

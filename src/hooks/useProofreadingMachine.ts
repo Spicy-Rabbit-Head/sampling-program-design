@@ -147,6 +147,12 @@ function logOutput(content: string) {
     })
 }
 
+// 日志初始化
+function initLogs(data: any) {
+    logs.length = 0
+    logs.push(...data)
+}
+
 // 校准状态更新
 function updateCalibrationStatus(index: number, item: number, i: boolean = true) {
     if (i) {
@@ -239,5 +245,6 @@ export function useProofreadingMachine() {
         dataBase,
         updateDataBase,
         initDataBase,
+        initLogs,
     }
 }
