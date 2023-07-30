@@ -133,6 +133,13 @@ export function useIpcSendEvent() {
         send('render-send-init-log');
     }
 
+    // 保存抽测数据
+    function saveSpotTestData(spotTestMode: any, spotTestBit: any, spotTestColumn: any) {
+        send('render-send-set-store', 'spotTestMode', spotTestMode);
+        send('render-send-set-store', 'spotTestBit', JSON.stringify(spotTestBit));
+        send('render-send-set-store', 'spotTestColumn', JSON.stringify(spotTestColumn));
+    }
+
     return {
         renderThreadInitialization,
         dllInitialization,
@@ -155,6 +162,7 @@ export function useIpcSendEvent() {
         cacheDataRead,
         closeWindow,
         updateTestDataLimit,
-        initLog
+        initLog,
+        saveSpotTestData
     }
 }

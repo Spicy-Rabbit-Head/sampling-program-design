@@ -56,6 +56,15 @@ export type GlobalStoreInterface = {
     proofreadingOperationMode: number,
     outputDisplay: Array<OutputDisplayInterface>,
     beforeClosingDialogue: boolean,
+    spotTestBit: {
+        start: number,
+        end: number
+    },
+    spotTestColumn: {
+        start: number,
+        end: number
+    },
+    spotTestMode: string,
 }
 
 // 配置文件

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 
-import {onUpdated, reactive, ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
 
 const trialSettingSwitch = ref(false)
 const trialSettingMode = ref<string>()
@@ -11,7 +11,7 @@ const bit = reactive({
 })
 const column = reactive<Array<string>>([])
 
-onUpdated(() => {
+onMounted(() => {
   column.length = 0
   for (let i = 0; i < 32; i++) {
     column.push('第 ' + (i + 1) + ' 列')

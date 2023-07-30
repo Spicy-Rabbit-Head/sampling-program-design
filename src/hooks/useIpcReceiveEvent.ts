@@ -34,7 +34,10 @@ export function useIpcReceiveEvent() {
         currentCalibrationMode,
         filePath,
         outputDisplay,
-        proofreadingOperationMode
+        proofreadingOperationMode,
+        spotTestMode,
+        spotTestBit,
+        spotTestColumn
     }: any) => {
         globalStore.filePath = filePath
         globalStore.currentCalibrationMode = currentCalibrationMode
@@ -48,6 +51,15 @@ export function useIpcReceiveEvent() {
             )
         } else {
             globalStore.outputDisplay = JSON.parse(outputDisplay)
+        }
+        if (spotTestMode != undefined) {
+            globalStore.spotTestMode = spotTestMode
+        }
+        if (spotTestBit != undefined) {
+            globalStore.spotTestBit = JSON.parse(spotTestBit)
+        }
+        if (spotTestColumn != undefined) {
+            globalStore.spotTestColumn = JSON.parse(spotTestColumn)
         }
         // resetData()
         // if (dataTable == undefined || filePath == undefined) {

@@ -31,6 +31,18 @@ export const useGlobalStore = defineStore('GlobalStore', {
             outputDisplay: [],
             // 关闭前对话框
             beforeClosingDialogue: false,
+            // 抽测位
+            spotTestBit: {
+                start: 0,
+                end: 768
+            },
+            // 抽测列
+            spotTestColumn: {
+                start: 0,
+                end: 31
+            },
+            // 抽测模式
+            spotTestMode: '',
         }
     },
     getters: {
@@ -38,7 +50,14 @@ export const useGlobalStore = defineStore('GlobalStore', {
         currentFileName: (state) => {
             let str = state.filePath.match(regex);
             return str ? str[1] : ''
-        }
+        },
+        // 当前抽测位展示
+        currentModeComputing: ((state) => {
+            if (state.spotTestMode == '位模式') {
+                return `当前模式: 位模式; 起始位: ${state.spotTestBit.start}; 结束位: ${state.spotTestBit.end}`
+            }
+            return `当前模式: 列模式; 起始列: ${state.spotTestColumn.start + 1}; 结束列: ${state.spotTestColumn.end + 1}`
+        })
     },
     actions: {
         // 校对机数据更新

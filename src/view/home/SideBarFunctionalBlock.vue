@@ -5,7 +5,8 @@ import {storeToRefs} from "pinia";
 import {useIpcSendEvent} from "@/hooks/useIpcSendEvent.ts";
 import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
 import {useConfig} from "@/hooks/useConfig.ts";
-import {computed, onUpdated, reactive, ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
+import {useNotification} from "naive-ui";
 
 const {
   autoButton,
@@ -20,32 +21,52 @@ const {calibrationStatus} = useProofreadingMachine();
 
 const {currentFileName, filePath} = storeToRefs(useGlobalStore());
 
-const {readNumberFile} = useIpcSendEvent();
+const {readNumberFile, saveSpotTestData} = useIpcSendEvent();
 
 const {exitPermission} = useConfig();
+
+const globalStore = useGlobalStore()
 const visible = ref(false)
-const spotTestMode = ref<string>()
-const bit = reactive({
-  start: 0,
-  end: 768
-})
-const column = reactive({
-  start: 0,
-  end: 32
-})
 
 const columnOption = reactive<Array<any>>([])
 
+// 通知
+const {error} = useNotification();
+
+// 错误通知
+function errorNotification(message: string) {
+  error({
+    title: '错误',
+    content: message,
+    duration: 5000,
+  });
+}
+
+// 判断
+function judgment() {
+  if (globalStore.spotTestMode == '列模式') {
+    if (globalStore.spotTestColumn.start > globalStore.spotTestColumn.end) {
+      errorNotification('起始列不能大于结束列')
+      return false
+    }
+  }
+  return true
+}
+
+// 打开抽测前的判断
 function start() {
   visible.value = true
 }
 
+// 判断成功
 function handleOk() {
   exitPermission();
   startSwitch();
+  saveSpotTestData(globalStore.spotTestMode, globalStore.spotTestBit, globalStore.spotTestColumn);
 }
 
-onUpdated(() => {
+// 更新列
+onMounted(() => {
   columnOption.length = 0
   for (let i = 0; i < 32; i++) {
     columnOption.push({
@@ -53,13 +74,6 @@ onUpdated(() => {
       value: i
     })
   }
-})
-
-const currentModeComputing = computed(() => {
-  if (spotTestMode.value == '位模式') {
-    return `当前模式: 位模式; 起始位: ${bit.start}; 结束位: ${bit.end}`
-  }
-  return `当前模式: 列模式; 起始列: ${column.start + 1}; 结束列: ${column.end + 1}`
 })
 
 </script>
@@ -83,7 +97,7 @@ const currentModeComputing = computed(() => {
       <n-input placeholder="" readonly v-model:value="optionsExhibition"/>
     </n-input-group>
     <div class="t-text-center">
-      {{ currentModeComputing }}
+      {{ globalStore.currentModeComputing }}
     </div>
     <n-button :disabled="autoButton || calibrationStatus" @click.stop="start" type="success">
       自动抽测
@@ -91,31 +105,32 @@ const currentModeComputing = computed(() => {
     <n-button :disabled="!autoButton" @click.stop="stopSwitch" type="error">
       停止抽测
     </n-button>
-    <a-modal v-model:visible="visible" @ok="handleOk">
+    <a-modal v-model:visible="visible" :on-before-ok="judgment" @ok="handleOk">
       <template #title>
         选择抽测模式
       </template>
-      <a-select class="t-mb-2" v-model:model-value="spotTestMode" :options="['位模式','列模式']"
-                placeholder="选择模式"/>
-      <a-input-group v-if="spotTestMode == '位模式'">
-        <a-input-number v-model:model-value="bit.start" :min="0" :max="768">
+      <a-select class="t-mb-2" v-model:model-value="globalStore.spotTestMode" :options="['位模式','列模式']"
+                placeholder="选择模式" default-value="列模式"/>
+      <a-input-group v-if="globalStore.spotTestMode == '位模式'">
+        <a-input-number v-model:model-value="globalStore.spotTestBit.start" :min="0" :max="768">
           <template #prepend>
             起始位
           </template>
         </a-input-number>
-        <a-input-number v-model:model-value="bit.end" :min="bit.start" :max="768">
+        <a-input-number v-model:model-value="globalStore.spotTestBit.end" :min="globalStore.spotTestBit.start"
+                        :max="768">
           <template #prepend>
             结束位
           </template>
         </a-input-number>
       </a-input-group>
       <a-input-group v-else class="t-w-full">
-        <a-select v-model:model-value="column.start" :options="columnOption" placeholder="">
+        <a-select v-model:model-value="globalStore.spotTestColumn.start" :options="columnOption" placeholder="">
           <template #prefix>
             起始
           </template>
         </a-select>
-        <a-select v-model:model-value="column.end" :options="columnOption" placeholder="">
+        <a-select v-model:model-value="globalStore.spotTestColumn.end" :options="columnOption" placeholder="">
           <template #prefix>
             结束
           </template>
