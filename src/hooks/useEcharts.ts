@@ -53,6 +53,21 @@ function updateLimitData(list: Array<any>) {
     testLimit.push(...list)
 }
 
+// 添加随机数据
+function addRandomData() {
+    for (let i = 0; i < data.length; i++) {
+        let s = Math.floor((Math.random() * (3 - -3) + -3) * 10) / 10;
+        let number = Math.floor(Math.random() * 7 + 1);
+        let index = data[i].findIndex(item => item[0] === s)
+        if (index && index !== -1 || index === 0) {
+            data[i][index][1] += number
+        } else {
+            data[i].push([Number(s), number])
+        }
+    }
+
+}
+
 // 全局echarts配置
 const globalOptions = computed(() => {
     return {
@@ -167,6 +182,7 @@ export function useEcharts() {
         updateLimitData,
         globalOptions,
         subitemOptions,
+        addRandomData,
     }
 }
 
