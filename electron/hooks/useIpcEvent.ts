@@ -219,6 +219,32 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
         }
     })
 
+    // 渲染进程发起关闭自动测试
+    ipcMain.on('render-send-close-auto-test', function () {
+        worker.webContents.send('worker-receive-close-auto-test')
+    })
+
+    // 渲染进程发起自动测试
+    ipcMain.on('render-send-start-auto-test', function () {
+        worker.webContents.send('worker-receive-start-auto-test')
+    })
+
+    // 量测进程校准信号判断
+    ipcMain.on('worker-send-measure-start-judgment', function (event, i) {
+        console.log(1)
+        if (i) {
+            event.reply('worker-receive-measure-go')
+        } else {
+            event.reply('worker-receive-measure-start')
+        }
+    })
+
+    // 量测数据
+    ipcMain.on('worker-send-measure-data', function (event, data) {
+        event.reply('worker-receive-measure-start');
+        render.webContents.send('render-receive-measure-data', data)
+    })
+
     // 接收工作进程自动校准进度失败
     ipcMain.on('worker-send-calibration-progress-error', function (_, result) {
         render.webContents.send('render-receive-calibration-progress-error', result)

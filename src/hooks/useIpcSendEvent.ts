@@ -140,6 +140,16 @@ export function useIpcSendEvent() {
         send('render-send-set-store', 'spotTestColumn', JSON.stringify(spotTestColumn));
     }
 
+    // 关闭自动测试
+    function closeAutoTest() {
+        send('render-send-close-auto-test');
+    }
+
+    // 开启自动测试
+    function startAutoTest() {
+        send('render-send-start-auto-test');
+    }
+
     return {
         renderThreadInitialization,
         dllInitialization,
@@ -163,6 +173,8 @@ export function useIpcSendEvent() {
         closeWindow,
         updateTestDataLimit,
         initLog,
-        saveSpotTestData
+        saveSpotTestData,
+        closeAutoTest,
+        startAutoTest,
     }
 }

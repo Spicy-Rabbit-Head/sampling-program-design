@@ -39,10 +39,7 @@ onMounted(() => {
             <span>{{ '位置 : ' + item.path }}</span>
           </n-text>
         </template>
-        <span>{{ 'FL : xxxxxx' }}</span><br/>
-        <span>{{ 'XX : xxxxxx' }}</span><br/>
-        <span>{{ 'XX : xxxxxx' }}</span><br/>
-        <span>{{ 'XX : xxxxxx' }}</span>
+        <span>{{ 'FL : xxxxxx' }}</span><br>
       </n-popover>
     </div>
     <div class="t-w-[300px] t-flex-none t-ml-1 t-flex t-flex-col">

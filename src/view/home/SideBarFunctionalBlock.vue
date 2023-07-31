@@ -20,12 +20,18 @@ const {calibrationStatus} = useProofreadingMachine();
 
 const {currentFileName, filePath} = storeToRefs(useGlobalStore());
 
-const {readNumberFile} = useIpcSendEvent();
+const {readNumberFile, closeAutoTest, startAutoTest} = useIpcSendEvent();
 const {exitPermission} = useConfig();
 
 function start() {
   exitPermission();
   startSwitch();
+  startAutoTest();
+}
+
+function stop() {
+  closeAutoTest();
+  stopSwitch();
 }
 
 // 通知
@@ -63,7 +69,7 @@ function start() {
     <n-button :disabled="autoButton || calibrationStatus" @click.stop="start" type="success">
       自动抽测
     </n-button>
-    <n-button :disabled="!autoButton" @click.stop="stopSwitch" type="error">
+    <n-button :disabled="!autoButton" @click.stop="stop" type="error">
       停止抽测
     </n-button>
   </div>

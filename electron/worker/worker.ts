@@ -120,6 +120,41 @@ const OpenProofreadingMode = func({
     methodName: "OpenProofreadingMode",
 })
 
+// 保存校对机数据
+const SaveCalibrationData = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "SaveCalibrationData",
+})
+
+// 输出开路完成信号
+const WriteOpenEnd = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "WriteOpenEnd",
+})
+
+// 关闭测试
+const CloseTest = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "CloseTest",
+})
+
+// 开启自动量测
+const OpenAutoMode = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "OpenAutoMode",
+})
+
+// 测试一组并返回结果
+const TestOneGroupData = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "TestOneGroupData",
+})
+
 // 服务初始化启动
 function ServiceInit(port: string) {
     Init(port, (error: any, result: any) => {
@@ -206,6 +241,19 @@ function TestOneGroupExecution() {
     return i;
 }
 
+// 量测一组
+function MeasureOneGroupExecution() {
+    let i: any;
+    TestOneGroupData(null, (error: any, result: any) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+        i = result;
+    })
+    return i;
+}
+
 // 写入补偿值
 function WriteStandardProductExecution(data: Array<string>) {
     let str = data.join('_')
@@ -240,22 +288,17 @@ function ScrewState(i: number) {
 // 判断是否开始量测
 function MeasureStart() {
     let state: boolean = false;
-    let status: boolean = true;
-    while (status) {
-        ReadMeasureStart(null, (error: any, result: any) => {
-            console.log(result)
-            if (error) {
-                console.log(error)
-                status = false;
-            }
-            if (result) {
-                state = result;
-                status = false;
-            }
-        })
-    }
+    ReadMeasureStart(null, (error: any, result: any) => {
+        if (error) {
+            console.log(error)
+        }
+        if (result) {
+            state = result;
+        }
+    })
     return state;
 }
+
 
 // 输出量测结束信号
 function MeasureEnd() {
@@ -268,11 +311,6 @@ function MeasureEnd() {
         status = result;
     })
     return status;
-}
-
-// 校对机模式
-function ProofreadingMode() {
-
 }
 
 const {on} = useIpcRenderer();
@@ -301,7 +339,7 @@ on("worker-receive-standard-query", (event: any, path: any, pn: any, location: a
 })
 
 // 工作进程校准执行
-on("worker-receive-calibration-start", async (event: any, step: any, fixture: any) => {
+on("worker-receive-calibration-start", (event: any, step: any, fixture: any) => {
     if (MeasureStart() != true) {
         console.log('无法执行')
         return
@@ -312,6 +350,28 @@ on("worker-receive-calibration-start", async (event: any, step: any, fixture: an
             event.sender.send('worker-send-calibration-progress-success', i)
         } else {
             event.sender.send('worker-send-calibration-progress-error', i)
+            return
+        }
+    }
+    if (step == 2) {
+        let state: boolean = false;
+        SaveCalibrationData(null, (error: any, result: any) => {
+            if (error) {
+                console.log(error)
+                return
+            }
+            state = result;
+        })
+        WriteOpenEnd(null, (error: any, result: any) => {
+            if (error) {
+                console.log(error)
+                state = false;
+                return
+            }
+            state = result;
+        })
+        if (state) {
+            event.sender.send('worker-send-step-success', step)
             return
         }
     }
@@ -402,6 +462,48 @@ on("worker-receive-mode", (event: any, mode: any) => {
         }
         console.log(result)
     })
+})
+
+// 关闭自动测试
+on("worker-receive-close-auto-test", () => {
+    console.log('关闭自动测试')
+    let b: boolean = false;
+    CloseTest(null, (error: any, result: any) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+        b = result
+    })
+    console.log(b)
+})
+
+// 工作进程自动测试
+on("worker-receive-start-auto-test", (event) => {
+    let b: boolean = false;
+    OpenAutoMode(null, (error: any, result: any) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+        b = result;
+    })
+    if (b) {
+        event.sender.send('worker-send-measure-start-judgment', MeasureStart())
+        return;
+    }
+    // TODO 打开自动测试失败
+})
+
+// 量测开始信号
+on("worker-receive-measure-start", (event: any) => {
+    event.sender.send('worker-send-measure-start-judgment', MeasureStart())
+})
+
+// 量测
+on("worker-receive-measure-go", (event: any) => {
+    event.sender.send('worker-send-measure-data', MeasureOneGroupExecution())
+    MeasureEnd();
 })
 
 

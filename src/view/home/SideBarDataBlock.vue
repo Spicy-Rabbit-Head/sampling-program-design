@@ -47,13 +47,6 @@ const status: Array<StatusOverview> = [
       </div>
       <div id="z-slide" class="t-h-36 t-overflow-y-auto t-overflow-hidden">
         <div>{{ 'FL : xxxxxx' }}</div>
-        <div>{{ 'XX : xxxxxx' }}</div>
-        <div>{{ 'XX : xxxxxx' }}</div>
-        <div>{{ 'XX : xxxxxx' }}</div>
-        <div>{{ 'XX : xxxxxx' }}</div>
-        <div>{{ 'XX : xxxxxx' }}</div>
-        <div>{{ 'XX : xxxxxx' }}</div>
-        <div>{{ 'XX : xxxxxx' }}</div>
       </div>
     </div>
   </div>

@@ -251,6 +251,12 @@ export function useIpcReceiveEvent() {
     on('render-receive-read-log', (_, data) => {
         initLogs(JSON.parse(data))
     })
+
+    // 量测数据
+    on('render-receive-measure-data', (_, data) => {
+        console.log(data)
+    })
+
     // // 读取数据表
     // on('render-receive-read-data-table', (_, data) => {
     //     replaceData(JSON.parse(data))
