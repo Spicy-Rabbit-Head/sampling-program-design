@@ -99,6 +99,27 @@ const ChangeFile = func({
     methodName: "ChangeFile",
 })
 
+// 读取量测开始信号
+const ReadMeasureStart = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "ReadMeasureStart",
+})
+
+// 输出量测接收信号
+const WriteMeasureEnd = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "WriteMeasureEnd",
+})
+
+// 开启校对机模式
+const OpenProofreadingMode = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "OpenProofreadingMode",
+})
+
 // 服务初始化启动
 function ServiceInit(port: string) {
     Init(port, (error: any, result: any) => {
@@ -216,6 +237,44 @@ function ScrewState(i: number) {
     return state;
 }
 
+// 判断是否开始量测
+function MeasureStart() {
+    let state: boolean = false;
+    let status: boolean = true;
+    while (status) {
+        ReadMeasureStart(null, (error: any, result: any) => {
+            console.log(result)
+            if (error) {
+                console.log(error)
+                status = false;
+            }
+            if (result) {
+                state = result;
+                status = false;
+            }
+        })
+    }
+    return state;
+}
+
+// 输出量测结束信号
+function MeasureEnd() {
+    let status: boolean = false;
+    WriteMeasureEnd(null, (error: any, result: any) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+        status = result;
+    })
+    return status;
+}
+
+// 校对机模式
+function ProofreadingMode() {
+
+}
+
 const {on} = useIpcRenderer();
 
 // 工作进程服务停止
@@ -242,45 +301,34 @@ on("worker-receive-standard-query", (event: any, path: any, pn: any, location: a
 })
 
 // 工作进程校准执行
-on("worker-receive-calibration-start", (event: any, step: any, fixture: any) => {
-    console.log(step)
-    if (step != 2) {
-        ScrewActionExecution(0)
-        // if (!ScrewState(1)) {
-        //     event.sender.send('worker-send-calibration-progress-error', 0)
-        //     console.log('无法执行')
-        //     return
-        // }
+on("worker-receive-calibration-start", async (event: any, step: any, fixture: any) => {
+    if (MeasureStart() != true) {
+        console.log('无法执行')
+        return
     }
     for (let i = 0; i < 4; i++) {
         let n = CalibrationExecution(step, i, fixture);
         if (n) {
             event.sender.send('worker-send-calibration-progress-success', i)
         } else {
-            ScrewActionExecution(0)
             event.sender.send('worker-send-calibration-progress-error', i)
             return
         }
     }
-    if (step != 2) {
-        ScrewActionExecution(0)
-        if (step != 1) {
-            ScrewActionExecution(1)
-        }
+    if (MeasureEnd()) {
+        event.sender.send('worker-send-step-success', step)
     }
-    event.sender.send('worker-send-step-success', step)
 })
 
 // 工作进程验证执行
 on("worker-receive-validation-start", (event: any) => {
-    ScrewActionExecution(0)
-    // if (!ScrewState(1)) {
-    //     console.log('无法执行')
-    //     return
-    // }
+    if (MeasureStart() != true) {
+        console.log('无法执行')
+        return
+    }
     if (WriteStandardProductExecution(['0', '0', '0', '0'])) {
         event.sender.send('worker-send-docking-data', TestOneGroupExecution())
-        ScrewActionExecution(0)
+        MeasureEnd();
         return
     }
     // TODO 写入补偿值失败
@@ -303,9 +351,12 @@ on("worker-receive-write-compensation", (event: any, data: any) => {
 
 // 工作进验证补偿
 on("worker-receive-verification-compensation", (event: any) => {
-    ScrewActionExecution(0)
+    if (MeasureStart() != true) {
+        console.log('无法执行')
+        return
+    }
     event.sender.send('worker-send-verification-result', TestOneGroupExecution())
-    ScrewActionExecution(0)
+    MeasureEnd();
 })
 
 // 工作进程测试上下限
@@ -340,6 +391,17 @@ on("worker-receive-change-file", (event: any, path: any) => {
     })
     if (!b) return;
     event.sender.send('worker-send-change-file-success')
+})
+
+// 设定模式
+on("worker-receive-mode", (event: any, mode: any) => {
+    OpenProofreadingMode(mode, (error: any, result: any) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+        console.log(result)
+    })
 })
 
 

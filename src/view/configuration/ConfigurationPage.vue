@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import IconAntDesignControlOutlined from "~icons/ant-design/control-outlined"
 import IconAntDesignDeleteRowOutlined from "~icons/ant-design/delete-row-outlined"
-import {onMounted, ref, watch} from "vue";
+import {onMounted, ref} from "vue";
 import {useIpcSendEvent} from "@/hooks/useIpcSendEvent.ts";
 import {useConfig} from "@/hooks/useConfig.ts";
 import {useHome} from "@/hooks/useHome.ts";
@@ -56,11 +56,11 @@ function gainFocus() {
 //   }
 // })
 
-watch(calibrationStatus, (value) => {
-  if (value) {
-    exitPermission()
-  }
-})
+// watch(calibrationStatus, (value) => {
+//   if (value) {
+//     exitPermission()
+//   }
+// })
 
 </script>
 

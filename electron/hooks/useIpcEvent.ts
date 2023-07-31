@@ -207,6 +207,7 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
 
     // 渲染进程自动校准开始
     ipcMain.on('render-send-calibration-short-circuit-start', function () {
+        worker.webContents.send('worker-receive-mode', localStore.get('proofreadingOperationMode'))
         switch (localStore.get('proofreadingOperationMode')) {
             case 0:
             case 1:
