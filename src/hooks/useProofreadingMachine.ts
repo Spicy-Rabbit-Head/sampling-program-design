@@ -196,7 +196,6 @@ export function useProofreadingMachine() {
         updateCalibrationStatus(step.value, item, false)
         logOutput(`阶段 ${phase[step.value]} : 校准 A${item + 1} 失败`)
         automaticCalibrationStop()
-
     }
 
     // 校准步骤更新

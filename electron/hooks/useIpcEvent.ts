@@ -6,7 +6,12 @@ const ini = require('ini');
 import fs from 'fs';
 import {join} from "path";
 import {LocalStoreInterface} from "../interface";
+import {ref} from "vue";
 
+// 自动测试状态
+const auto = ref<boolean>(false);
+// 校准步骤数
+const steps = ref<number>(0);
 
 // 事件监听
 export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
@@ -31,13 +36,10 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
 
     // 渲染进程通知窗口关闭(保存数据)
     ipcMain.on('render-send-window-close', function (event: any) {
+        auto.value = false;
         event.reply('render-receive-show-close-confirm-dialog')
         // 进行数据保存
         event.reply('render-receive-save-data')
-        // 关闭服务
-        // worker.webContents.send('worker-receive-stop-service');
-        // 保存数据
-        // render.close()
     })
 
     // 渲染进程通知窗口关闭(等待数据保存)
@@ -207,34 +209,52 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
 
     // 渲染进程自动校准开始
     ipcMain.on('render-send-calibration-short-circuit-start', function () {
+        auto.value = true;
+        steps.value = 0;
         worker.webContents.send('worker-receive-mode', localStore.get('proofreadingOperationMode'))
-        switch (localStore.get('proofreadingOperationMode')) {
-            case 0:
-            case 1:
-                worker.webContents.send('worker-receive-calibration-start', 0, localStore.get('currentCalibrationMode'))
-                break;
-            case 2:
-                worker.webContents.send('worker-receive-validation-start')
-                break;
+        // switch (localStore.get('proofreadingOperationMode')) {
+        //     case 0:
+        //     case 1:
+        //         worker.webContents.send('worker-receive-calibration-start', 0, localStore.get('currentCalibrationMode'))
+        //         break;
+        //     case 2:
+        //         worker.webContents.send('worker-receive-validation-start')
+        //         break;
+        // }
+    })
+
+    // 量测进程校准信号判断
+    ipcMain.on('worker-send-calibration-judgment', function (event, i) {
+        if (auto.value == false) return;
+        if (i) {
+            console.log('进行校准...')
+            event.reply('worker-receive-calibration-execute', steps.value, localStore.get('currentCalibrationMode'))
+        } else {
+            console.log('等待校准中...')
+            event.reply('worker-receive-calibration-start')
         }
     })
 
     // 渲染进程发起关闭自动测试
     ipcMain.on('render-send-close-auto-test', function () {
+        auto.value = false;
         worker.webContents.send('worker-receive-close-auto-test')
     })
 
     // 渲染进程发起自动测试
     ipcMain.on('render-send-start-auto-test', function () {
+        auto.value = true;
         worker.webContents.send('worker-receive-start-auto-test')
     })
 
-    // 量测进程校准信号判断
+    // 量测进程量测信号判断
     ipcMain.on('worker-send-measure-start-judgment', function (event, i) {
-        console.log(1)
+        if (auto.value == false) return;
         if (i) {
+            console.log('进行量测...')
             event.reply('worker-receive-measure-go')
         } else {
+            console.log('等待量测中...')
             event.reply('worker-receive-measure-start')
         }
     })
@@ -248,11 +268,24 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     // 接收工作进程自动校准进度失败
     ipcMain.on('worker-send-calibration-progress-error', function (_, result) {
         render.webContents.send('render-receive-calibration-progress-error', result)
+        auto.value = false;
     })
 
     // 接收工作进程自动校准进度成功
     ipcMain.on('worker-send-calibration-progress-success', function (_, result) {
         render.webContents.send('render-receive-calibration-progress-success', result)
+    })
+
+    // 量测进程验证信号判断
+    ipcMain.on('worker-send-validation-judgment', function (event, i) {
+        if (auto.value == false) return;
+        if (i) {
+            console.log('进行对机...')
+            event.reply('worker-receive-validation-execute')
+        } else {
+            console.log('等待对机中...')
+            event.reply('worker-receive-validation-start')
+        }
     })
 
     // 工作进程发起阶段完成
@@ -262,11 +295,13 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
                 worker.webContents.send('worker-receive-validation-start')
                 return;
             }
+            steps.value = 0;
             render.webContents.send('render-receive-calibration-step-success')
             return
         }
-        render.webContents.send('render-receive-step-update', step + 1)
-        worker.webContents.send('worker-receive-calibration-start', step + 1, localStore.get('currentCalibrationMode'))
+        steps.value = step + 1;
+        render.webContents.send('render-receive-step-update', steps.value)
+        worker.webContents.send('worker-receive-calibration-start')
     })
 
     // 渲染进程发起丝杆动作
@@ -295,14 +330,26 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
         render.webContents.send('render-receive-write-compensation-success')
     })
 
+    // 工作进程再次验证信号判断
+    ipcMain.on('worker-send-reverification-judgment', function (event, i) {
+        if (auto.value == false) return;
+        if (i) {
+            console.log('进行再次验证...')
+            event.reply('worker-receive-reverification-execute')
+        } else {
+            console.log('等待再次验证中...')
+            event.reply('worker-receive-reverification-start')
+        }
+    })
+
     // 渲染进程发起验证补偿
     ipcMain.on('render-send-verification-compensation', function () {
-        worker.webContents.send('worker-receive-verification-compensation')
+        worker.webContents.send('worker-receive-reverification-start')
     })
 
     // 工作进程发起验证结果
-    ipcMain.on('worker-send-verification-result', function (_, result) {
-        render.webContents.send('render-receive-verification-result', result)
+    ipcMain.on('worker-send-reverification-result', function (_, result) {
+        render.webContents.send('render-receive-reverification-result', result)
     })
 
     // 渲染进程发起缓存数据保存

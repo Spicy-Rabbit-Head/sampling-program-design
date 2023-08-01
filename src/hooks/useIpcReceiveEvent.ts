@@ -226,7 +226,7 @@ export function useIpcReceiveEvent() {
     })
 
     // 验证结果
-    on('render-receive-verification-result', (_, data) => {
+    on('render-receive-reverification-result', (_, data) => {
         if (data == null) {
             checkTheMachineFail(2)
             automaticCalibrationStop()

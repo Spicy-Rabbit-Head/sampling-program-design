@@ -36,13 +36,6 @@ const CloseMeasuringProgram = func({
     methodName: "CloseMeasuringProgram",
 })
 
-// 获取串口列表
-const GetSerialPortList = func({
-    assemblyFile: url,
-    typeName: "Measurement.Entrance",
-    methodName: "GetSerialPortList",
-})
-
 // 标品数据查询
 const GetStandardProductData = func({
     assemblyFile: url,
@@ -76,13 +69,6 @@ const WriteStandardProduct = func({
     assemblyFile: url,
     typeName: "Measurement.Entrance",
     methodName: "WriteStandardProduct",
-})
-
-// 获取丝杆位置
-const GetScrewState = func({
-    assemblyFile: url,
-    typeName: "Measurement.Entrance",
-    methodName: "GetScrewState",
 })
 
 // 获取测试上下限
@@ -153,6 +139,13 @@ const TestOneGroupData = func({
     assemblyFile: url,
     typeName: "Measurement.Entrance",
     methodName: "TestOneGroupData",
+})
+
+// 错误终止
+const ErrorStop = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "ErrorStop",
 })
 
 // 服务初始化启动
@@ -268,23 +261,6 @@ function WriteStandardProductExecution(data: Array<string>) {
     return b;
 }
 
-function ScrewState(i: number) {
-    let state: any;
-    for (let j = 0; j < 10; j++) {
-        GetScrewState(i, (error: any, result: any) => {
-            if (error) {
-                console.log(error)
-                return
-            }
-            if (result) {
-                state = result;
-                return
-            }
-        })
-    }
-    return state;
-}
-
 // 判断是否开始量测
 function MeasureStart() {
     let state: boolean = false;
@@ -338,12 +314,13 @@ on("worker-receive-standard-query", (event: any, path: any, pn: any, location: a
     }
 })
 
+// 校准开始信号
+on("worker-receive-calibration-start", (event: any) => {
+    event.sender.send('worker-send-calibration-judgment', MeasureStart())
+})
+
 // 工作进程校准执行
-on("worker-receive-calibration-start", (event: any, step: any, fixture: any) => {
-    if (MeasureStart() != true) {
-        console.log('无法执行')
-        return
-    }
+on("worker-receive-calibration-execute", (event: any, step: any, fixture: any) => {
     for (let i = 0; i < 4; i++) {
         let n = CalibrationExecution(step, i, fixture);
         if (n) {
@@ -373,26 +350,29 @@ on("worker-receive-calibration-start", (event: any, step: any, fixture: any) => 
         if (state) {
             event.sender.send('worker-send-step-success', step)
             return
+        } else {
+            // TODO 写入开启量测失败
+            event.sender.send('worker-send-step-error', step)
+            return
         }
     }
-    if (MeasureEnd()) {
-        event.sender.send('worker-send-step-success', step)
-    }
+    MeasureEnd();
+    event.sender.send('worker-send-step-success', step)
+})
+
+// 验证开始信号
+on("worker-receive-validation-start", (event: any) => {
+    event.sender.send('worker-send-validation-judgment', MeasureStart())
 })
 
 // 工作进程验证执行
-on("worker-receive-validation-start", (event: any) => {
-    if (MeasureStart() != true) {
-        console.log('无法执行')
-        return
-    }
+on("worker-receive-validation-execute", (event: any) => {
     if (WriteStandardProductExecution(['0', '0', '0', '0'])) {
         event.sender.send('worker-send-docking-data', TestOneGroupExecution())
         MeasureEnd();
         return
     }
     // TODO 写入补偿值失败
-    ScrewActionExecution(0)
 })
 
 // 工作进程丝杆动作
@@ -409,13 +389,14 @@ on("worker-receive-write-compensation", (event: any, data: any) => {
     event.sender.send('worker-send-write-compensation-error')
 })
 
+// 再次验证开始信号
+on("worker-receive-reverification-start", (event: any) => {
+    event.sender.send('worker-send-reverification-judgment', MeasureStart())
+})
+
 // 工作进验证补偿
-on("worker-receive-verification-compensation", (event: any) => {
-    if (MeasureStart() != true) {
-        console.log('无法执行')
-        return
-    }
-    event.sender.send('worker-send-verification-result', TestOneGroupExecution())
+on("worker-receive-reverification-execute", (event: any) => {
+    event.sender.send('worker-send-reverification-result', TestOneGroupExecution())
     MeasureEnd();
 })
 
@@ -455,13 +436,25 @@ on("worker-receive-change-file", (event: any, path: any) => {
 
 // 设定模式
 on("worker-receive-mode", (event: any, mode: any) => {
+    let state: boolean = false;
     OpenProofreadingMode(mode, (error: any, result: any) => {
         if (error) {
             console.log(error)
             return
         }
-        console.log(result)
+        state = result;
     })
+    if (state) {
+        switch (mode) {
+            case 0:
+            case 1:
+                event.sender.send('worker-send-calibration-judgment', MeasureStart())
+                break
+            case 2:
+                event.sender.send('worker-send-validation-judgment', MeasureStart())
+                break
+        }
+    }
 })
 
 // 关闭自动测试
@@ -505,6 +498,19 @@ on("worker-receive-measure-go", (event: any) => {
     event.sender.send('worker-send-measure-data', MeasureOneGroupExecution())
     MeasureEnd();
 })
+
+// 错误终止
+on("worker-receive-error-stop", () => {
+    ErrorStop(null, (error: any, result: any) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+        console.log(result)
+    })
+})
+
+
 
 
 
