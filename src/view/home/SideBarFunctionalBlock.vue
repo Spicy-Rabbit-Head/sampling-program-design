@@ -53,7 +53,7 @@ function stop() {
     <n-input-group>
       <n-input-group-label class="t-bg-gray-100">当前料号 :</n-input-group-label>
       <n-input class="t-font-mono" placeholder="" readonly v-model:value="currentFileName"/>
-      <n-button type="warning" :disabled="autoButton || calibrationStatus" @click="readNumberFile">
+      <n-button type="warning" :disabled="autoButton || calibrationStatus" @click="readNumberFile(currentFileName)">
         修改
       </n-button>
     </n-input-group>

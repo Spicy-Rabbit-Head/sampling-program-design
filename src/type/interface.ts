@@ -93,3 +93,9 @@ export type DataBaseInterface = {
     value: string,
     style: string,
 }
+
+// 位置
+export type PositionInterface = {
+    value: number,
+    label: string,
+}

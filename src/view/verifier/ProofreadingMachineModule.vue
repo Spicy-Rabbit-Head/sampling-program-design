@@ -45,7 +45,8 @@ const {
   proofreadingOperationModeUpdate,
   standardProductQuery,
   readNumberFile,
-  automaticCalibrationStarts
+  automaticCalibrationStarts,
+  refreshInstance,
 } = useIpcSendEvent();
 const {exitPermission} = useConfig();
 
@@ -111,7 +112,10 @@ function openDialogBox() {
 
 // 对话框确认
 function handleBeforeOk() {
-  if (proofreadingOperationMode.value === 1) return true;
+  if (proofreadingOperationMode.value === 1) {
+    refreshInstance(currentFileName.value);
+    return true;
+  }
   if (dockingNumber.value.label === undefined || verificationNumber.value.label === undefined) {
     errorNotification('对机编号和验证编号不能为空');
     return false;
@@ -121,6 +125,7 @@ function handleBeforeOk() {
     return false;
   }
   globalStore.outputDisplayUpdate(dockingNumber.value, verificationNumber.value);
+  refreshInstance(currentFileName.value);
   return true;
 }
 
@@ -190,7 +195,8 @@ function logScrollStart(i: boolean) {
               <span class="t-text-[16px] t-font-normal">当前料号 :</span>
               <n-tooltip trigger="hover" placement="right">
                 <template #trigger>
-                  <n-button circle secondary :disabled="calibrationStatus || autoButton" @click.stop="readNumberFile">
+                  <n-button circle secondary :disabled="calibrationStatus || autoButton"
+                            @click.stop="readNumberFile(currentFileName)">
                     <template #icon>
                       <n-icon>
                         <IconAntDesignFormOutlined/>

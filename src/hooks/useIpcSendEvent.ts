@@ -16,7 +16,8 @@ export function useIpcSendEvent() {
     }
 
     // 开启文件选择对话框-读取QCC文件
-    function readNumberFile() {
+    function readNumberFile(path: string) {
+        executeSave(path);
         send('render-send-open-qcc-dialog');
     }
 
@@ -108,9 +109,24 @@ export function useIpcSendEvent() {
         send('render-send-calibration-short-circuit-start');
     }
 
-    // 丝杆动作
-    function screwAction(i: number) {
-        send('render-send-screw-action', i);
+    // 自动校准停止
+    function automaticCalibrationStops() {
+        send('render-send-calibration-short-circuit-stop');
+    }
+
+    // 刷新实例
+    function refreshInstance(number: string) {
+        send('render-send-refresh-instance', number);
+    }
+
+    // 测试头动作
+    function testHeadAction(i: number) {
+        send('render-send-test-head-action', i);
+    }
+
+    // 手动位置
+    function manualPosition(i: number) {
+        send('render-send-manual-position', i);
     }
 
     // 缓存数据保存
@@ -150,6 +166,12 @@ export function useIpcSendEvent() {
         send('render-send-start-auto-test');
     }
 
+    // 执行保存
+    function executeSave(path: string) {
+        refreshInstance(path);
+        send('render-send-save');
+    }
+
     return {
         renderThreadInitialization,
         dllInitialization,
@@ -166,7 +188,7 @@ export function useIpcSendEvent() {
         standardProductUpdate,
         workshopListUpdate,
         automaticCalibrationStarts,
-        screwAction,
+        testHeadAction,
         proofreadingOperationModeUpdate,
         cacheDataSave,
         cacheDataRead,
@@ -176,5 +198,8 @@ export function useIpcSendEvent() {
         saveSpotTestData,
         closeAutoTest,
         startAutoTest,
+        automaticCalibrationStops,
+        refreshInstance,
+        manualPosition
     }
 }

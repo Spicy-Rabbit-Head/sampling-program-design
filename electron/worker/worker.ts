@@ -50,13 +50,6 @@ const Proofreading = func({
     methodName: "Proofreading",
 })
 
-// 丝杆动作
-const ScrewAction = func({
-    assemblyFile: url,
-    typeName: "Measurement.Entrance",
-    methodName: "ScrewAction",
-})
-
 // 一组测试
 const TestOneGroup = func({
     assemblyFile: url,
@@ -148,6 +141,34 @@ const ErrorStop = func({
     methodName: "ErrorStop",
 })
 
+// 保存文件
+const SaveFile = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "SaveFile",
+})
+
+// 刷新应用程序
+const RefreshApplication = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "RefreshApplication",
+})
+
+// 测试头动作
+const TestHeadPosition = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "TestHeadPosition",
+})
+
+// 手动位置
+const ManualPosition = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "ManualPosition",
+})
+
 // 服务初始化启动
 function ServiceInit(port: string) {
     Init(port, (error: any, result: any) => {
@@ -211,16 +232,6 @@ function CalibrationExecution(step: number, index: number, fixture: string) {
     return status;
 }
 
-// 丝杆动作
-function ScrewActionExecution(action: number) {
-    let i = false;
-    ScrewAction(action, (error: any, result: any) => {
-        if (error) return
-        i = result
-    })
-    console.log('丝杆动作' + i)
-}
-
 // 一组测试
 function TestOneGroupExecution() {
     let i: any;
@@ -272,7 +283,7 @@ function MeasureStart() {
             state = result;
         }
     })
-    return state;
+    return true;
 }
 
 
@@ -287,6 +298,31 @@ function MeasureEnd() {
         status = result;
     })
     return status;
+}
+
+// 执行保存
+function ExecutionSave() {
+    let state: boolean = false;
+    SaveFile(null, (error: any, result: any) => {
+        if (error) {
+            console.log(error)
+        }
+        state = result;
+    })
+    return state;
+}
+
+// 刷新实例
+function RefreshInstance(number: string) {
+    let state: boolean = false;
+    RefreshApplication(number, (error: any, result: any) => {
+        if (error) {
+            console.log(error)
+        }
+        state = result;
+    })
+    console.log('刷新实例' + state)
+    return state;
 }
 
 const {on} = useIpcRenderer();
@@ -375,11 +411,6 @@ on("worker-receive-validation-execute", (event: any) => {
     // TODO 写入补偿值失败
 })
 
-// 工作进程丝杆动作
-on("worker-receive-screw-action", (_: any, action: any) => {
-    ScrewActionExecution(action)
-})
-
 // 工作进程写入补偿值
 on("worker-receive-write-compensation", (event: any, data: any) => {
     if (WriteStandardProductExecution(data)) {
@@ -416,13 +447,7 @@ on("worker-receive-update-limit", (event: any) => {
 
 // 工作进程更改文件
 on("worker-receive-change-file", (event: any, path: any) => {
-    ServiceStop()
-    let b: boolean;
-    OpenMeasuringProgram(null, (error: any, result: any) => {
-        if (error) throw error;
-        b = result;
-    })
-    if (!b) return;
+    let b: boolean = false;
     ChangeFile(path, (error: any, result: any) => {
         if (error) {
             console.log(error)
@@ -507,6 +532,38 @@ on("worker-receive-error-stop", () => {
             return
         }
         console.log(result)
+    })
+})
+
+// 刷新实例
+on("worker-receive-refresh-instance", (_, number: any) => {
+    RefreshInstance(number)
+})
+
+// 保存
+on("worker-receive-save", () => {
+    console.log(ExecutionSave())
+})
+
+// 测试头动作
+on("worker-receive-test-head-action", (_, action: any) => {
+    TestHeadPosition(action, (error: any, result: any) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+        console.log('测试题动作' + result)
+    })
+})
+
+// 手动位置
+on("worker-receive-manual-position", (_, position: any) => {
+    ManualPosition(position, (error: any, result: any) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+        console.log('手动位置:' + position + result)
     })
 })
 

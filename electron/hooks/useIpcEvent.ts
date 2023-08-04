@@ -207,6 +207,17 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
         render.webContents.send('render-receive-standard-query-success', dataList)
     })
 
+    // 渲染进程发起刷新实例
+    ipcMain.on('render-send-refresh-instance', function (_, number) {
+        worker.webContents.send('worker-receive-refresh-instance', number)
+    })
+
+    // 渲染进程自动校准结束
+    ipcMain.on('render-send-calibration-short-circuit-stop', function () {
+        auto.value = false;
+        worker.webContents.send('worker-receive-error-stop')
+    })
+
     // 渲染进程自动校准开始
     ipcMain.on('render-send-calibration-short-circuit-start', function () {
         auto.value = true;
@@ -304,9 +315,14 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
         worker.webContents.send('worker-receive-calibration-start')
     })
 
-    // 渲染进程发起丝杆动作
-    ipcMain.on('render-send-screw-action', function (_, action) {
-        worker.webContents.send('worker-receive-screw-action', action)
+    // 渲染进程发起测试头动作
+    ipcMain.on('render-send-test-head-action', function (_, action) {
+        worker.webContents.send('worker-receive-test-head-action', action)
+    })
+
+    // 渲染进程发起手动位置
+    ipcMain.on('render-send-manual-position', function (_, position) {
+        worker.webContents.send('worker-receive-manual-position', position);
     })
 
     // 工作进程发起对机数据更新
@@ -423,6 +439,11 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
         })
     })
 
+    // 保存
+    ipcMain.on('render-send-save', function () {
+        worker.webContents.send('worker-receive-save');
+    })
+
     // // 渲染进程发起数据表读取
     // ipcMain.on('render-send-read-data-table', function (event, pathName) {
     //     let path = join(__dirname, '../../data', pathName);
@@ -458,3 +479,5 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     //     })
     // })
 }
+
+

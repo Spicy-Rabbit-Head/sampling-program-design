@@ -3,7 +3,7 @@ import {DataBaseInterface, Log, StandardProductsInterface, Step} from "@/type/in
 import dayjs from 'dayjs'
 import {useIpcSendEvent} from "@/hooks/useIpcSendEvent.ts";
 
-const {cacheDataSave} = useIpcSendEvent();
+const {cacheDataSave, automaticCalibrationStops} = useIpcSendEvent();
 
 // 校对机开启状态
 const calibrationStatus = ref<boolean>(false);
@@ -32,6 +32,7 @@ function automaticCalibrationStop() {
         dataBase: dataBase
     }
     cacheDataSave(JSON.stringify(data));
+    automaticCalibrationStops();
 }
 
 // 日志数据
