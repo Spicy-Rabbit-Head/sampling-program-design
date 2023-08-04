@@ -18,6 +18,7 @@ const {
   workshopListUpdate,
   testHeadAction,
   manualPosition,
+  onceMeasure,
 } = useIpcSendEvent();
 
 
@@ -156,6 +157,12 @@ function gainFocus() {
                 对机位置
               </a-button>
             </a-button-group>
+          </div>
+          <div>
+            <p class="t-mb-1">量测 :</p>
+            <a-button type="primary" status="success" :disabled="!changePermission" @click.stop="onceMeasure">
+              一次测试
+            </a-button>
           </div>
         </div>
       </div>

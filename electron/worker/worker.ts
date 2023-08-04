@@ -169,6 +169,13 @@ const ManualPosition = func({
     methodName: "ManualPosition",
 })
 
+// 一次量测
+const SingleTest = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "SingleTest",
+})
+
 // 服务初始化启动
 function ServiceInit(port: string) {
     Init(port, (error: any, result: any) => {
@@ -564,6 +571,17 @@ on("worker-receive-manual-position", (_, position: any) => {
             return
         }
         console.log('手动位置:' + position + result)
+    })
+})
+
+// 一次量测
+on("worker-receive-measure-one", () => {
+    SingleTest(null, (error: any, result: any) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+        console.log(result)
     })
 })
 

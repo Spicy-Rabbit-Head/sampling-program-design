@@ -44,8 +44,8 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
 
     // 渲染进程通知窗口关闭(等待数据保存)
     ipcMain.on('render-send-close-server', function () {
+        // 关闭工作进程
         worker.webContents.send('worker-receive-stop-service');
-        // 保存数据
         render.close()
     })
 
@@ -442,6 +442,11 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     // 保存
     ipcMain.on('render-send-save', function () {
         worker.webContents.send('worker-receive-save');
+    })
+
+    // 一次量测
+    ipcMain.on('render-send-measure-one', function () {
+        worker.webContents.send('worker-receive-measure-one')
     })
 
     // // 渲染进程发起数据表读取

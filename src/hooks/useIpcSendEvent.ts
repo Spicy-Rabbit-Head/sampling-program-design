@@ -172,6 +172,11 @@ export function useIpcSendEvent() {
         send('render-send-save');
     }
 
+    // 一次量测
+    function onceMeasure() {
+        send('render-send-measure-one')
+    }
+
     return {
         renderThreadInitialization,
         dllInitialization,
@@ -200,6 +205,7 @@ export function useIpcSendEvent() {
         startAutoTest,
         automaticCalibrationStops,
         refreshInstance,
-        manualPosition
+        manualPosition,
+        onceMeasure
     }
 }
