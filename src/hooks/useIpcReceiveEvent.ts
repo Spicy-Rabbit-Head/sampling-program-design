@@ -3,6 +3,7 @@ import {useIpcRenderer} from "@vueuse/electron";
 import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
 import {useConfig} from "@/hooks/useConfig.ts";
 import {useEcharts} from "@/hooks/useEcharts.ts";
+import {useHome} from "@/hooks/useHome.ts";
 
 const {on} = useIpcRenderer()
 
@@ -28,6 +29,7 @@ export function useIpcReceiveEvent() {
     } = useProofreadingMachine();
     const {addWorkshopOptions} = useConfig();
     const {updateLimitData} = useEcharts();
+    const {updateView} = useHome();
 
     // 数据初始化
     on('render-receive-init', (_, {
@@ -254,7 +256,12 @@ export function useIpcReceiveEvent() {
 
     // 量测数据
     on('render-receive-measure-data', (_, data) => {
-        console.log(data)
+        updateView(data)
+    })
+
+    // 起始位置
+    on('render-receive-start-position', (_, data) => {
+        globalStore.writeStartBit(data);
     })
 
     // // 读取数据表

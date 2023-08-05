@@ -61,6 +61,17 @@ export function useHome() {
         autoButton.value = false
     }
 
+    // 更新视图
+    function updateView(data: any) {
+        if (data == null) {
+            console.log('数据为空')
+            return
+        }
+        for (let i = 0; i < data.length; i++) {
+            console.log(data[i])
+        }
+    }
+
     return {
         mainTable,
         select,
@@ -71,5 +82,6 @@ export function useHome() {
         optionsValue,
         optionsExhibition,
         stopSwitch,
+        updateView,
     }
 }

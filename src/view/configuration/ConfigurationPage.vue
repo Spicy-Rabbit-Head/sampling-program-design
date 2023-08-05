@@ -19,6 +19,7 @@ const {
   testHeadAction,
   manualPosition,
   onceMeasure,
+  clearMeasureData,
 } = useIpcSendEvent();
 
 
@@ -158,10 +159,16 @@ function gainFocus() {
               </a-button>
             </a-button-group>
           </div>
-          <div>
+          <div class="t-col-span-2">
             <p class="t-mb-1">量测 :</p>
             <a-button type="primary" status="success" :disabled="!changePermission" @click.stop="onceMeasure">
               一次测试
+            </a-button>
+          </div>
+          <div>
+            <p class="t-mb-1">数据 :</p>
+            <a-button type="primary" status="warning" :disabled="!changePermission" @click.stop="clearMeasureData">
+              清除测量数据
             </a-button>
           </div>
         </div>

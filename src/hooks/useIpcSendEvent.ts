@@ -177,6 +177,11 @@ export function useIpcSendEvent() {
         send('render-send-measure-one')
     }
 
+    // 清除量测数据
+    function clearMeasureData() {
+        send('render-send-clear-measure')
+    }
+
     return {
         renderThreadInitialization,
         dllInitialization,
@@ -206,6 +211,7 @@ export function useIpcSendEvent() {
         automaticCalibrationStops,
         refreshInstance,
         manualPosition,
-        onceMeasure
+        onceMeasure,
+        clearMeasureData
     }
 }

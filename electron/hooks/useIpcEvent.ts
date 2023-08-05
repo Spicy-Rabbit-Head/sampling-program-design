@@ -19,6 +19,26 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     const localStore = new Store({LocalStoreInterface});
     console.log(localStore.store)
 
+    // 主窗口最大化
+    render.on('maximize', () => {
+        render.webContents.send('render-receive-max-windows')
+    })
+
+    // 主窗口最小化
+    render.on('unmaximize', () => {
+        render.webContents.send('render-receive-min-windows')
+    })
+
+    // 主窗口关闭
+    render.on('close', (e) => {
+        e.preventDefault()
+        console.log('关闭前确认')
+        auto.value = false;
+        render.webContents.send('render-receive-show-close-confirm-dialog')
+        // 进行数据保存
+        render.webContents.send('render-receive-save-data')
+    })
+
     // 渲染进程最小化
     ipcMain.on('render-send-window-min', function () {
         render.minimize();
@@ -46,12 +66,12 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     ipcMain.on('render-send-close-server', function () {
         // 关闭工作进程
         worker.webContents.send('worker-receive-stop-service');
-        render.close()
     })
 
     // 工作进程关闭
     ipcMain.on('worker-send-close', function () {
-        worker.close();
+        render.destroy();
+        worker.destroy();
     })
 
     // 渲染进程数据初始化
@@ -447,6 +467,16 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     // 一次量测
     ipcMain.on('render-send-measure-one', function () {
         worker.webContents.send('worker-receive-measure-one')
+    })
+
+    // 清除量测数据
+    ipcMain.on('render-send-clear-measure', function () {
+        worker.webContents.send('worker-receive-clear');
+    })
+
+    // 起始位置
+    ipcMain.on('worker-send-start-position', function (_, data) {
+        render.webContents.send('render-receive-start-position', data)
     })
 
     // // 渲染进程发起数据表读取

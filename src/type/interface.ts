@@ -65,6 +65,8 @@ export type GlobalStoreInterface = {
         end: number
     },
     spotTestMode: string,
+    currentColumn: number,
+    currentRow: number,
 }
 
 // 配置文件

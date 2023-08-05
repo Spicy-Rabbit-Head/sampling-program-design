@@ -176,6 +176,27 @@ const SingleTest = func({
     methodName: "SingleTest",
 })
 
+// 当前位置
+const CurrentPosition = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "CurrentPosition",
+})
+
+// 当前列
+const CurrentColumn = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "CurrentColumn",
+})
+
+// 清除
+const Clear = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "Clear",
+})
+
 // 服务初始化启动
 function ServiceInit(port: string) {
     Init(port, (error: any, result: any) => {
@@ -330,6 +351,26 @@ function RefreshInstance(number: string) {
     })
     console.log('刷新实例' + state)
     return state;
+}
+
+// 起始位置
+function StartPosition() {
+    let position: Array<number> = [];
+    CurrentColumn(null, (error: any, result: any) => {
+        if (error) {
+            console.log(error)
+        }
+        console.log("当前列:" + result)
+        position.push(result)
+    })
+    CurrentPosition(null, (error: any, result: any) => {
+        if (error) {
+            console.log(error)
+        }
+        console.log("当前位置:" + result)
+        position.push(result)
+    })
+    return position;
 }
 
 const {on} = useIpcRenderer();
@@ -575,8 +616,23 @@ on("worker-receive-manual-position", (_, position: any) => {
 })
 
 // 一次量测
-on("worker-receive-measure-one", () => {
-    SingleTest(null, (error: any, result: any) => {
+on("worker-receive-measure-one", (event) => {
+    // event.sender.send('worker-send-start-position', StartPosition())
+    event.sender.send('worker-send-start-position', [7, 0])
+    // event.sender.send('worker-send-measure-data', MeasureOneGroupExecution())
+
+    // SingleTest(null, (error: any, result: any) => {
+    //     if (error) {
+    //         console.log(error)
+    //         return
+    //     }
+    //     console.log(result)
+    // })
+})
+
+// 清除
+on("worker-receive-clear", () => {
+    Clear(null, (error: any, result: any) => {
         if (error) {
             console.log(error)
             return

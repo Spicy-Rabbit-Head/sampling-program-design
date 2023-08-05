@@ -1,7 +1,6 @@
 import {app} from 'electron';
 import {useBrowserWindow} from "./hooks/useBrowserWindow";
 import {useIpcEvent} from "./hooks/useIpcEvent";
-import {useIpcViewportEvent} from "./hooks/useIpcViewportEvent";
 
 const {buildMainWindow, workerWindow} = useBrowserWindow();
 // 主进程入口
@@ -12,7 +11,6 @@ app.whenReady().then(() => {
     // const sqlite = sqliteWindow();
     // 事件监听
     useIpcEvent(main, worker)
-    useIpcViewportEvent(main)
 });
 
 app.on('window-all-closed', () => {
