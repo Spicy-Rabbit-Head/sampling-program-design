@@ -197,6 +197,20 @@ const Clear = func({
     methodName: "Clear",
 })
 
+// 开始报警
+const StartAlarm = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "StartAlarm",
+})
+
+// 停止报警
+const StopAlarm = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "StopAlarm",
+})
+
 // 服务初始化启动
 function ServiceInit(port: string) {
     Init(port, (error: any, result: any) => {
@@ -619,7 +633,7 @@ on("worker-receive-manual-position", (_, position: any) => {
 on("worker-receive-measure-one", (event) => {
     // event.sender.send('worker-send-start-position', StartPosition())
     event.sender.send('worker-send-start-position', [7, 0])
-    // event.sender.send('worker-send-measure-data', MeasureOneGroupExecution())
+    event.sender.send('worker-send-measure-data', MeasureOneGroupExecution())
 
     // SingleTest(null, (error: any, result: any) => {
     //     if (error) {

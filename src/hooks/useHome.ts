@@ -11,6 +11,8 @@ for (let i = 1; i <= 24; i++) {
     }
 }
 
+const realTimeValue = reactive<Array<Array<string>>>([]);
+
 // 料盘选项
 const options = [
     {
@@ -67,9 +69,18 @@ export function useHome() {
             console.log('数据为空')
             return
         }
+        // TODO: 更新视图
+        updateRealTimeValue(data[data.length - 1])
         for (let i = 0; i < data.length; i++) {
             console.log(data[i])
         }
+    }
+
+    // 更新实时数据
+    function updateRealTimeValue(data: any) {
+        realTimeValue.length = 0
+        realTimeValue.push(...data)
+        console.log(realTimeValue[0])
     }
 
     return {
@@ -83,5 +94,6 @@ export function useHome() {
         optionsExhibition,
         stopSwitch,
         updateView,
+        realTimeValue,
     }
 }

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 
 import type {StatusOverview} from "@/type/interface.ts";
+import {useHome} from "@/hooks/useHome.ts";
 // 状态概述
 const status: Array<StatusOverview> = [
   {
@@ -28,6 +29,8 @@ const status: Array<StatusOverview> = [
     bgColor: "t-bg-yellow-500",
   }
 ]
+
+const {realTimeValue} = useHome();
 </script>
 
 <template>
@@ -46,7 +49,9 @@ const status: Array<StatusOverview> = [
         </div>
       </div>
       <div id="z-slide" class="t-h-36 t-overflow-y-auto t-overflow-hidden">
-        <div>{{ 'FL : xxxxxx' }}</div>
+        <div class="t-truncate" v-for="(item,index) in realTimeValue" :key="index">
+          {{ item[0] }} : {{ item[1] }}
+        </div>
       </div>
     </div>
   </div>
