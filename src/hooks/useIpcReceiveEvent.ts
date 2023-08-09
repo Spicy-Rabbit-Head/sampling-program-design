@@ -29,7 +29,7 @@ export function useIpcReceiveEvent() {
     } = useProofreadingMachine();
     const {addWorkshopOptions} = useConfig();
     const {updateLimitData} = useEcharts();
-    const {updateView} = useHome();
+    const {updateView, writeStartBit} = useHome();
 
     // 数据初始化
     on('render-receive-init', (_, {
@@ -261,7 +261,7 @@ export function useIpcReceiveEvent() {
 
     // 起始位置
     on('render-receive-start-position', (_, data) => {
-        globalStore.writeStartBit(data);
+        writeStartBit(data);
     })
 
     // // 读取数据表

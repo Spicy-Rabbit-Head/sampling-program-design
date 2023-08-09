@@ -42,11 +42,7 @@ export const useGlobalStore = defineStore('GlobalStore', {
                 end: 31
             },
             // 抽测模式
-            spotTestMode: '',
-            // 当前列
-            currentColumn: 0,
-            // 当前行
-            currentRow: 0,
+            spotTestMode: ''
         }
     },
     getters: {
@@ -101,11 +97,6 @@ export const useGlobalStore = defineStore('GlobalStore', {
             }
             return true
         },
-        // 写入起始位置
-        writeStartBit(data: any) {
-            this.currentColumn = data[0]
-            this.currentRow = data[1]
-        }
     },
 })
 

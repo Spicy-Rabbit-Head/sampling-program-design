@@ -13,13 +13,19 @@ for (let i = 1; i <= 24; i++) {
 
 const realTimeValue = reactive<Array<Array<string>>>([]);
 
+// 当前列
+const currentColumn = ref<number>(0);
+// 当前行
+const currentRow = ref<number>(0);
+
 // 料盘选项
-const options = [
-    {
-        label: '实时',
-        value: 0,
-    },
-]
+const
+    options = [
+        {
+            label: '实时',
+            value: 0,
+        },
+    ]
 
 // 初始化选项列表
 for (let i = 1; i <= 2; i++) {
@@ -72,8 +78,26 @@ export function useHome() {
         // TODO: 更新视图
         updateRealTimeValue(data[data.length - 1])
         for (let i = 0; i < data.length; i++) {
-            console.log(data[i])
+            computeStatus(data[i])
         }
+    }
+
+    // 计算状态
+    function computeStatus(data: any) {
+        for (let i = 0; i < data.length; i++) {
+            if (data[i][0] === 'FL') {
+                if (data[i][2] == 'pass') {
+                    console.log('pass')
+                } else {
+                    console.log(Number(data[i][1]) > 0 ? 'F+' : 'F-')
+                }
+            }
+        }
+    }
+
+    // 更新表格项
+    function updateTableItem(result: any) {
+
     }
 
     // 更新实时数据
@@ -81,6 +105,12 @@ export function useHome() {
         realTimeValue.length = 0
         realTimeValue.push(...data)
         console.log(realTimeValue[0])
+    }
+
+    // 写入起始位置
+    function writeStartBit(data: any) {
+        currentColumn.value = data[0]
+        currentRow.value = data[1]
     }
 
     return {
@@ -95,5 +125,6 @@ export function useHome() {
         stopSwitch,
         updateView,
         realTimeValue,
+        writeStartBit,
     }
 }
