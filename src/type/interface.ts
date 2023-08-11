@@ -28,6 +28,7 @@ export type Log = {
 export type tab = {
     path: string,
     class: string,
+    data?: Array<Array<string>>
 }
 
 // 窗口缓存
@@ -65,6 +66,7 @@ export type GlobalStoreInterface = {
         end: number
     },
     spotTestMode: string,
+    complement: Array<string>,
 }
 
 // 配置文件
@@ -73,6 +75,8 @@ export type ConfigStoreInterface = {
     standardProductPath: string,
     standardProductPassword: string,
     currentWorkshop: string,
+    compensationDeviationUpperLimit: number,
+    verificationDeviationUpperLimit: number,
 }
 
 // 标品状态

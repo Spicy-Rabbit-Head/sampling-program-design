@@ -211,6 +211,20 @@ const StopAlarm = func({
     methodName: "StopAlarm",
 })
 
+// 当前盘号
+const QueryDisk = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "QueryDisk",
+})
+
+// 一次测试并返回结果
+const MeasureAndReturn = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "MeasureAndReturn",
+})
+
 // 服务初始化启动
 function ServiceInit(port: string) {
     Init(port, (error: any, result: any) => {
@@ -278,6 +292,19 @@ function CalibrationExecution(step: number, index: number, fixture: string) {
 function TestOneGroupExecution() {
     let i: any;
     TestOneGroup(null, (error: any, result: any) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+        i = result;
+    })
+    return i;
+}
+
+// 一次对机测试
+function TestOneProofreadingExecution() {
+    let i: any;
+    MeasureAndReturn(null, (error: any, result: any) => {
         if (error) {
             console.log(error)
             return
@@ -384,6 +411,13 @@ function StartPosition() {
         console.log("当前位置:" + result)
         position.push(result)
     })
+    QueryDisk(null, (error: any, result: any) => {
+        if (error) {
+            console.log(error)
+        }
+        console.log("当前盘号:" + result)
+        position.push(result)
+    })
     return position;
 }
 
@@ -458,19 +492,29 @@ on("worker-receive-calibration-execute", (event: any, step: any, fixture: any) =
     event.sender.send('worker-send-step-success', step)
 })
 
-// 验证开始信号
-on("worker-receive-validation-start", (event: any) => {
-    event.sender.send('worker-send-validation-judgment', MeasureStart())
+// // 验证开始信号
+// on("worker-receive-validation-start", (event: any) => {
+//     event.sender.send('worker-send-validation-judgment', MeasureStart())
+// })
+
+// 对机开始信号
+on("worker-receive-verify-start", (event: any) => {
+    event.sender.send('worker-send-verify-judgment', MeasureStart())
 })
 
-// 工作进程验证执行
-on("worker-receive-validation-execute", (event: any) => {
+// 工作进程对机前执行
+on("worker-receive-compensate-execute", (event: any) => {
     if (WriteStandardProductExecution(['0', '0', '0', '0'])) {
-        event.sender.send('worker-send-docking-data', TestOneGroupExecution())
-        MeasureEnd();
-        return
+        event.sender.send('worker-send-standard-write-success')
     }
     // TODO 写入补偿值失败
+})
+
+// 工作进程对机执行
+on("worker-receive-verify-execute", (event: any) => {
+    // event.sender.send('worker-send-reverification-result', TestOneGroupExecution())
+    event.sender.send('worker-send-docking-data', TestOneProofreadingExecution())
+    MeasureEnd();
 })
 
 // 工作进程写入补偿值
@@ -489,7 +533,7 @@ on("worker-receive-reverification-start", (event: any) => {
 
 // 工作进验证补偿
 on("worker-receive-reverification-execute", (event: any) => {
-    event.sender.send('worker-send-reverification-result', TestOneGroupExecution())
+    event.sender.send('worker-send-reverification-result', TestOneProofreadingExecution())
     MeasureEnd();
 })
 
@@ -538,7 +582,7 @@ on("worker-receive-mode", (event: any, mode: any) => {
                 event.sender.send('worker-send-calibration-judgment', MeasureStart())
                 break
             case 2:
-                event.sender.send('worker-send-validation-judgment', MeasureStart())
+                event.sender.send('worker-send-compensate-execute')
                 break
         }
     }
@@ -632,9 +676,8 @@ on("worker-receive-manual-position", (_, position: any) => {
 // 一次量测
 on("worker-receive-measure-one", (event) => {
     // event.sender.send('worker-send-start-position', StartPosition())
-    event.sender.send('worker-send-start-position', [7, 0])
+    event.sender.send('worker-send-start-position', [8, 0, 1])
     event.sender.send('worker-send-measure-data', MeasureOneGroupExecution())
-
     // SingleTest(null, (error: any, result: any) => {
     //     if (error) {
     //         console.log(error)

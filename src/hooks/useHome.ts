@@ -2,21 +2,32 @@ import {computed, reactive, ref} from "vue";
 import type {tab} from "@/type/interface.ts";
 
 // 主体表格
-const mainTable = reactive<Array<tab>>([]);
+const mainTable = reactive<Array<Array<tab>>>([]);
 
 // 初始化主体表格
-for (let i = 1; i <= 24; i++) {
-    for (let j = 1; j <= 32; j++) {
-        mainTable.push({path: `${i}-${j}`, class: ""});
+for (let w = 0; w < 11; w++) {
+    mainTable.push([]);
+    initTable(w);
+}
+
+function initTable(w: number) {
+    for (let i = 1; i <= 24; i++) {
+        for (let j = 1; j <= 32; j++) {
+            mainTable[w].push({path: `${i}-${j}`, class: ""});
+        }
     }
 }
 
+console.log(mainTable)
+// 实时数据
 const realTimeValue = reactive<Array<Array<string>>>([]);
-
 // 当前列
 const currentColumn = ref<number>(0);
 // 当前行
 const currentRow = ref<number>(0);
+// 当前盘号
+const currentPan = ref<number>(0);
+
 
 // 料盘选项
 const
@@ -51,12 +62,12 @@ const optionsExhibition = computed<string>(() => {
 export function useHome() {
     // 选中异常
     function select(i: number) {
-        mainTable[i].class = "t-bg-red-500";
+        mainTable[currentPan.value][i].class = "t-bg-red-500";
     }
 
     // 选中通过
     function selectPass(i: number) {
-        mainTable[i].class = "t-bg-green-600";
+        mainTable[currentPan.value][i].class = "t-bg-green-600";
     }
 
     // 启动
@@ -75,29 +86,50 @@ export function useHome() {
             console.log('数据为空')
             return
         }
-        // TODO: 更新视图
+        if (currentColumn.value == 8) {
+            mainTable[0].length = 0;
+            initTable(0);
+        }
+        // 更新视图
         updateRealTimeValue(data[data.length - 1])
         for (let i = 0; i < data.length; i++) {
-            computeStatus(data[i])
+            computeStatus(data[i], i)
         }
+        console.log(mainTable)
     }
 
     // 计算状态
-    function computeStatus(data: any) {
+    function computeStatus(data: any, index: number) {
         for (let i = 0; i < data.length; i++) {
+            let result = 'pass';
             if (data[i][0] === 'FL') {
-                if (data[i][2] == 'pass') {
-                    console.log('pass')
-                } else {
-                    console.log(Number(data[i][1]) > 0 ? 'F+' : 'F-')
-                }
+                if (data[i][2] != 'pass')
+                    result = Number(data[i][1]) > 0 ? 'F+' : 'F-';
+                updateTableItem(result, index, data)
             }
         }
     }
 
     // 更新表格项
-    function updateTableItem(result: any) {
-
+    function updateTableItem(result: string, index: number, data: any) {
+        console.log((currentRow.value + index) * 32 + currentColumn.value)
+        let style = 't-bg-green-600';
+        switch (result) {
+            case 'pass':
+                style = "t-bg-green-600";
+                break;
+            case 'F+':
+                style = "t-bg-red-500";
+                break;
+            case 'F-':
+                style = "t-bg-blue-500";
+                break;
+        }
+        let position = (currentRow.value + index) * 32 + currentColumn.value;
+        mainTable[currentPan.value][position].class = style;
+        mainTable[0][position].class = style;
+        mainTable[currentPan.value][position].data = data;
+        mainTable[0][position].data = data;
     }
 
     // 更新实时数据
@@ -111,6 +143,19 @@ export function useHome() {
     function writeStartBit(data: any) {
         currentColumn.value = data[0]
         currentRow.value = data[1]
+        currentPan.value = data[2]
+    }
+
+    // 初始化数据
+    function initTableData(data: any) {
+        try {
+            if (data == null) return;
+            if (data.length == 0) return;
+            mainTable.length = 0
+            mainTable.push(...data)
+        } catch {
+            console.log('初始化数据失败')
+        }
     }
 
     return {
@@ -126,5 +171,6 @@ export function useHome() {
         updateView,
         realTimeValue,
         writeStartBit,
+        initTableData,
     }
 }

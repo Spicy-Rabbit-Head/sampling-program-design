@@ -42,7 +42,9 @@ export const useGlobalStore = defineStore('GlobalStore', {
                 end: 31
             },
             // 抽测模式
-            spotTestMode: ''
+            spotTestMode: '',
+            // 补偿值
+            complement: []
         }
     },
     getters: {
@@ -69,31 +71,26 @@ export const useGlobalStore = defineStore('GlobalStore', {
             standardProductUpdate(this.outputDisplay)
         },
         // 计算补偿值
-        calculatedComplement(data: Array<string>): Array<string> | null {
-            let list: Array<string> | null = []
-            for (let i = 0; i < 4; i++) {
-                let value = (parseFloat(this.outputDisplay[1].value) - parseFloat(data[i])).toFixed(2)
-                if (value.length > 5) {
-                    updateDataBase(1, i + 1, false, value)
-                    return null
-                } else {
-                    updateDataBase(1, i + 1, true, value)
-                }
-                list.push(value)
+        calculatedComplement(data: string, index: number): string | null {
+            let value =
+                parseFloat((parseFloat(this.outputDisplay[1].value) - parseFloat(data)).toFixed(2))
+            if (value > useConfigStore().compensationDeviationUpperLimit) {
+                updateDataBase(1, index, false, value.toString())
+                return null
+            } else {
+                updateDataBase(1, index, true, value.toString())
             }
-            return list
+            return value.toString();
         },
         // 计算差值判断
-        calculateDifference(data: Array<string>) {
-            for (let i = 0; i < 4; i++) {
-                // 计算两个数之间的差值（取绝对值）
-                let difference = Math.abs(Number(this.outputDisplay[2].value) - Number(data[i]));
-                if (difference >= 100) {
-                    updateDataBase(2, i + 1, false, data[i])
-                    return null
-                } else {
-                    updateDataBase(2, i + 1, true, data[i])
-                }
+        calculateDifference(data: string, index: number) {
+            // 计算两个数之间的差值（取绝对值）
+            let difference = Math.abs(Number(this.outputDisplay[2].value) - Number(data));
+            if (difference >= useConfigStore().verificationDeviationUpperLimit) {
+                updateDataBase(2, index, false, data)
+                return null
+            } else {
+                updateDataBase(2, index, true, data)
             }
             return true
         },
@@ -112,6 +109,10 @@ export const useConfigStore = defineStore('ConfigStore', {
             standardProductPassword: '',
             // 当前车间
             currentWorkshop: '',
+            // 补偿偏差上限
+            compensationDeviationUpperLimit: 0,
+            // 验证偏差上限
+            verificationDeviationUpperLimit: 0,
         }
     }
 })

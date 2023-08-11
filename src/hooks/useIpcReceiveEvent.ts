@@ -29,7 +29,7 @@ export function useIpcReceiveEvent() {
     } = useProofreadingMachine();
     const {addWorkshopOptions} = useConfig();
     const {updateLimitData} = useEcharts();
-    const {updateView, writeStartBit} = useHome();
+    const {updateView, writeStartBit, mainTable, initTableData} = useHome();
 
     // 数据初始化
     on('render-receive-init', (_, {
@@ -77,6 +77,8 @@ export function useIpcReceiveEvent() {
         configStore.standardProductPath = data.standardProductPath
         configStore.standardProductPassword = data.standardProductPassword
         configStore.currentWorkshop = data.currentWorkshop
+        configStore.compensationDeviationUpperLimit = data.compensationDeviationUpperLimit
+        configStore.verificationDeviationUpperLimit = data.verificationDeviationUpperLimit
     })
 
     // 读取缓存配置
@@ -92,6 +94,7 @@ export function useIpcReceiveEvent() {
     // 关闭前数据保存
     on('render-receive-save-data', (event) => {
         event.sender.send('render-send-save-log', JSON.stringify(logs))
+        event.sender.send('render-send-save-measure', JSON.stringify(mainTable))
     })
 
     // 读取250BINI配置
@@ -186,32 +189,36 @@ export function useIpcReceiveEvent() {
     })
 
     // 对机数据
-    on('render-receive-docking-data', (event, data) => {
+    on('render-receive-docking-data', (event, data, index) => {
         stepsUpdate(3)
         if (data == null) {
             checkTheMachineFail(0)
             automaticCalibrationStop()
             return
         }
-        for (let i = 0; i < data.length; i++) {
-            if (Number(data[i]) > 10000) {
-                updateDataBase(0, i + 1, false, data[i])
-                checkTheMachineFail(0)
-                automaticCalibrationStop()
-                return
-            } else {
-                updateDataBase(0, i + 1, true, data[i])
-            }
+        if (Number(data) > 10000) {
+            updateDataBase(0, index, false, data)
+            checkTheMachineFail(0)
+            automaticCalibrationStop()
+            return
+        } else {
+            updateDataBase(0, index, true, data)
         }
         // 计算补正值
-        let amend = globalStore.calculatedComplement(data)
+        let amend = globalStore.calculatedComplement(data, index)
         if (amend == null) {
             checkTheMachineFail(0)
             automaticCalibrationStop()
             return
         } else {
-            checkTheMachineSuccess(0)
-            event.sender.send('render-send-write-compensation', amend)
+            globalStore.complement.push(amend);
+            if (index == 4) {
+                checkTheMachineSuccess(0)
+                event.sender.send('render-send-write-compensation', globalStore.complement)
+                globalStore.complement.length = 0
+                return;
+            }
+            event.sender.send('worker-send-verify-judgment', false)
         }
     })
 
@@ -228,19 +235,23 @@ export function useIpcReceiveEvent() {
     })
 
     // 验证结果
-    on('render-receive-reverification-result', (_, data) => {
+    on('render-receive-reverification-result', (event, data, index) => {
         if (data == null) {
             checkTheMachineFail(2)
             automaticCalibrationStop()
             return
         }
-        if (globalStore.calculateDifference(data) == null) {
+        if (globalStore.calculateDifference(data, index) == null) {
             checkTheMachineFail(2)
             automaticCalibrationStop()
             return
         } else {
-            checkTheMachineSuccess(2)
-            automaticCalibrationStop()
+            if (index == 4) {
+                checkTheMachineSuccess(2)
+                automaticCalibrationStop()
+                return
+            }
+            event.sender.send('worker-send-reverification-judgment', false)
         }
     })
 
@@ -252,6 +263,11 @@ export function useIpcReceiveEvent() {
     // 读取日志
     on('render-receive-read-log', (_, data) => {
         initLogs(JSON.parse(data))
+    })
+
+    // 读取量测数据
+    on('render-receive-read-measure', (_, data) => {
+        initTableData(JSON.parse(data));
     })
 
     // 量测数据

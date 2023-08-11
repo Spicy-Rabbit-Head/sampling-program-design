@@ -12,6 +12,9 @@ import {ref} from "vue";
 const auto = ref<boolean>(false);
 // 校准步骤数
 const steps = ref<number>(0);
+// 对机验证步骤数
+const checkTheMachineSteps = ref<number>(0);
+
 
 // 事件监听
 export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
@@ -307,15 +310,20 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
         render.webContents.send('render-receive-calibration-progress-success', result)
     })
 
-    // 量测进程验证信号判断
-    ipcMain.on('worker-send-validation-judgment', function (event, i) {
+    // 执行补偿
+    ipcMain.on('worker-send-compensate-execute', function (event) {
+        event.reply('worker-receive-compensate-execute')
+    })
+
+    // 量测进程对机信号判断
+    ipcMain.on('worker-send-verify-judgment', function (event, i) {
         if (auto.value == false) return;
         if (i) {
             console.log('进行对机...')
-            event.reply('worker-receive-validation-execute')
+            event.reply('worker-receive-verify-execute')
         } else {
             console.log('等待对机中...')
-            event.reply('worker-receive-validation-start')
+            event.reply('worker-receive-verify-start')
         }
     })
 
@@ -345,9 +353,18 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
         worker.webContents.send('worker-receive-manual-position', position);
     })
 
+    // 工作进程发起标志写入成功
+    ipcMain.on('worker-send-standard-write-success', function () {
+        worker.webContents.send('worker-receive-verify-start');
+    })
+
     // 工作进程发起对机数据更新
     ipcMain.on('worker-send-docking-data', function (_, data) {
-        render.webContents.send('render-receive-docking-data', data)
+        checkTheMachineSteps.value += 1;
+        render.webContents.send('render-receive-docking-data', data, checkTheMachineSteps.value)
+        if (checkTheMachineSteps.value == 4) {
+            checkTheMachineSteps.value = 0;
+        }
     })
 
     // 渲染进程发起写入补偿
@@ -378,14 +395,18 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
         }
     })
 
-    // 渲染进程发起验证补偿
+    // 渲染进程发起再次验证补偿
     ipcMain.on('render-send-verification-compensation', function () {
         worker.webContents.send('worker-receive-reverification-start')
     })
 
     // 工作进程发起验证结果
     ipcMain.on('worker-send-reverification-result', function (_, result) {
-        render.webContents.send('render-receive-reverification-result', result)
+        checkTheMachineSteps.value += 1;
+        render.webContents.send('render-receive-reverification-result', result, checkTheMachineSteps.value)
+        if (checkTheMachineSteps.value == 4) {
+            checkTheMachineSteps.value = 0;
+        }
     })
 
     // 渲染进程发起缓存数据保存
@@ -477,6 +498,34 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     // 起始位置
     ipcMain.on('worker-send-start-position', function (_, data) {
         render.webContents.send('render-receive-start-position', data)
+    })
+
+    // 保存量测数据
+    ipcMain.on('render-send-save-measure', function (_, data) {
+        let path = join(__dirname, '../../measure_cache.json');
+        if (process.env.VITE_DEV_SERVER_URL) {
+            path = join(__dirname + '../../public/measure_cache.json')
+        }
+        fs.writeFile(path, data, function (err) {
+            if (err) {
+                console.log(err)
+            }
+        })
+    })
+
+    // 初始化量测数据
+    ipcMain.on('render-send-init-measure', function (event) {
+        let path = join(__dirname, '../../measure_cache.json');
+        if (process.env.VITE_DEV_SERVER_URL) {
+            path = join(__dirname + '../../public/measure_cache.json')
+        }
+        fs.readFile(path, 'utf8', function (err, data) {
+            if (err) {
+                console.log(err)
+            } else {
+                event.reply('render-receive-read-measure', data)
+            }
+        })
     })
 
     // // 渲染进程发起数据表读取

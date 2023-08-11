@@ -20,6 +20,8 @@ const {
   manualPosition,
   onceMeasure,
   clearMeasureData,
+  compensationDeviationUpdate,
+  proofreadingDeviationUpdate,
 } = useIpcSendEvent();
 
 
@@ -102,6 +104,19 @@ function gainFocus() {
                    @blur="standardProductPasswordUpdate(configStore.standardProductPassword)"
                    :disabled="!changePermission"/>
         </n-input-group>
+        <!--  补偿上下限及验证差值上下限  -->
+        <n-input-group>
+          <n-input-group-label class="t-w-1/5">补偿值偏差上限 :</n-input-group-label>
+          <n-input-number placeholder="N/A" class="t-font-mono"
+                          v-model:value="configStore.compensationDeviationUpperLimit"
+                          @blur="compensationDeviationUpdate(configStore.compensationDeviationUpperLimit)"
+                          :disabled="!changePermission"/>
+          <n-input-group-label class="t-w-1/5">验证差值上限 :</n-input-group-label>
+          <n-input-number placeholder="N/A" class="t-font-mono"
+                          v-model:value="configStore.verificationDeviationUpperLimit"
+                          @blur="proofreadingDeviationUpdate(configStore.verificationDeviationUpperLimit)"
+                          :disabled="!changePermission"/>
+        </n-input-group>
       </div>
       <div class="t-grid t-gap-2">
         <div class="t-grid t-grid-cols-3">
@@ -176,7 +191,7 @@ function gainFocus() {
     </div>
     <a-modal v-model:visible="visible" type="password" :mask-closable="false" title="输入密码" @cancel="handleCancel"
              :on-before-ok="passwordComparison" @ok="comparisonSuccess" @open="gainFocus">
-      <a-input ref="passwordInput" v-model="password"/>
+      <a-input-password ref="passwordInput" v-model="password" placeholder="输入密码"/>
     </a-modal>
   </div>
 </template>

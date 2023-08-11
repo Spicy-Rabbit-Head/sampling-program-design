@@ -72,6 +72,14 @@
       {
         "from": "public/cache.json",
         "to": "cache.json"
+      },
+      {
+        "from": "public/log.json",
+        "to": "log.json"
+      },
+      {
+        "from": "public/measure_cache.json",
+        "to": "measure_cache.json"
       }
     ],
     "mac": {

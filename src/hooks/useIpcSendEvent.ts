@@ -182,6 +182,16 @@ export function useIpcSendEvent() {
         send('render-send-clear-measure')
     }
 
+    // 补偿偏差更新
+    function compensationDeviationUpdate(value: number) {
+        send('render-send-set-store', 'compensationDeviationUpperLimit', value);
+    }
+
+    // 验证偏差更新
+    function proofreadingDeviationUpdate(value: number) {
+        send('render-send-set-store', 'verificationDeviationUpperLimit', value);
+    }
+
     return {
         renderThreadInitialization,
         dllInitialization,
@@ -212,6 +222,8 @@ export function useIpcSendEvent() {
         refreshInstance,
         manualPosition,
         onceMeasure,
-        clearMeasureData
+        clearMeasureData,
+        compensationDeviationUpdate,
+        proofreadingDeviationUpdate,
     }
 }
