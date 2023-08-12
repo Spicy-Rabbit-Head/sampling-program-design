@@ -19,6 +19,7 @@ const {
   cacheDataRead,
   updateTestDataLimit,
   initLog,
+  initMeasure,
 } = useIpcSendEvent();
 
 onMounted(() => {
@@ -27,6 +28,7 @@ onMounted(() => {
   cacheDataRead();
   updateTestDataLimit();
   initLog();
+  initMeasure();
 })
 
 </script>

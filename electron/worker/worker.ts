@@ -677,7 +677,8 @@ on("worker-receive-manual-position", (_, position: any) => {
 on("worker-receive-measure-one", (event) => {
     // event.sender.send('worker-send-start-position', StartPosition())
     event.sender.send('worker-send-start-position', [8, 0, 1])
-    event.sender.send('worker-send-measure-data', MeasureOneGroupExecution())
+    // event.sender.send('worker-send-measure-data', MeasureOneGroupExecution())
+    event.sender.send('render-send-manual-measure-data', MeasureOneGroupExecution())
     // SingleTest(null, (error: any, result: any) => {
     //     if (error) {
     //         console.log(error)

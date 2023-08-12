@@ -9,6 +9,8 @@ const changePermission = ref<boolean>(false)
 const visible = ref(false)
 // 密码
 const password = ref("")
+// 手动数据
+const manualData = reactive<Array<Array<string>>>([]);
 
 export function useConfig() {
     // 更新车间选项
@@ -44,6 +46,12 @@ export function useConfig() {
         }
     }
 
+    // 更新手动数据
+    function updateManualData(value: any) {
+        manualData.length = 0
+        manualData.push(...value)
+    }
+
     return {
         workshopOptions,
         addWorkshopOptions,
@@ -53,6 +61,8 @@ export function useConfig() {
         visible,
         handleCancel,
         passwordComparison,
-        password
+        password,
+        manualData,
+        updateManualData
     }
 }

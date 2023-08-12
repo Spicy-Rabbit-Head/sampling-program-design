@@ -27,7 +27,7 @@ export function useIpcReceiveEvent() {
         initLogs,
         logs
     } = useProofreadingMachine();
-    const {addWorkshopOptions} = useConfig();
+    const {addWorkshopOptions, updateManualData} = useConfig();
     const {updateLimitData} = useEcharts();
     const {updateView, writeStartBit, mainTable, initTableData} = useHome();
 
@@ -278,6 +278,11 @@ export function useIpcReceiveEvent() {
     // 起始位置
     on('render-receive-start-position', (_, data) => {
         writeStartBit(data);
+    })
+
+    // 手动量测数据
+    on('render-receive-manual-measure-data', (_, data) => {
+        updateManualData(data);
     })
 
     // // 读取数据表

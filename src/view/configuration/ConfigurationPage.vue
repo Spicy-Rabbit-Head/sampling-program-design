@@ -34,6 +34,7 @@ const {
   passwordComparison,
   password,
   handleCancel,
+  manualData,
 } = useConfig();
 const {autoButton} = useHome();
 const {calibrationStatus} = useProofreadingMachine();
@@ -79,7 +80,7 @@ function gainFocus() {
     </div>
     <!--  配置框  -->
     <div class="t-grid t-grid-cols-2 t-gap-2 t-flex-auto t-px-2">
-      <div class="t-flex t-flex-col t-gap-2 t-text-center">
+      <div class="t-flex t-flex-col t-gap-2 t-text-center t-pb-2">
         <!--  配置250Bini文件地址  -->
         <n-input-group>
           <n-input-group-label class="t-w-1/5">250B配置地址 :</n-input-group-label>
@@ -117,6 +118,15 @@ function gainFocus() {
                           @blur="proofreadingDeviationUpdate(configStore.verificationDeviationUpperLimit)"
                           :disabled="!changePermission"/>
         </n-input-group>
+        <div class="t-flex-auto"></div>
+        <div class="t-grid t-grid-cols-4 t-border t-rounded-md t-h-32 t-overflow-hidden t-overflow-y-auto">
+          <div v-for="index1 in 4" :key="index1">
+            <p class="t-border-b t-py-1 t-border-r last:t-border-r-0">{{ index1 }}</p>
+            <div class="t-truncate t-border-r" v-for="(item,index2) in manualData[index1 -1]" :key="index2">
+              {{ item[0] }} : {{ item[1] }}
+            </div>
+          </div>
+        </div>
       </div>
       <div class="t-grid t-gap-2">
         <div class="t-grid t-grid-cols-3">

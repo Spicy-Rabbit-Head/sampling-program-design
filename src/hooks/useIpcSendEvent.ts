@@ -149,6 +149,11 @@ export function useIpcSendEvent() {
         send('render-send-init-log');
     }
 
+    // 初始化抽测数据
+    function initMeasure() {
+        send('render-send-init-measure');
+    }
+
     // 保存抽测数据
     function saveSpotTestData(spotTestMode: any, spotTestBit: any, spotTestColumn: any) {
         send('render-send-set-store', 'spotTestMode', spotTestMode);
@@ -225,5 +230,6 @@ export function useIpcSendEvent() {
         clearMeasureData,
         compensationDeviationUpdate,
         proofreadingDeviationUpdate,
+        initMeasure,
     }
 }
