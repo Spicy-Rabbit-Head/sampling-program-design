@@ -88,7 +88,6 @@ export function useHome() {
     // 更新视图
     function updateView(data: any) {
         if (data == null) {
-            console.log('数据为空')
             return
         }
         if (currentColumn.value == 8) {
@@ -172,7 +171,6 @@ export function useHome() {
     function stopAlarm() {
         alarmTriggerUpperLimit.value = 0;
         closeAlarm();
-        console.log(alarmTriggerUpperLimit.value)
     }
 
     return {

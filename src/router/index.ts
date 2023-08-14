@@ -56,18 +56,17 @@ const router: Router = createRouter({
 })
 
 // 前置全局守卫
-router.beforeEach((to, from, next) => {
-    console.log("路由跳转开始")
-    console.log(from.path)
-    console.log(to.matched)
-    next()
-})
+// router.beforeEach((to, from, next) => {
+//     console.log("路由跳转开始")
+//     console.log(from.path)
+//     console.log(to.matched)
+//     next()
+// })
 // 后置全局守卫
-router.afterEach((to) => {
-
-    console.log(to.path)
-    console.log("路由跳转结束")
-})
+// router.afterEach((to) => {
+//     console.log(to.path)
+//     console.log("路由跳转结束")
+// })
 // 路由跳转错误
 router.onError((error) => {
     console.log("路由跳转错误:")

@@ -440,6 +440,7 @@ on("worker-receive-standard-query", (event: any, path: any, pn: any, location: a
     if (dataList == null) {
         // 工作进程标品数据查询失败
         event.sender.send('worker-send-standard-query-error')
+        event.sender.send('worker-send-err-notification', '标品数据查询失败');
     } else {
         // 工作进程标品数据查询成功
         event.sender.send('worker-send-standard-query-success', dataList)
@@ -483,7 +484,6 @@ on("worker-receive-calibration-execute", (event: any, step: any, fixture: any) =
             event.sender.send('worker-send-step-success', step)
             return
         } else {
-            // TODO 写入开启量测失败
             event.sender.send('worker-send-step-error', step)
             return
         }
@@ -507,7 +507,7 @@ on("worker-receive-compensate-execute", (event: any) => {
     if (WriteStandardProductExecution(['0', '0', '0', '0'])) {
         event.sender.send('worker-send-standard-write-success')
     }
-    // TODO 写入补偿值失败
+    event.sender.send('worker-send-err-notification', '写入补偿值失败');
 })
 
 // 工作进程对机执行
@@ -542,12 +542,12 @@ on("worker-receive-update-limit", (event: any) => {
     let limit: any;
     GetTestLimit(null, (error: any, result: any) => {
         if (error) {
-            console.log(error)
-            limit = null
+            event.sender.send('worker-send-err-notification', '测试上下限获取失败');
             return
         }
         limit = result
     })
+    if (limit == null) return;
     event.sender.send('worker-send-brake-limit', limit)
 })
 
@@ -556,7 +556,7 @@ on("worker-receive-change-file", (event: any, path: any) => {
     let b: boolean = false;
     ChangeFile(path, (error: any, result: any) => {
         if (error) {
-            console.log(error)
+            event.sender.send('worker-send-err-notification', '更改文件失败');
             return
         }
         b = result
@@ -570,7 +570,7 @@ on("worker-receive-mode", (event: any, mode: any) => {
     let state: boolean = false;
     OpenProofreadingMode(mode, (error: any, result: any) => {
         if (error) {
-            console.log(error)
+            event.sender.send('worker-send-err-notification', '模式设定失败');
             return
         }
         state = result;
@@ -579,7 +579,7 @@ on("worker-receive-mode", (event: any, mode: any) => {
         switch (mode) {
             case 0:
             case 1:
-                event.sender.send('worker-send-calibration-judgmentjudgment', MeasureStart())
+                event.sender.send('worker-send-calibration-judgment', MeasureStart())
                 break
             case 2:
                 event.sender.send('worker-send-compensate-execute')
@@ -589,12 +589,11 @@ on("worker-receive-mode", (event: any, mode: any) => {
 })
 
 // 关闭自动测试
-on("worker-receive-close-auto-test", () => {
-    console.log('关闭自动测试')
+on("worker-receive-close-auto-test", (event) => {
     let b: boolean = false;
     CloseTest(null, (error: any, result: any) => {
         if (error) {
-            console.log(error)
+            event.sender.send('worker-send-err-notification', '关闭自动测试失败');
             return
         }
         b = result
@@ -607,7 +606,7 @@ on("worker-receive-start-auto-test", (event) => {
     let b: boolean = false;
     OpenAutoMode(null, (error: any, result: any) => {
         if (error) {
-            console.log(error)
+            event.sender.send('worker-send-err-notification', '开启自动测试失败');
             return
         }
         b = result;
@@ -616,7 +615,6 @@ on("worker-receive-start-auto-test", (event) => {
         event.sender.send('worker-send-measure-start-judgment', MeasureStart())
         return;
     }
-    // TODO 打开自动测试失败
 })
 
 // 量测开始信号
@@ -632,10 +630,10 @@ on("worker-receive-measure-go", (event: any) => {
 })
 
 // 错误终止
-on("worker-receive-error-stop", () => {
+on("worker-receive-error-stop", (event) => {
     ErrorStop(null, (error: any, result: any) => {
         if (error) {
-            console.log(error)
+            event.sender.send('worker-send-err-notification', '错误终止失败');
             return
         }
         console.log(result)
@@ -653,10 +651,10 @@ on("worker-receive-save", () => {
 })
 
 // 测试头动作
-on("worker-receive-test-head-action", (_, action: any) => {
+on("worker-receive-test-head-action", (event, action: any) => {
     TestHeadPosition(action, (error: any, result: any) => {
         if (error) {
-            console.log(error)
+            event.sender.send('worker-send-err-notification', '测试头动作失败');
             return
         }
         console.log('测试题动作' + result)
@@ -664,10 +662,10 @@ on("worker-receive-test-head-action", (_, action: any) => {
 })
 
 // 手动位置
-on("worker-receive-manual-position", (_, position: any) => {
+on("worker-receive-manual-position", (event, position: any) => {
     ManualPosition(position, (error: any, result: any) => {
         if (error) {
-            console.log(error)
+            event.sender.send('worker-send-err-notification', '手动位置失败');
             return
         }
         console.log('手动位置:' + position + result)
@@ -690,10 +688,10 @@ on("worker-receive-measure-one", (event) => {
 })
 
 // 清除
-on("worker-receive-clear", () => {
+on("worker-receive-clear", (event) => {
     Clear(null, (error: any, result: any) => {
         if (error) {
-            console.log(error)
+            event.sender.send('worker-send-err-notification', '清除失败');
             return
         }
         console.log(result)
@@ -701,10 +699,10 @@ on("worker-receive-clear", () => {
 })
 
 // 开始报警
-on("worker-receive-start-alarm", () => {
+on("worker-receive-start-alarm", (event) => {
     StartAlarm(null, (error: any, result: any) => {
         if (error) {
-            console.log(error)
+            event.sender.send('worker-send-err-notification', '开始报警失败');
             return
         }
         console.log(result)
@@ -712,10 +710,10 @@ on("worker-receive-start-alarm", () => {
 })
 
 // 停止报警
-on("worker-receive-stop-alarm", () => {
+on("worker-receive-stop-alarm", (event) => {
     StopAlarm(null, (error: any, result: any) => {
         if (error) {
-            console.log(error)
+            event.sender.send('worker-send-err-notification', '停止报警失败');
             return
         }
         console.log(result)

@@ -4,6 +4,7 @@ import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
 import {useConfig} from "@/hooks/useConfig.ts";
 import {useEcharts} from "@/hooks/useEcharts.ts";
 import {useHome} from "@/hooks/useHome.ts";
+import {useNotification} from "@/hooks/useNotification.ts";
 
 const {on} = useIpcRenderer()
 
@@ -30,6 +31,7 @@ export function useIpcReceiveEvent() {
     const {addWorkshopOptions, updateManualData} = useConfig();
     const {updateLimitData} = useEcharts();
     const {updateView, writeStartBit, mainTable, initTableData} = useHome();
+    const {errNotification} = useNotification();
 
     // 数据初始化
     on('render-receive-init', (_, {
@@ -283,6 +285,11 @@ export function useIpcReceiveEvent() {
     // 手动量测数据
     on('render-receive-manual-measure-data', (_, data) => {
         updateManualData(data);
+    })
+
+    // 异常通知
+    on('render-receive-err-notification', (_, data) => {
+        errNotification(data);
     })
 
     // // 读取数据表

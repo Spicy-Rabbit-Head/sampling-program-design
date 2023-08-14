@@ -35,7 +35,6 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     // 主窗口关闭
     render.on('close', (e) => {
         e.preventDefault()
-        console.log('关闭前确认')
         auto.value = false;
         render.webContents.send('render-receive-show-close-confirm-dialog')
         // 进行数据保存
@@ -541,6 +540,11 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     // 渲染进程发起停止报警
     ipcMain.on('render-send-stop-alarm', function () {
         worker.webContents.send('worker-receive-stop-alarm');
+    })
+
+    // 异常通知
+    ipcMain.on('worker-send-err-notification', function (_, data) {
+        render.webContents.send('render-receive-err-notification', data)
     })
 
     // // 渲染进程发起数据表读取
