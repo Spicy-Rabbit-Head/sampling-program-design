@@ -36,16 +36,6 @@ export function useConfig() {
         password.value = ""
     }
 
-    // 密码比对
-    function passwordComparison() {
-        if (password.value === "666666") {
-            password.value = ""
-            return true
-        } else {
-            return false
-        }
-    }
-
     // 更新手动数据
     function updateManualData(value: any) {
         manualData.length = 0
@@ -60,7 +50,6 @@ export function useConfig() {
         changePermission,
         visible,
         handleCancel,
-        passwordComparison,
         password,
         manualData,
         updateManualData

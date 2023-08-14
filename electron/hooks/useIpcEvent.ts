@@ -533,6 +533,16 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
         render.webContents.send('render-receive-manual-measure-data', data)
     })
 
+    // 渲染进程发起报警
+    ipcMain.on('render-send-start-alarm', function () {
+        worker.webContents.send('worker-receive-start-alarm');
+    })
+
+    // 渲染进程发起停止报警
+    ipcMain.on('render-send-stop-alarm', function () {
+        worker.webContents.send('worker-receive-stop-alarm');
+    })
+
     // // 渲染进程发起数据表读取
     // ipcMain.on('render-send-read-data-table', function (event, pathName) {
     //     let path = join(__dirname, '../../data', pathName);

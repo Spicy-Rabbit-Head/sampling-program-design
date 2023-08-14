@@ -1,8 +1,12 @@
 import {computed, reactive, ref} from "vue";
 import type {tab} from "@/type/interface.ts";
+import {useEcharts} from "@/hooks/useEcharts.ts";
+import {useIpcSendEvent} from "@/hooks/useIpcSendEvent.ts";
 
 // 主体表格
 const mainTable = reactive<Array<Array<tab>>>([]);
+const {updateData} = useEcharts();
+const {startAlarm, closeAlarm} = useIpcSendEvent();
 
 // 初始化主体表格
 for (let w = 0; w < 11; w++) {
@@ -18,7 +22,6 @@ function initTable(w: number) {
     }
 }
 
-console.log(mainTable)
 // 实时数据
 const realTimeValue = reactive<Array<Array<string>>>([]);
 // 当前列
@@ -27,8 +30,10 @@ const currentColumn = ref<number>(0);
 const currentRow = ref<number>(0);
 // 当前盘号
 const currentPan = ref<number>(0);
-
-
+// 报警触发上限
+const alarmTriggerUpperLimit = ref<number>(0);
+// 报警显示
+const visible = ref<boolean>(false);
 // 料盘选项
 const
     options = [
@@ -88,6 +93,7 @@ export function useHome() {
         }
         if (currentColumn.value == 8) {
             mainTable[0].length = 0;
+            alarmTriggerUpperLimit.value = 0;
             initTable(0);
         }
         // 更新视图
@@ -95,7 +101,6 @@ export function useHome() {
         for (let i = 0; i < data.length; i++) {
             computeStatus(data[i], i)
         }
-        console.log(mainTable)
     }
 
     // 计算状态
@@ -106,22 +111,24 @@ export function useHome() {
                 if (data[i][2] != 'pass')
                     result = Number(data[i][1]) > 0 ? 'F+' : 'F-';
                 updateTableItem(result, index, data)
+                updateData(currentRow.value + index, Number(data[i][1]));
             }
         }
     }
 
     // 更新表格项
     function updateTableItem(result: string, index: number, data: any) {
-        console.log((currentRow.value + index) * 32 + currentColumn.value)
         let style = 't-bg-green-600';
         switch (result) {
             case 'pass':
                 style = "t-bg-green-600";
                 break;
             case 'F+':
+                alarmTriggerUpperLimit.value++;
                 style = "t-bg-red-500";
                 break;
             case 'F-':
+                alarmTriggerUpperLimit.value++;
                 style = "t-bg-blue-500";
                 break;
         }
@@ -130,13 +137,16 @@ export function useHome() {
         mainTable[0][position].class = style;
         mainTable[currentPan.value][position].data = data;
         mainTable[0][position].data = data;
+        if (alarmTriggerUpperLimit.value > 10) {
+            startAlarm();
+            visible.value = true;
+        }
     }
 
     // 更新实时数据
     function updateRealTimeValue(data: any) {
         realTimeValue.length = 0
         realTimeValue.push(...data)
-        console.log(realTimeValue[0])
     }
 
     // 写入起始位置
@@ -158,6 +168,13 @@ export function useHome() {
         }
     }
 
+    // 清除报警
+    function stopAlarm() {
+        alarmTriggerUpperLimit.value = 0;
+        closeAlarm();
+        console.log(alarmTriggerUpperLimit.value)
+    }
+
     return {
         mainTable,
         select,
@@ -172,5 +189,7 @@ export function useHome() {
         realTimeValue,
         writeStartBit,
         initTableData,
+        visible,
+        stopAlarm,
     }
 }

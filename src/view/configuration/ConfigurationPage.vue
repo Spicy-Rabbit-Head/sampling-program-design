@@ -8,6 +8,7 @@ import {useHome} from "@/hooks/useHome.ts";
 import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
 import {useConfigStore} from "@/store";
 import {PositionInterface} from "@/type/interface.ts";
+import {useNotification} from "naive-ui";
 
 const {
   readModifiableConfigurations,
@@ -31,7 +32,6 @@ const {
   comparisonSuccess,
   exitPermission,
   visible,
-  passwordComparison,
   password,
   handleCancel,
   manualData,
@@ -60,6 +60,29 @@ const passwordInput = ref();
 // 获取焦点
 function gainFocus() {
   passwordInput.value.focus();
+}
+
+// 通知
+const {error} = useNotification();
+
+// 错误通知
+function errorNotification(message: string) {
+  error({
+    title: '错误',
+    content: message,
+    duration: 5000,
+  });
+}
+
+// 密码比对
+function passwordComparison() {
+  if (password.value === "666666") {
+    password.value = ""
+    return true
+  } else {
+    errorNotification("密码错误")
+    return false
+  }
 }
 
 </script>

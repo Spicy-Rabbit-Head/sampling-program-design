@@ -1,20 +1,26 @@
 <script setup lang="ts">
 
 
-import {onMounted, reactive, ref} from "vue";
+import {computed, onMounted, reactive, ref} from "vue";
 
 const trialSettingSwitch = ref(false)
-const trialSettingMode = ref<string>()
-const bit = reactive({
-  start: 0,
-  end: 768
+const column = reactive<Array<number>>([])
+const computedColumn = computed(() => {
+  return column.slice(startColumn.value - 8, column.length)
 })
-const column = reactive<Array<string>>([])
-const item = ref(true)
+
+const startColumn = ref<number>(8);
+const stopColumn = ref<number>();
+
+function scopeOfJudgment(index: any) {
+  stopColumn.value = index;
+}
+
+const item = ref(false)
 onMounted(() => {
   column.length = 0
-  for (let i = 0; i < 32; i++) {
-    column.push('第 ' + (i + 1) + ' 列')
+  for (let i = 8; i <= 32; i++) {
+    column.push(i)
   }
 })
 
@@ -29,29 +35,16 @@ onMounted(() => {
         </n-button>
         <n-button type="warning" :disabled="!trialSettingSwitch || item" @click.stop="trialSettingSwitch = false">停止试调
         </n-button>
-        <a-select v-model:model-value="trialSettingMode" :options="['位模式','列模式']" placeholder="选择模式"
-                  :disabled="item"/>
-        <a-input-group v-if="trialSettingMode == '位模式'">
-          <a-input-number v-model:model-value="bit.start" :min="0" :max="768" :disabled="item">
-            <template #prepend>
-              起始位
-            </template>
-          </a-input-number>
-          <a-input-number v-model:model-value="bit.end" :min="bit.start" :max="768" :disabled="item">
-            <template #prepend>
-              结束位
-            </template>
-          </a-input-number>
-        </a-input-group>
-        <a-input-group v-else>
-          <a-select :options="column" placeholder="" :disabled="item">
+        <a-input-group>
+          <a-select v-model:model-value="startColumn" :options="column" placeholder="" :disabled="item"
+                    @change="scopeOfJudgment">
             <template #prefix>
-              起始
+              起始列
             </template>
           </a-select>
-          <a-select :options="column" placeholder="" :disabled="item">
+          <a-select v-model:model-value="stopColumn" :options="computedColumn" placeholder="" :disabled="item">
             <template #prefix>
-              结束
+              结束列
             </template>
           </a-select>
         </a-input-group>

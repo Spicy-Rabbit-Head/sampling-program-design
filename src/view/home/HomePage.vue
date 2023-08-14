@@ -10,7 +10,9 @@ const {
   mainTable,
   selectPass,
   select,
-  optionsValue
+  optionsValue,
+  visible,
+  stopAlarm,
 } = useHome();
 
 const {
@@ -56,6 +58,15 @@ onMounted(() => {
     <div class="t-w-[300px] t-flex-none t-ml-1 t-flex t-flex-col">
       <side-bar/>
     </div>
+    <a-modal v-model:visible="visible" :closable="false" hideCancel :maskClosable="false" :escToClose="false"
+             @ok="stopAlarm" :okText="'清除警报并重置'">
+      <template #title>
+        量测异常
+      </template>
+      <div>
+        当前盘量测不良品超过设定值上限，请检查!
+      </div>
+    </a-modal>
   </div>
 </template>
 

@@ -626,6 +626,7 @@ on("worker-receive-measure-start", (event: any) => {
 
 // 量测
 on("worker-receive-measure-go", (event: any) => {
+    event.sender.send('worker-send-start-position', StartPosition())
     event.sender.send('worker-send-measure-data', MeasureOneGroupExecution())
     MeasureEnd();
 })
@@ -675,8 +676,8 @@ on("worker-receive-manual-position", (_, position: any) => {
 
 // 一次量测
 on("worker-receive-measure-one", (event) => {
-    // event.sender.send('worker-send-start-position', StartPosition())
-    event.sender.send('worker-send-start-position', [8, 0, 1])
+    // event.sender.send('worker-send-start-position', [10, 0, 1])
+    // event.sender.send('worker-send-measure-data', [8, 0, 1])
     // event.sender.send('worker-send-measure-data', MeasureOneGroupExecution())
     event.sender.send('render-send-manual-measure-data', MeasureOneGroupExecution())
     // SingleTest(null, (error: any, result: any) => {
@@ -691,6 +692,28 @@ on("worker-receive-measure-one", (event) => {
 // 清除
 on("worker-receive-clear", () => {
     Clear(null, (error: any, result: any) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+        console.log(result)
+    })
+})
+
+// 开始报警
+on("worker-receive-start-alarm", () => {
+    StartAlarm(null, (error: any, result: any) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+        console.log(result)
+    })
+})
+
+// 停止报警
+on("worker-receive-stop-alarm", () => {
+    StopAlarm(null, (error: any, result: any) => {
         if (error) {
             console.log(error)
             return

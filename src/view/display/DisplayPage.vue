@@ -14,7 +14,7 @@ for (let i = 0; i < 24; i++) {
   });
 }
 
-const {globalOptions, subitemOptions, lineNumber, addRandomData} = useEcharts();
+const {globalOptions, subitemOptions, lineNumber} = useEcharts();
 const {updateTestDataLimit} = useIpcSendEvent();
 // 图表实例
 const globalChart = ref<any>(null);
@@ -38,9 +38,9 @@ function handleResize() {
 }
 
 // 定时添加数据
-setInterval(() => {
-  addRandomData();
-}, 10000);
+// setInterval(() => {
+//   addRandomData();
+// }, 10000);
 
 const loading = ref<boolean>(false);
 

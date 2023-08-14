@@ -197,6 +197,16 @@ export function useIpcSendEvent() {
         send('render-send-set-store', 'verificationDeviationUpperLimit', value);
     }
 
+    // 启动报警
+    function startAlarm() {
+        send('render-send-start-alarm');
+    }
+
+    // 关闭报警
+    function closeAlarm() {
+        send('render-send-stop-alarm');
+    }
+
     return {
         renderThreadInitialization,
         dllInitialization,
@@ -231,5 +241,7 @@ export function useIpcSendEvent() {
         compensationDeviationUpdate,
         proofreadingDeviationUpdate,
         initMeasure,
+        startAlarm,
+        closeAlarm,
     }
 }
