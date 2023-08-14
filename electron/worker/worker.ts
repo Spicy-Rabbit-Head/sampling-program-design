@@ -302,9 +302,9 @@ function TestOneGroupExecution() {
 }
 
 // 一次对机测试
-function TestOneProofreadingExecution() {
+function TestOneProofreadingExecution(index: any) {
     let i: any;
-    MeasureAndReturn(null, (error: any, result: any) => {
+    MeasureAndReturn(index, (error: any, result: any) => {
         if (error) {
             console.log(error)
             return
@@ -352,7 +352,7 @@ function MeasureStart() {
             state = result;
         }
     })
-    return true;
+    return state;
 }
 
 
@@ -511,9 +511,9 @@ on("worker-receive-compensate-execute", (event: any) => {
 })
 
 // 工作进程对机执行
-on("worker-receive-verify-execute", (event: any) => {
+on("worker-receive-verify-execute", (event: any, index) => {
     // event.sender.send('worker-send-reverification-result', TestOneGroupExecution())
-    event.sender.send('worker-send-docking-data', TestOneProofreadingExecution())
+    event.sender.send('worker-send-docking-data', TestOneProofreadingExecution(index))
     MeasureEnd();
 })
 
@@ -532,8 +532,8 @@ on("worker-receive-reverification-start", (event: any) => {
 })
 
 // 工作进验证补偿
-on("worker-receive-reverification-execute", (event: any) => {
-    event.sender.send('worker-send-reverification-result', TestOneProofreadingExecution())
+on("worker-receive-reverification-execute", (event: any, index) => {
+    event.sender.send('worker-send-reverification-result', TestOneProofreadingExecution(index))
     MeasureEnd();
 })
 
@@ -579,7 +579,7 @@ on("worker-receive-mode", (event: any, mode: any) => {
         switch (mode) {
             case 0:
             case 1:
-                event.sender.send('worker-send-calibration-judgment', MeasureStart())
+                event.sender.send('worker-send-calibration-judgmentjudgment', MeasureStart())
                 break
             case 2:
                 event.sender.send('worker-send-compensate-execute')

@@ -320,7 +320,7 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
         if (auto.value == false) return;
         if (i) {
             console.log('进行对机...')
-            event.reply('worker-receive-verify-execute')
+            event.reply('worker-receive-verify-execute', checkTheMachineSteps.value)
         } else {
             console.log('等待对机中...')
             event.reply('worker-receive-verify-start')
@@ -388,7 +388,7 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
         if (auto.value == false) return;
         if (i) {
             console.log('进行再次验证...')
-            event.reply('worker-receive-reverification-execute')
+            event.reply('worker-receive-reverification-execute', checkTheMachineSteps.value)
         } else {
             console.log('等待再次验证中...')
             event.reply('worker-receive-reverification-start')

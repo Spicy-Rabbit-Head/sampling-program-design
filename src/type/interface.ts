@@ -38,10 +38,10 @@ export type WindowCache = {
 
 // 步骤
 export type Step = {
-    current: number
-    currentStatus: StepsProps['status']
-    name: string
-    content: {
+    current?: number
+    currentStatus?: StepsProps['status']
+    name?: string
+    content?: {
         name: string
         content: string
     }[]
