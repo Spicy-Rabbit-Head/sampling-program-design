@@ -16,6 +16,9 @@ module.exports = {
             fontFamily: {
                 'noto': ['NotoSerif'],
             },
+            gridTemplateRows: {
+                '12': 'repeat(12, minmax(0, 1fr))',
+            }
         },
     },
     corePlugins: {

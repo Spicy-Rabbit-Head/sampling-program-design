@@ -11,13 +11,13 @@ const computedColumn = computed(() => {
 })
 
 const startColumn = ref<number>(8);
-const stopColumn = ref<number>();
+const stopColumn = ref<number>(8);
 
 function scopeOfJudgment(index: any) {
   stopColumn.value = index;
 }
 
-const item = ref(true)
+const item = ref(false)
 onMounted(() => {
   column.length = 0
   for (let i = 8; i <= 32; i++) {
@@ -49,12 +49,14 @@ function initStep() {
 
 initStep()
 
+const brakingPoint = reactive<Array<number>>([])
+
 </script>
 
 <template>
   <div class="t-h-full t-flex t-flex-col">
     <div class="t-flex">
-      <div class="t-w-[320px] t-p-2 t-border-2 t-m-4 t-rounded-md t-flex t-flex-col t-gap-4">
+      <div class="t-w-[320px] t-p-2 t-border-2 t-m-4 t-rounded-md t-flex t-flex-col t-gap-10">
         <n-button type="primary" :disabled="trialSettingSwitch || item" @click.stop="trialSettingSwitch = true">
           开始试调并计算刹车点
         </n-button>
@@ -80,8 +82,16 @@ initStep()
         </a-steps>
       </div>
     </div>
-    <div class="t-flex-auto t-bg-blue-500">
-      3
+    <div class="t-flex-auto t-grid t-grid-cols-3">
+      <div class="t-col-span-2 t-bg-blue-500">
+        1
+      </div>
+      <div class="t-m-2 t-p-2 t-border-2 t-rounded-md t-grid t-grid-rows-12 t-grid-flow-col t-gap-2">
+        <div class="t-flex t-border-2 t-rounded-md" v-for="item in 24" :key="item">
+          <p class="t-border-r-2 t-flex t-items-center t-justify-center t-w-1/5">{{ item }}</p>
+          <p class="t-flex t-flex-auto t-items-center t-justify-center">{{ brakingPoint[item - 1] }}</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
