@@ -74,13 +74,22 @@ export const useGlobalStore = defineStore('GlobalStore', {
         calculatedComplement(data: string, index: number): string | null {
             let value =
                 parseFloat((parseFloat(this.outputDisplay[1].value) - parseFloat(data)).toFixed(2))
-            if (value > useConfigStore().compensationDeviationUpperLimit) {
+            if (this.judgeComplementRange(value)) {
                 updateDataBase(1, index, false, value.toString())
                 return null
             } else {
                 updateDataBase(1, index, true, value.toString())
             }
             return value.toString();
+        },
+        // 判断补偿值是否在范围内
+        judgeComplementRange(number: number): boolean {
+            // 计算目标值的上限和下限
+            let upperLimit = parseFloat(this.outputDisplay[1].value) + useConfigStore().compensationDeviationUpperLimit;
+            let lowerLimit = parseFloat(this.outputDisplay[1].value) - useConfigStore().compensationDeviationUpperLimit;
+
+            // 判断 number 是否在范围内
+            return number >= lowerLimit && number <= upperLimit;
         },
         // 计算差值判断
         calculateDifference(data: string, index: number) {
