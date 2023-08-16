@@ -1,62 +1,26 @@
 <script setup lang="ts">
+import {useTrialSetting} from "@/hooks/useTrialSetting.ts";
 
+const {
+  trialSettingSwitch,
+  steps,
+  columns,
+  data,
+  scopeOfJudgment,
+  startColumn,
+  column,
+  computedColumn,
+  item,
+  stopColumn
+} = useTrialSetting();
 
-import {computed, onMounted, reactive, ref} from "vue";
-import {Step} from "@/type/interface.ts";
-
-const trialSettingSwitch = ref(false)
-const column = reactive<Array<number>>([])
-const computedColumn = computed(() => {
-  return column.slice(startColumn.value - 8, column.length)
-})
-
-const startColumn = ref<number>(8);
-const stopColumn = ref<number>(8);
-
-function scopeOfJudgment(index: any) {
-  stopColumn.value = index;
-}
-
-const item = ref(false)
-onMounted(() => {
-  column.length = 0
-  for (let i = 8; i <= 32; i++) {
-    column.push(i)
-  }
-})
-
-const steps = reactive<Step>({});
-
-function initStep() {
-  steps.name = '试调'
-  steps.current = 0
-  steps.currentStatus = 'process'
-  steps.content = [
-    {
-      name: '等待量测文本',
-      content: '等待中'
-    },
-    {
-      name: '计算刹车点',
-      content: '等待中'
-    },
-    {
-      name: '展示结果',
-      content: '等待中'
-    }
-  ]
-}
-
-initStep()
-
-const brakingPoint = reactive<Array<number>>([])
 
 </script>
 
 <template>
-  <div class="t-h-full t-flex t-flex-col">
-    <div class="t-flex">
-      <div class="t-w-[320px] t-p-2 t-border-2 t-m-4 t-rounded-md t-flex t-flex-col t-gap-10">
+  <div class="t-h-full t-w-full">
+    <div class="t-flex t-h-1/4">
+      <div class="t-w-[320px] t-p-2 t-border-2 t-m-4 t-rounded-md t-flex t-flex-col t-gap-4">
         <n-button type="primary" :disabled="trialSettingSwitch || item" @click.stop="trialSettingSwitch = true">
           开始试调并计算刹车点
         </n-button>
@@ -82,16 +46,9 @@ const brakingPoint = reactive<Array<number>>([])
         </a-steps>
       </div>
     </div>
-    <div class="t-flex-auto t-grid t-grid-cols-3">
-      <div class="t-col-span-2 t-bg-blue-500">
-        1
-      </div>
-      <div class="t-m-2 t-p-2 t-border-2 t-rounded-md t-grid t-grid-rows-12 t-grid-flow-col t-gap-2">
-        <div class="t-flex t-border-2 t-rounded-md" v-for="item in 24" :key="item">
-          <p class="t-border-r-2 t-flex t-items-center t-justify-center t-w-1/5">{{ item }}</p>
-          <p class="t-flex t-flex-auto t-items-center t-justify-center">{{ brakingPoint[item - 1] }}</p>
-        </div>
-      </div>
+    <div class="t-h-3/4">
+      <a-table :scroll="{y:'100%'}" :columns="columns" :data="data" :pagination="false"
+               table-layout-fixed :bordered="{cell:true}"/>
     </div>
   </div>
 </template>

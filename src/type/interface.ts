@@ -41,10 +41,10 @@ export type Step = {
     current?: number
     currentStatus?: StepsProps['status']
     name?: string
-    content?: {
+    content: Array<{
         name: string
         content: string
-    }[]
+    }>
 }
 
 // 全局共享
