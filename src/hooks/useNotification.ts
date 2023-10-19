@@ -1,8 +1,20 @@
-import {Notification} from '@arco-design/web-vue';
+import { createDiscreteApi, } from 'naive-ui';
+
+const {notification} = createDiscreteApi(
+    ['notification']
+)
 
 function errNotification(content: string) {
-    Notification.error({
+    notification.error({
         title: '异常',
+        content: content,
+        duration: 3000,
+    });
+}
+
+function successNotification(content: string) {
+    notification.success({
+        title: '成功',
         content: content,
         duration: 3000,
     });
@@ -11,6 +23,7 @@ function errNotification(content: string) {
 
 export function useNotification() {
     return {
-        errNotification
+        errNotification,
+        successNotification
     }
 }

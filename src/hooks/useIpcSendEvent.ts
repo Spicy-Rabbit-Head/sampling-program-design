@@ -207,6 +207,11 @@ export function useIpcSendEvent() {
         send('render-send-stop-alarm');
     }
 
+    // 验证PLC状态
+    function verificationPLCStatus() {
+        send('render-send-verification-plc-status');
+    }
+
     return {
         renderThreadInitialization,
         dllInitialization,
@@ -243,5 +248,6 @@ export function useIpcSendEvent() {
         initMeasure,
         startAlarm,
         closeAlarm,
+        verificationPLCStatus
     }
 }

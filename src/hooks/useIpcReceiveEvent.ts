@@ -1,10 +1,10 @@
-import {useConfigStore, useGlobalStore} from "@/store";
-import {useIpcRenderer} from "@vueuse/electron";
-import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
-import {useConfig} from "@/hooks/useConfig.ts";
-import {useEcharts} from "@/hooks/useEcharts.ts";
-import {useHome} from "@/hooks/useHome.ts";
-import {useNotification} from "@/hooks/useNotification.ts";
+import { useConfigStore, useGlobalStore } from "@/store";
+import { useIpcRenderer } from "@vueuse/electron";
+import { useProofreadingMachine } from "@/hooks/useProofreadingMachine.ts";
+import { useConfig } from "@/hooks/useConfig.ts";
+import { useEcharts } from "@/hooks/useEcharts.ts";
+import { useHome } from "@/hooks/useHome.ts";
+import { useNotification } from "@/hooks/useNotification";
 
 const {on} = useIpcRenderer()
 
@@ -31,8 +31,7 @@ export function useIpcReceiveEvent() {
     const {addWorkshopOptions, updateManualData} = useConfig();
     const {updateLimitData} = useEcharts();
     const {updateView, writeStartBit, mainTable, initTableData} = useHome();
-    const {errNotification} = useNotification();
-
+    const {successNotification, errNotification} = useNotification();
     // 数据初始化
     on('render-receive-init', (_, {
         currentCalibrationMode,
@@ -287,9 +286,25 @@ export function useIpcReceiveEvent() {
         updateManualData(data);
     })
 
-    // 异常通知
-    on('render-receive-err-notification', (_, data) => {
-        errNotification(data);
+    // PLC连接状态
+    on('render-receive-plc-status', (_, data) => {
+        if (data == true) {
+            successNotification('PLC连接正常')
+        } else {
+            errNotification('PLC连接异常')
+        }
+    })
+
+    // 消息通知
+    on('render-receive-notification-error', (_, data) => {
+        console.log(data)
+        errNotification(data)
+    })
+
+    // 消息通知
+    on('render-receive-notification-success', (_, data) => {
+        console.log(data)
+        successNotification(data)
     })
 
     // // 读取数据表

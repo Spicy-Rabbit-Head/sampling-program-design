@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import IconAntDesignControlOutlined from "~icons/ant-design/control-outlined"
 import IconAntDesignDeleteRowOutlined from "~icons/ant-design/delete-row-outlined"
-import {onMounted, ref} from "vue";
-import {useIpcSendEvent} from "@/hooks/useIpcSendEvent.ts";
-import {useConfig} from "@/hooks/useConfig.ts";
-import {useHome} from "@/hooks/useHome.ts";
-import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
-import {useConfigStore} from "@/store";
-import {PositionInterface} from "@/type/interface.ts";
-import {useNotification} from "naive-ui";
+import { onMounted, ref } from "vue";
+import { useIpcSendEvent } from "@/hooks/useIpcSendEvent.ts";
+import { useConfig } from "@/hooks/useConfig.ts";
+import { useHome } from "@/hooks/useHome.ts";
+import { useProofreadingMachine } from "@/hooks/useProofreadingMachine.ts";
+import { useConfigStore } from "@/store";
+import { PositionInterface } from "@/type/interface.ts";
+import { useNotification } from "naive-ui";
 
 const {
   readModifiableConfigurations,
@@ -23,6 +23,7 @@ const {
   clearMeasureData,
   compensationDeviationUpdate,
   proofreadingDeviationUpdate,
+  verificationPLCStatus,
 } = useIpcSendEvent();
 
 
@@ -167,13 +168,13 @@ function passwordComparison() {
           <div class="t-col-span-2">
             <p class="t-mb-1">测试头动作 :</p>
             <a-button-group>
-              <a-button type="primary" @click.stop="testHeadAction(0)" :disabled="!changePermission">
+              <a-button type="primary" @click.stop="testHeadAction(2)" :disabled="!changePermission">
                 测试头上位
               </a-button>
               <a-button type="primary" @click.stop="testHeadAction(1)" :disabled="!changePermission">
                 测试头下位
               </a-button>
-              <a-button type="primary" @click.stop="testHeadAction(2)" :disabled="!changePermission">
+              <a-button type="primary" @click.stop="testHeadAction(0)" :disabled="!changePermission">
                 测试头间距移动
               </a-button>
             </a-button-group>
@@ -207,10 +208,16 @@ function passwordComparison() {
               </a-button>
             </a-button-group>
           </div>
-          <div class="t-col-span-2">
+          <div>
             <p class="t-mb-1">量测 :</p>
             <a-button type="primary" status="success" :disabled="!changePermission" @click.stop="onceMeasure">
               一次测试
+            </a-button>
+          </div>
+          <div>
+            <p class="t-mb-1">验证 :</p>
+            <a-button type="primary" status="success" :disabled="!changePermission" @click.stop="verificationPLCStatus">
+              验证PLC链接状态
             </a-button>
           </div>
           <div>

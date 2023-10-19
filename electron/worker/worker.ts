@@ -3,7 +3,7 @@
 // const {join, resolve} = require('path');
 const {func} = require('electron-edge-js');
 const {join, resolve} = require('path');
-import {useIpcRenderer} from "@vueuse/electron";
+import { useIpcRenderer } from "@vueuse/electron";
 
 
 let environment: any;
@@ -225,18 +225,33 @@ const MeasureAndReturn = func({
     methodName: "MeasureAndReturn",
 })
 
+// 验证PLC状态
+const VerificationPLCStatus = func({
+    assemblyFile: url,
+    typeName: "Measurement.Entrance",
+    methodName: "VerifyPlcConnection",
+})
+
 // 服务初始化启动
 function ServiceInit(port: string) {
     Init(port, (error: any, result: any) => {
         if (error) {
-            console.log(error)
+            send('worker-send-dll-error', '服务初始化失败')
             return
         }
-        console.log(result);
+        if (result == true) {
+            send('worker-send-dll-success', '服务初始化成功')
+        } else {
+            send('worker-send-dll-error', '服务初始化失败')
+        }
     })
     OpenMeasuringProgram(null, (error: any, result: any) => {
-        if (error) throw error;
-        console.log(result);
+        if (error) send('worker-send-dll-error', '250B启动异常')
+        if (result == true) {
+            send('worker-send-dll-success', '250B启动成功')
+        } else {
+            send('worker-send-dll-error', '250B启动异常')
+        }
     })
 }
 
@@ -244,10 +259,14 @@ function ServiceInit(port: string) {
 function ServiceStop() {
     CloseMeasuringProgram(null, (error: any, result: any) => {
         if (error) {
-            console.log(error)
+            send('worker-send-dll-error', '250B异常')
             return
         }
-        console.log(result);
+        if (result == true) {
+            send('worker-send-dll-success', '250B停止成功')
+        } else {
+            send('worker-send-dll-error', '250B停止异常')
+        }
     })
 }
 
@@ -263,6 +282,7 @@ function StandardProductQuery(path: string, pn: string, location: string, passwo
     GetStandardProductData(data, (error: any, result: any) => {
         if (error) {
             portList = null
+            send('worker-send-dll-error', '标品数据查询失败');
             return
         }
         portList = result
@@ -306,7 +326,7 @@ function TestOneProofreadingExecution(index: any) {
     let i: any;
     MeasureAndReturn(index, (error: any, result: any) => {
         if (error) {
-            console.log(error)
+            send('worker-send-dll-error', '一次对机测试失败');
             return
         }
         i = result;
@@ -319,7 +339,7 @@ function MeasureOneGroupExecution() {
     let i: any;
     TestOneGroupData(null, (error: any, result: any) => {
         if (error) {
-            console.log(error)
+            send('worker-send-dll-error', '量测一组失败');
             return
         }
         i = result;
@@ -346,7 +366,7 @@ function MeasureStart() {
     let state: boolean = false;
     ReadMeasureStart(null, (error: any, result: any) => {
         if (error) {
-            console.log(error)
+            send('worker-send-dll-error', '读取量测开始信号失败');
         }
         if (result) {
             state = result;
@@ -361,7 +381,7 @@ function MeasureEnd() {
     let status: boolean = false;
     WriteMeasureEnd(null, (error: any, result: any) => {
         if (error) {
-            console.log(error)
+            send('worker-send-dll-error', '输出量测结束信号失败');
             return
         }
         status = result;
@@ -374,7 +394,7 @@ function ExecutionSave() {
     let state: boolean = false;
     SaveFile(null, (error: any, result: any) => {
         if (error) {
-            console.log(error)
+            send('worker-send-dll-error', '保存失败');
         }
         state = result;
     })
@@ -386,11 +406,10 @@ function RefreshInstance(number: string) {
     let state: boolean = false;
     RefreshApplication(number, (error: any, result: any) => {
         if (error) {
-            console.log(error)
+            send('worker-send-dll-error', '刷新实例失败');
         }
         state = result;
     })
-    console.log('刷新实例' + state)
     return state;
 }
 
@@ -399,29 +418,26 @@ function StartPosition() {
     let position: Array<number> = [];
     CurrentColumn(null, (error: any, result: any) => {
         if (error) {
-            console.log(error)
+            send('worker-send-dll-error', '当前列获取失败');
         }
-        console.log("当前列:" + result)
         position.push(result)
     })
     CurrentPosition(null, (error: any, result: any) => {
         if (error) {
-            console.log(error)
+            send('worker-send-dll-error', '当前位置获取失败');
         }
-        console.log("当前位置:" + result)
         position.push(result)
     })
     QueryDisk(null, (error: any, result: any) => {
         if (error) {
-            console.log(error)
+            send('worker-send-dll-error', '当前盘号获取失败')
         }
-        console.log("当前盘号:" + result)
         position.push(result)
     })
     return position;
 }
 
-const {on} = useIpcRenderer();
+const {on, send} = useIpcRenderer();
 
 // 工作进程服务停止
 on("worker-receive-stop-service", (event: any) => {
@@ -440,7 +456,7 @@ on("worker-receive-standard-query", (event: any, path: any, pn: any, location: a
     if (dataList == null) {
         // 工作进程标品数据查询失败
         event.sender.send('worker-send-standard-query-error')
-        event.sender.send('worker-send-err-notification', '标品数据查询失败');
+        event.sender.send('worker-send-dll-error', '标品数据查询失败');
     } else {
         // 工作进程标品数据查询成功
         event.sender.send('worker-send-standard-query-success', dataList)
@@ -467,14 +483,14 @@ on("worker-receive-calibration-execute", (event: any, step: any, fixture: any) =
         let state: boolean = false;
         SaveCalibrationData(null, (error: any, result: any) => {
             if (error) {
-                console.log(error)
+                send('worker-send-dll-error', '保存校对机数据失败');
                 return
             }
             state = result;
         })
         WriteOpenEnd(null, (error: any, result: any) => {
             if (error) {
-                console.log(error)
+                send('worker-send-dll-error', '输出开路完成信号失败');
                 state = false;
                 return
             }
@@ -492,11 +508,6 @@ on("worker-receive-calibration-execute", (event: any, step: any, fixture: any) =
     event.sender.send('worker-send-step-success', step)
 })
 
-// // 验证开始信号
-// on("worker-receive-validation-start", (event: any) => {
-//     event.sender.send('worker-send-validation-judgment', MeasureStart())
-// })
-
 // 对机开始信号
 on("worker-receive-verify-start", (event: any) => {
     event.sender.send('worker-send-verify-judgment', MeasureStart())
@@ -507,7 +518,7 @@ on("worker-receive-compensate-execute", (event: any) => {
     if (WriteStandardProductExecution(['0', '0', '0', '0'])) {
         event.sender.send('worker-send-standard-write-success')
     }
-    event.sender.send('worker-send-err-notification', '写入补偿值失败');
+    event.sender.send('worker-send-dll-error', '写入补偿值失败');
 })
 
 // 工作进程对机执行
@@ -542,7 +553,7 @@ on("worker-receive-update-limit", (event: any) => {
     let limit: any;
     GetTestLimit(null, (error: any, result: any) => {
         if (error) {
-            event.sender.send('worker-send-err-notification', '测试上下限获取失败');
+            event.sender.send('worker-send-dll-error', '测试上下限获取失败');
             return
         }
         limit = result
@@ -556,7 +567,7 @@ on("worker-receive-change-file", (event: any, path: any) => {
     let b: boolean = false;
     ChangeFile(path, (error: any, result: any) => {
         if (error) {
-            event.sender.send('worker-send-err-notification', '更改文件失败');
+            event.sender.send('worker-send-dll-error', '更改文件失败');
             return
         }
         b = result
@@ -570,7 +581,7 @@ on("worker-receive-mode", (event: any, mode: any) => {
     let state: boolean = false;
     OpenProofreadingMode(mode, (error: any, result: any) => {
         if (error) {
-            event.sender.send('worker-send-err-notification', '模式设定失败');
+            event.sender.send('worker-send-dll-error', '模式设定失败');
             return
         }
         state = result;
@@ -593,7 +604,7 @@ on("worker-receive-close-auto-test", (event) => {
     let b: boolean = false;
     CloseTest(null, (error: any, result: any) => {
         if (error) {
-            event.sender.send('worker-send-err-notification', '关闭自动测试失败');
+            event.sender.send('worker-send-dll-error', '关闭自动测试失败');
             return
         }
         b = result
@@ -606,7 +617,7 @@ on("worker-receive-start-auto-test", (event) => {
     let b: boolean = false;
     OpenAutoMode(null, (error: any, result: any) => {
         if (error) {
-            event.sender.send('worker-send-err-notification', '开启自动测试失败');
+            event.sender.send('worker-send-dll-error', '开启自动测试失败');
             return
         }
         b = result;
@@ -633,7 +644,7 @@ on("worker-receive-measure-go", (event: any) => {
 on("worker-receive-error-stop", (event) => {
     ErrorStop(null, (error: any, result: any) => {
         if (error) {
-            event.sender.send('worker-send-err-notification', '错误终止失败');
+            event.sender.send('worker-send-dll-error', '错误终止失败');
             return
         }
         console.log(result)
@@ -654,10 +665,10 @@ on("worker-receive-save", () => {
 on("worker-receive-test-head-action", (event, action: any) => {
     TestHeadPosition(action, (error: any, result: any) => {
         if (error) {
-            event.sender.send('worker-send-err-notification', '测试头动作失败');
+            event.sender.send('worker-send-dll-error', '测试头动作失败');
             return
         }
-        console.log('测试题动作' + result)
+        console.log('测试头动作' + result)
     })
 })
 
@@ -665,7 +676,7 @@ on("worker-receive-test-head-action", (event, action: any) => {
 on("worker-receive-manual-position", (event, position: any) => {
     ManualPosition(position, (error: any, result: any) => {
         if (error) {
-            event.sender.send('worker-send-err-notification', '手动位置失败');
+            event.sender.send('worker-send-dll-error', '手动位置失败');
             return
         }
         console.log('手动位置:' + position + result)
@@ -691,7 +702,7 @@ on("worker-receive-measure-one", (event) => {
 on("worker-receive-clear", (event) => {
     Clear(null, (error: any, result: any) => {
         if (error) {
-            event.sender.send('worker-send-err-notification', '清除失败');
+            event.sender.send('worker-send-dll-error', '清除失败');
             return
         }
         console.log(result)
@@ -702,7 +713,7 @@ on("worker-receive-clear", (event) => {
 on("worker-receive-start-alarm", (event) => {
     StartAlarm(null, (error: any, result: any) => {
         if (error) {
-            event.sender.send('worker-send-err-notification', '开始报警失败');
+            event.sender.send('worker-send-dll-error', '开始报警失败');
             return
         }
         console.log(result)
@@ -713,10 +724,21 @@ on("worker-receive-start-alarm", (event) => {
 on("worker-receive-stop-alarm", (event) => {
     StopAlarm(null, (error: any, result: any) => {
         if (error) {
-            event.sender.send('worker-send-err-notification', '停止报警失败');
+            event.sender.send('worker-send-dll-error', '停止报警失败');
             return
         }
         console.log(result)
+    })
+})
+
+// 验证PLC状态
+on("worker-receive-verification-plc-status", (event) => {
+    VerificationPLCStatus(null, (error: any, result: any) => {
+        if (error) {
+            event.sender.send('worker-send-plc-status', result);
+            return
+        }
+        event.sender.send('worker-send-plc-status', result);
     })
 })
 

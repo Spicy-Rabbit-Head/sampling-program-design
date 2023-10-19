@@ -1,12 +1,12 @@
-import {BrowserWindow, ipcMain, dialog} from "electron";
-import {SelectOption} from "naive-ui";
+import { BrowserWindow, ipcMain, dialog } from "electron";
+import { SelectOption } from "naive-ui";
 
 const Store = require('electron-store');
 const ini = require('ini');
 import fs from 'fs';
-import {join} from "path";
-import {LocalStoreInterface} from "../interface";
-import {ref} from "vue";
+import { join } from "path";
+import { LocalStoreInterface } from "../interface";
+import { ref } from "vue";
 
 // 自动测试状态
 const auto = ref<boolean>(false);
@@ -330,7 +330,7 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     ipcMain.on('worker-send-step-success', function (_, step) {
         if (step === 2) {
             if (localStore.get('proofreadingOperationMode') == 0) {
-                worker.webContents.send('worker-receive-validation-start')
+                worker.webContents.send('worker-receive-verify-start')
                 return;
             }
             steps.value = 0;
@@ -542,9 +542,24 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
         worker.webContents.send('worker-receive-stop-alarm');
     })
 
-    // 异常通知
-    ipcMain.on('worker-send-err-notification', function (_, data) {
-        render.webContents.send('render-receive-err-notification', data)
+    // 验证PLC状态
+    ipcMain.on('render-send-verification-plc-status', function () {
+        return worker.webContents.send('worker-receive-verification-plc-status')
+    })
+
+    // PLC状态
+    ipcMain.on('worker-send-plc-status', function (_, data) {
+        render.webContents.send('render-receive-plc-status', data)
+    })
+
+    // 消息通知
+    ipcMain.on('worker-send-dll-success', function (_, data) {
+        render.webContents.send('render-receive-notification-success', data)
+    })
+
+    // 消息通知
+    ipcMain.on('worker-send-dll-error', function (_, data) {
+        render.webContents.send('render-receive-notification-error', data)
     })
 
     // // 渲染进程发起数据表读取
