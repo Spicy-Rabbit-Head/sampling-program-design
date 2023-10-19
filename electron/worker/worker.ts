@@ -353,6 +353,7 @@ function WriteStandardProductExecution(data: Array<string>) {
     let b: boolean;
     WriteStandardProduct(str, (error: any, result: any) => {
         if (error) {
+            send('worker-send-dll-error', '写入补偿值失败');
             b = false
             return
         }
@@ -658,7 +659,11 @@ on("worker-receive-refresh-instance", (_, number: any) => {
 
 // 保存
 on("worker-receive-save", () => {
-    console.log(ExecutionSave())
+    if (ExecutionSave()) {
+        send('worker-send-dll-success', '保存成功');
+    } else {
+        send('worker-send-dll-error', '保存失败');
+    }
 })
 
 // 测试头动作
@@ -668,7 +673,11 @@ on("worker-receive-test-head-action", (event, action: any) => {
             event.sender.send('worker-send-dll-error', '测试头动作失败');
             return
         }
-        console.log('测试头动作' + result)
+        if (result == true) {
+            send('worker-send-dll-success', '测试头动作执行');
+        } else {
+            send('worker-send-dll-error', '测试头动作执行失败');
+        }
     })
 })
 
@@ -679,23 +688,13 @@ on("worker-receive-manual-position", (event, position: any) => {
             event.sender.send('worker-send-dll-error', '手动位置失败');
             return
         }
-        console.log('手动位置:' + position + result)
+        send('worker-send-dll-success', `手动位置 ${position} 执行状态: ${result}`);
     })
 })
 
 // 一次量测
 on("worker-receive-measure-one", (event) => {
-    // event.sender.send('worker-send-start-position', [10, 0, 1])
-    // event.sender.send('worker-send-measure-data', [8, 0, 1])
-    // event.sender.send('worker-send-measure-data', MeasureOneGroupExecution())
     event.sender.send('render-send-manual-measure-data', MeasureOneGroupExecution())
-    // SingleTest(null, (error: any, result: any) => {
-    //     if (error) {
-    //         console.log(error)
-    //         return
-    //     }
-    //     console.log(result)
-    // })
 })
 
 // 清除
@@ -705,7 +704,11 @@ on("worker-receive-clear", (event) => {
             event.sender.send('worker-send-dll-error', '清除失败');
             return
         }
-        console.log(result)
+        if (result == true) {
+            event.sender.send('worker-send-dll-success', '清除成功');
+        } else {
+            event.sender.send('worker-send-dll-error', '清除失败');
+        }
     })
 })
 
@@ -716,7 +719,11 @@ on("worker-receive-start-alarm", (event) => {
             event.sender.send('worker-send-dll-error', '开始报警失败');
             return
         }
-        console.log(result)
+        if (result == true) {
+            event.sender.send('worker-send-dll-error', '开始报警');
+        } else {
+            event.sender.send('worker-send-dll-error', '开始报警异常');
+        }
     })
 })
 
@@ -727,7 +734,11 @@ on("worker-receive-stop-alarm", (event) => {
             event.sender.send('worker-send-dll-error', '停止报警失败');
             return
         }
-        console.log(result)
+        if (result == true) {
+            event.sender.send('worker-send-dll-success', '停止报警');
+        } else {
+            event.sender.send('worker-send-dll-error', '停止报警异常');
+        }
     })
 })
 

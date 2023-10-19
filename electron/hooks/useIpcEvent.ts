@@ -20,7 +20,6 @@ const checkTheMachineSteps = ref<number>(0);
 export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     // 本地配置储存
     const localStore = new Store({LocalStoreInterface});
-    console.log(localStore.store)
 
     // 主窗口最大化
     render.on('maximize', () => {
@@ -162,7 +161,7 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
                 localStore.set('filePath', r.filePaths[0])
             }
         }).catch(err => {
-            console.log(err)
+            event.sender.send('render-receive-notification-error', err);
         })
     })
 
@@ -182,7 +181,7 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
                 localStore.set('iniConfiguration', r.filePaths[0])
             }
         }).catch(err => {
-            console.log(err)
+            event.sender.send('render-receive-notification-error', err);
         })
     })
 
@@ -202,7 +201,7 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
                 localStore.set('standardProductPath', r.filePaths[0])
             }
         }).catch(err => {
-            console.log(err)
+            event.sender.send('render-receive-notification-error', err);
         })
     })
 
@@ -245,25 +244,16 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
         auto.value = true;
         steps.value = 0;
         worker.webContents.send('worker-receive-mode', localStore.get('proofreadingOperationMode'))
-        // switch (localStore.get('proofreadingOperationMode')) {
-        //     case 0:
-        //     case 1:
-        //         worker.webContents.send('worker-receive-calibration-start', 0, localStore.get('currentCalibrationMode'))
-        //         break;
-        //     case 2:
-        //         worker.webContents.send('worker-receive-validation-start')
-        //         break;
-        // }
     })
 
     // 量测进程校准信号判断
     ipcMain.on('worker-send-calibration-judgment', function (event, i) {
         if (auto.value == false) return;
         if (i) {
-            console.log('进行校准...')
+            // 进行校准
             event.reply('worker-receive-calibration-execute', steps.value, localStore.get('currentCalibrationMode'))
         } else {
-            console.log('等待校准中...')
+            // 等待校准循环
             event.reply('worker-receive-calibration-start')
         }
     })
@@ -284,10 +274,10 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     ipcMain.on('worker-send-measure-start-judgment', function (event, i) {
         if (auto.value == false) return;
         if (i) {
-            console.log('进行量测...')
+            // 进行量测
             event.reply('worker-receive-measure-go')
         } else {
-            console.log('等待量测中...')
+            // 等待量测循环
             event.reply('worker-receive-measure-start')
         }
     })
@@ -318,10 +308,10 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     ipcMain.on('worker-send-verify-judgment', function (event, i) {
         if (auto.value == false) return;
         if (i) {
-            console.log('进行对机...')
+            // 进行对机
             event.reply('worker-receive-verify-execute', checkTheMachineSteps.value)
         } else {
-            console.log('等待对机中...')
+            // 等待对机循环
             event.reply('worker-receive-verify-start')
         }
     })
@@ -373,7 +363,6 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
 
     // 工作进程发起写入补偿失败
     ipcMain.on('worker-send-write-compensation-error', function (_, error) {
-        console.log(error)
         render.webContents.send('render-receive-write-compensation-error')
     })
 
@@ -386,10 +375,10 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     ipcMain.on('worker-send-reverification-judgment', function (event, i) {
         if (auto.value == false) return;
         if (i) {
-            console.log('进行再次验证...')
+            // 进行再次验证
             event.reply('worker-receive-reverification-execute', checkTheMachineSteps.value)
         } else {
-            console.log('等待再次验证中...')
+            // 等待再次验证中循环
             event.reply('worker-receive-reverification-start')
         }
     })
@@ -409,14 +398,14 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     })
 
     // 渲染进程发起缓存数据保存
-    ipcMain.on('render-send-cache-data-save', function (_, data) {
+    ipcMain.on('render-send-cache-data-save', function (event, data) {
         let path = join(__dirname, '../../cache.json');
         if (process.env.VITE_DEV_SERVER_URL) {
             path = join(__dirname + '../../public/cache.json')
         }
         fs.writeFile(path, data, 'utf8', function (err) {
             if (err) {
-                console.log(err)
+                event.sender.send('render-receive-notification-error', err);
             }
         })
     })
@@ -429,7 +418,7 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
         }
         fs.readFile(path, 'utf8', function (err, data) {
             if (err) {
-                console.log(err)
+                event.sender.send('render-receive-notification-error', err);
             } else {
                 event.reply('render-receive-read-store', data)
             }
@@ -459,7 +448,7 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
         }
         fs.readFile(path, 'utf8', function (err, data) {
             if (err) {
-                console.log(err)
+                event.reply('render-receive-notification-error', err);
             } else {
                 event.reply('render-receive-read-log', data)
             }
@@ -467,14 +456,14 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     })
 
     // 保存日志
-    ipcMain.on('render-send-save-log', function (_, data) {
+    ipcMain.on('render-send-save-log', function (event, data) {
         let path = join(__dirname, '../../log.json');
         if (process.env.VITE_DEV_SERVER_URL) {
             path = join(__dirname + '../../public/log.json')
         }
         fs.writeFile(path, data, function (err) {
             if (err) {
-                console.log(err)
+                event.reply('render-receive-notification-error', err);
             }
         })
     })
@@ -500,14 +489,14 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     })
 
     // 保存量测数据
-    ipcMain.on('render-send-save-measure', function (_, data) {
+    ipcMain.on('render-send-save-measure', function (event, data) {
         let path = join(__dirname, '../../measure_cache.json');
         if (process.env.VITE_DEV_SERVER_URL) {
             path = join(__dirname + '../../public/measure_cache.json')
         }
         fs.writeFile(path, data, function (err) {
             if (err) {
-                console.log(err)
+                event.reply('render-receive-notification-error', err);
             }
         })
     })
@@ -520,7 +509,7 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
         }
         fs.readFile(path, 'utf8', function (err, data) {
             if (err) {
-                console.log(err)
+                event.reply('render-receive-notification-error', err);
             } else {
                 event.reply('render-receive-read-measure', data)
             }
