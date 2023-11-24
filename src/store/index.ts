@@ -75,8 +75,8 @@ export const useGlobalStore = defineStore('GlobalStore', {
             let value =
                 parseFloat((parseFloat(this.outputDisplay[1].value) - parseFloat(data)).toFixed(2))
             if (this.judgeComplementRange(value)) {
-                updateDataBase(1, index, false, value.toString())
-                return null
+                updateDataBase(1, index, true, value.toString())
+                // return null
             } else {
                 updateDataBase(1, index, true, value.toString())
             }

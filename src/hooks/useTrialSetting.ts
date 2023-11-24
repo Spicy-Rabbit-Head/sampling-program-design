@@ -1,4 +1,4 @@
-import {computed, ComputedRef, onMounted, reactive, ref} from "vue";
+import {computed, ComputedRef, reactive, ref} from "vue";
 import {Step} from "@/type/interface.ts";
 import {TableColumnData} from "@arco-design/web-vue";
 
@@ -15,16 +15,15 @@ function scopeOfJudgment(index: any) {
 }
 
 const item = ref(false)
-onMounted(() => {
-    column.length = 0
-    for (let i = 8; i <= 32; i++) {
-        column.push(i)
-    }
-})
 
 const steps = reactive<Step>({content: []});
 
 function initStep() {
+    column.length = 0
+    for (let i = 8; i <= 32; i++) {
+        column.push(i)
+    }
+    console.log(column)
     steps.name = '试调'
     steps.current = 0
     steps.currentStatus = 'process'

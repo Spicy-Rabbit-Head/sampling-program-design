@@ -1,7 +1,7 @@
-import {computed, reactive, ref} from "vue";
-import type {tab} from "@/type/interface.ts";
-import {useEcharts} from "@/hooks/useEcharts.ts";
-import {useIpcSendEvent} from "@/hooks/useIpcSendEvent.ts";
+import { computed, reactive, ref } from "vue";
+import type { tab } from "@/type/interface.ts";
+import { useEcharts } from "@/hooks/useEcharts.ts";
+import { useIpcSendEvent } from "@/hooks/useIpcSendEvent.ts";
 
 // 主体表格
 const mainTable = reactive<Array<Array<tab>>>([]);
@@ -100,6 +100,7 @@ export function useHome() {
         for (let i = 0; i < data.length; i++) {
             computeStatus(data[i], i)
         }
+        console.log(mainTable)
     }
 
     // 计算状态

@@ -24,6 +24,7 @@ const {
   compensationDeviationUpdate,
   proofreadingDeviationUpdate,
   verificationPLCStatus,
+  proofreadingMachineMove,
 } = useIpcSendEvent();
 
 
@@ -152,7 +153,7 @@ function passwordComparison() {
           </div>
         </div>
       </div>
-      <div class="t-grid t-gap-2">
+      <div class="t-grid t-gap-2 t-grid-rows-4">
         <div class="t-grid t-grid-cols-3">
           <!--  配置查询标品条件  -->
           <n-input-group>
@@ -163,7 +164,7 @@ function passwordComparison() {
                       :disabled="!changePermission"/>
           </n-input-group>
         </div>
-        <div class="t-p-2 t-m-2 t-border t-rounded-lg t-grid t-grid-cols-3">
+        <div class="t-p-2 t-row-span-3 t-m-2 t-border t-rounded-lg t-grid t-grid-cols-3">
           <!--  上下丝杆动作  -->
           <div class="t-col-span-2">
             <p class="t-mb-1">测试头动作 :</p>
@@ -205,6 +206,17 @@ function passwordComparison() {
               </a-button>
               <a-button type="primary" :disabled="!changePermission" @click.stop="manualPosition(8)">
                 对机位置
+              </a-button>
+            </a-button-group>
+          </div>
+          <div>
+            <p class="t-mb-1">校对机位置 :</p>
+            <a-button-group>
+              <a-button type="primary" :disabled="!changePermission" @click.stop="proofreadingMachineMove(0)">
+                0 欧姆
+              </a-button>
+              <a-button type="primary" :disabled="!changePermission" @click.stop="proofreadingMachineMove(1)">
+                50 欧姆
               </a-button>
             </a-button-group>
           </div>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import {useTrialSetting} from "@/hooks/useTrialSetting.ts";
+import { useTrialSetting } from "@/hooks/useTrialSetting.ts";
+import { useIpcSendEvent } from "@/hooks/useIpcSendEvent.ts";
 
 const {
   trialSettingSwitch,
@@ -14,6 +15,7 @@ const {
   stopColumn
 } = useTrialSetting();
 
+const {startProofreading, stopProofreading} = useIpcSendEvent();
 
 </script>
 
@@ -21,10 +23,11 @@ const {
   <div class="t-h-full t-w-full">
     <div class="t-flex t-h-1/4">
       <div class="t-w-[320px] t-p-2 t-border-2 t-m-4 t-rounded-md t-flex t-flex-col t-gap-4">
-        <n-button type="primary" :disabled="trialSettingSwitch || item" @click.stop="trialSettingSwitch = true">
+        <n-button type="primary" :disabled="trialSettingSwitch || item"
+                  @click.stop="startProofreading({start: startColumn,end: stopColumn});">
           开始试调并计算刹车点
         </n-button>
-        <n-button type="warning" :disabled="!trialSettingSwitch || item" @click.stop="trialSettingSwitch = false">停止试调
+        <n-button type="warning" :disabled="!trialSettingSwitch || item" @click.stop="stopProofreading">停止试调
         </n-button>
         <a-input-group>
           <a-select v-model:model-value="startColumn" :options="column" placeholder="" :disabled="item"

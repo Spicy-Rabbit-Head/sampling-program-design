@@ -26,7 +26,7 @@ function calibrationStarts() {
 function automaticCalibrationStop() {
     calibrationStatus.value = false
     step.value = 0
-    // 持久化数据
+    // 持久化数据a
     let data = {
         steps: steps,
         dataBase: dataBase

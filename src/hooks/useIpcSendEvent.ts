@@ -1,5 +1,5 @@
-import {useIpcRenderer} from "@vueuse/electron";
-import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
+import { useIpcRenderer } from "@vueuse/electron";
+import { useProofreadingMachine } from "@/hooks/useProofreadingMachine.ts";
 
 const {send} = useIpcRenderer();
 const {calibrationStarts, initSteps, initDataBase} = useProofreadingMachine();
@@ -212,6 +212,21 @@ export function useIpcSendEvent() {
         send('render-send-verification-plc-status');
     }
 
+    // 校对机位置移动
+    function proofreadingMachineMove(value: number) {
+        send('render-send-proofreading-position', value);
+    }
+
+    // 启动试调
+    function startProofreading(data: any) {
+        send('render-send-proofreading-start', data);
+    }
+
+    // 结束试调
+    function stopProofreading() {
+        send('render-send-proofreading-stop');
+    }
+
     return {
         renderThreadInitialization,
         dllInitialization,
@@ -248,6 +263,9 @@ export function useIpcSendEvent() {
         initMeasure,
         startAlarm,
         closeAlarm,
-        verificationPLCStatus
+        verificationPLCStatus,
+        proofreadingMachineMove,
+        startProofreading,
+        stopProofreading,
     }
 }
