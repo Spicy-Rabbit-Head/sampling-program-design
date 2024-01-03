@@ -3,15 +3,15 @@ import IconAntDesignCaretUpOutlined from '~icons/ant-design/CaretUpOutlined'
 import IconAntDesignCaretDownOutlined from '~icons/ant-design/CaretDownOutlined'
 import IconAntDesignReloadOutlined from '~icons/ant-design/reload-outlined'
 import IconAntDesignFormOutlined from '~icons/ant-design/form-outlined'
-import {useProofreadingMachine} from "@/hooks/useProofreadingMachine.ts";
+import { useProofreadingMachine } from "@/hooks/useProofreadingMachine.ts";
 import ProofreadingMachineStatus from "@/view/verifier/ProofreadingMachineStatus.vue";
-import {useGlobalStore} from "@/store";
-import {storeToRefs} from "pinia";
-import {useIpcSendEvent} from "@/hooks/useIpcSendEvent.ts";
-import {onMounted, ref} from "vue";
-import {useHome} from "@/hooks/useHome.ts";
-import {SelectOption, useNotification} from "naive-ui";
-import {useConfig} from "@/hooks/useConfig.ts";
+import { useGlobalStore } from "@/store";
+import { storeToRefs } from "pinia";
+import { useIpcSendEvent } from "@/hooks/useIpcSendEvent.ts";
+import { onMounted, ref, computed } from "vue";
+import { useHome } from "@/hooks/useHome.ts";
+import { SelectOption, useNotification } from "naive-ui";
+import { useConfig } from "@/hooks/useConfig.ts";
 
 // 校对机闭包
 const {
@@ -102,7 +102,7 @@ function errorNotification(message: string) {
 
 // 对话框显示
 function openDialogBox() {
-  if (standardProducts[0].label === 'N/A') {
+  if (standardProducts[0].Id === 0) {
     errorNotification('当前料号未检测到标品数据');
     return;
   }
@@ -154,6 +154,16 @@ function logScrollStart(i: boolean) {
     logsScroll.value.scrollTop = logsScroll.value.scrollHeight;
   }
 }
+
+const options = computed(() => {
+  return standardProducts.map((item) => {
+    return {
+      label: item.Id.toString(),
+      value: item.Fl,
+      Rr: item.Rr,
+    };
+  });
+});
 
 </script>
 
@@ -227,8 +237,16 @@ function logScrollStart(i: boolean) {
               刷新状态
             </n-tooltip>
           </div>
-          <a-descriptions :value-style="{padding:'4px 2px'}" align="center" :data="standardProducts" bordered
-                          table-layout="fixed" layout="vertical"/>
+          <div class="t-grid t-grid-cols-3">
+            <div v-if="standardProducts[0].Id === 0" class="t-col-span-3">
+              <p class="t-text-center">未检测到标品数据</p>
+            </div>
+            <div v-else v-for="item in standardProducts" :key="item.Id" class="t-border t-grid t-gap-2">
+              <p class="t-text-center">ID:{{ item.Id }}</p>
+              <p class="t-text-center">FL:{{ item.Fl }}</p>
+              <p class="t-text-center">RR:{{ item.Rr }}</p>
+            </div>
+          </div>
         </div>
         <n-button type="error" dashed class="t-w-20 t-mt-2 t-ml-auto" @click.stop="logs.length = 0">
           清除记录
@@ -273,12 +291,12 @@ function logScrollStart(i: boolean) {
       <div class="t-grid t-grid-cols-2">
         <div>
           <span>选择对机标品编号 :</span>
-          <n-select :options="standardProducts" @update-value="DockingUpdate"
+          <n-select :options="options" @update-value="DockingUpdate"
                     :disabled="proofreadingOperationMode == 1"/>
         </div>
         <div>
           <span>选择验证标品编号 :</span>
-          <n-select :options="standardProducts" @update-value="VerificationUpdate"
+          <n-select :options="options" @update-value="VerificationUpdate"
                     :disabled="proofreadingOperationMode == 1"/>
         </div>
       </div>

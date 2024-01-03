@@ -27,11 +27,12 @@ export function useIpcReceiveEvent() {
     checkTheMachineSuccess,
     updateDataBase,
     initLogs,
-    logs
+    logs,
+    stateWordUpdate,
   } = useProofreadingMachine();
   const {addWorkshopOptions, updateManualData} = useConfig();
   const {updateLimitData} = useEcharts();
-  const {updateView, writeStartBit, mainTable, initTableData} = useHome();
+  const {updateView, writeStartBit, mainTable, initTableData, stopSwitch, origin} = useHome();
   const {successNotification, errNotification} = useNotification();
   const {trialSettingSwitch} = useTrialSetting();
   // 数据初始化
@@ -42,7 +43,14 @@ export function useIpcReceiveEvent() {
     proofreadingOperationMode,
     spotTestMode,
     spotTestBit,
-    spotTestColumn
+    spotTestColumn,
+    iniConfiguration,
+    standardProductPath,
+    standardProductPassword,
+    currentWorkshop,
+    compensationDeviationUpperLimit,
+    verificationDeviationUpperLimit,
+    rrDeviationUpperLimit
   }: any) => {
     globalStore.filePath = filePath
     globalStore.currentCalibrationMode = currentCalibrationMode
@@ -50,9 +58,11 @@ export function useIpcReceiveEvent() {
     if (outputDisplay == undefined) {
       globalStore.outputDisplay.push(
         {label: "对机标品编号 :", value: "N/A"},
-        {label: "对机标:", value: "N/A"},
+        {label: "对机FL :", value: "N/A"},
+        {label: "对机RR :", value: "N/A"},
         {label: "验证标品编号 :", value: "N/A"},
-        {label: "验验标品值 :", value: "N/A"}
+        {label: "验证FL :", value: "N/A"},
+        {label: "验证RR :", value: "N/A"},
       )
     } else {
       globalStore.outputDisplay = JSON.parse(outputDisplay)
@@ -66,12 +76,13 @@ export function useIpcReceiveEvent() {
     if (spotTestColumn != undefined) {
       globalStore.spotTestColumn = JSON.parse(spotTestColumn)
     }
-    // resetData()
-    // if (dataTable == undefined || filePath == undefined) {
-    //
-    // } else {
-    //     event.sender.send('render-send-read-data-table', dataTable)
-    // }
+    configStore.iniConfiguration = iniConfiguration
+    configStore.standardProductPath = standardProductPath
+    configStore.standardProductPassword = standardProductPassword
+    configStore.currentWorkshop = currentWorkshop
+    configStore.compensationDeviationUpperLimit = compensationDeviationUpperLimit
+    configStore.verificationDeviationUpperLimit = verificationDeviationUpperLimit
+    configStore.rrDeviationUpperLimit = rrDeviationUpperLimit
   })
 
   // 读取可修改配置
@@ -82,6 +93,7 @@ export function useIpcReceiveEvent() {
     configStore.currentWorkshop = data.currentWorkshop
     configStore.compensationDeviationUpperLimit = data.compensationDeviationUpperLimit
     configStore.verificationDeviationUpperLimit = data.verificationDeviationUpperLimit
+    configStore.rrDeviationUpperLimit = data.rrDeviationUpperLimit
   })
 
   // 读取缓存配置
@@ -194,18 +206,26 @@ export function useIpcReceiveEvent() {
   // 对机数据
   on('render-receive-docking-data', (event, data, index) => {
     stepsUpdate(3)
-    if (data == null) {
+    if (data == null || data.length == 0) {
       checkTheMachineFail(0)
       automaticCalibrationStop()
       return
     }
-    if (Number(data) > 10000) {
-      updateDataBase(0, index, false, data)
+    if (Number(data[0]) > 10000) {
+      updateDataBase(0, index, false, data[0])
       checkTheMachineFail(0)
       automaticCalibrationStop()
       return
     } else {
-      updateDataBase(0, index, true, data)
+      updateDataBase(0, index, true, data[0])
+    }
+    if (globalStore.judgeRRRange(data[1])) {
+      updateDataBase(1, index, true, data[1])
+    } else {
+      updateDataBase(1, index, false, data[1])
+      checkTheMachineFail(0)
+      automaticCalibrationStop()
+      return
     }
     // 计算补正值
     let amend = globalStore.calculatedComplement(data, index)
@@ -217,6 +237,7 @@ export function useIpcReceiveEvent() {
       globalStore.complement.push(amend);
       if (index == 4) {
         checkTheMachineSuccess(0)
+        stateWordUpdate('校对机步骤成功')
         event.sender.send('render-send-write-compensation', globalStore.complement.join('_'))
         globalStore.complement.length = 0
         return;
@@ -239,11 +260,12 @@ export function useIpcReceiveEvent() {
 
   // 验证结果
   on('render-receive-reverification-result', (event, data, index) => {
-    if (data == null) {
+    if (data == null || data.length == 0) {
       checkTheMachineFail(2)
       automaticCalibrationStop()
       return
     }
+
     if (globalStore.calculateDifference(data, index) == null) {
       checkTheMachineFail(2)
       automaticCalibrationStop()
@@ -299,13 +321,11 @@ export function useIpcReceiveEvent() {
 
   // 消息通知
   on('render-receive-notification-error', (_, data) => {
-    console.log(data)
     errNotification(data)
   })
 
   // 消息通知
   on('render-receive-notification-success', (_, data) => {
-    console.log(data)
     successNotification(data)
   })
 
@@ -327,6 +347,12 @@ export function useIpcReceiveEvent() {
   // 试调停止
   on('render-receive-proofreading-stop', () => {
     trialSettingSwitch.value = false
+  })
+
+  // 原点恢复
+  on('render-receive-check-origin', () => {
+    stopSwitch()
+    origin.value = true
   })
 
   // // 读取数据表

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
-import type {StatusOverview} from "@/type/interface.ts";
-import {useHome} from "@/hooks/useHome.ts";
+import type { StatusOverview } from "@/type/interface.ts";
+import { useHome } from "@/hooks/useHome.ts";
 // 状态概述
 const status: Array<StatusOverview> = [
   {
@@ -30,10 +30,18 @@ const status: Array<StatusOverview> = [
   }
 ]
 
-const {realTimeValue} = useHome();
+const {realTimeValue, origin} = useHome();
 </script>
 
 <template>
+  <a-modal v-model:visible="origin" message-type="error" :mask-closable="false" hide-cancel :closable="false">
+    <template #title>
+      提示
+    </template>
+    <div class="t-text-center t-text-2xl">
+      检测到会原点,请重新启动指定抽测
+    </div>
+  </a-modal>
   <div class="t-h-44 t-my-2 t-grid t-grid-cols-1 t-rounded-md t-text-center t-shadow-status"
        style="background-image: linear-gradient(to right, #a8edea 0%, #fed6e3 100%);">
     <div class="t-w-full t-h-6 t-grid t-grid-cols-2 t-py-1">

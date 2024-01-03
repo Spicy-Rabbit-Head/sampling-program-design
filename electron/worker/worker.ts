@@ -246,6 +246,20 @@ const StartProofreading = func({
   methodName: "OpenAdjustMode",
 })
 
+// 停止试调
+const StopAdjustMode = func({
+  assemblyFile: url,
+  typeName: "Measurement.Entrance",
+  methodName: "StopAdjustMode",
+})
+
+// 读取原点状态
+const CheckOrigin = func({
+  assemblyFile: url,
+  typeName: "Measurement.Entrance",
+  methodName: "CheckOrigin",
+})
+
 // 服务初始化启动
 function ServiceInit(port: string) {
   Init(port, (error: any, result: any) => {
@@ -540,7 +554,7 @@ on("worker-receive-compensate-execute", (event: any) => {
 // 工作进程对机执行
 on("worker-receive-verify-execute", (event: any, index) => {
   event.sender.send('worker-send-docking-data', TestOneProofreadingExecution(index))
-  // event.sender.send('worker-send-docking-data', '6')
+  // event.sender.send('worker-send-docking-data', ['1', '11'])
   MeasureEnd();
 })
 
@@ -556,11 +570,13 @@ on("worker-receive-write-compensation", (event: any, data: any) => {
 // 再次验证开始信号
 on("worker-receive-reverification-start", (event: any) => {
   event.sender.send('worker-send-reverification-judgment', MeasureStart())
+  // event.sender.send('worker-send-reverification-judgment', true)
 })
 
 // 工作进验证补偿
 on("worker-receive-reverification-execute", (event: any, index) => {
   event.sender.send('worker-send-reverification-result', TestOneProofreadingExecution(index))
+  // event.sender.send('worker-send-reverification-result', ['-3', '11'])
   MeasureEnd();
 })
 
@@ -592,16 +608,16 @@ on("worker-receive-change-file", (event: any, path: any) => {
   event.sender.send('worker-send-change-file-success')
 })
 
-// 设定模式 TODO
+// 设定模式
 on("worker-receive-mode", (event: any, mode: any) => {
   // let state: boolean = true;
   let state: boolean = false;
   OpenProofreadingMode(mode, (error: any, result: any) => {
-      if (error) {
-          event.sender.send('worker-send-dll-error', '模式设定失败');
-          return
-      }
-      state = result;
+    if (error) {
+      event.sender.send('worker-send-dll-error', '模式设定失败');
+      return
+    }
+    state = result;
   })
   if (state) {
     switch (mode) {
@@ -626,7 +642,6 @@ on("worker-receive-close-auto-test", (event) => {
     }
     b = result
   })
-  console.log(b)
 })
 
 // 工作进程自动测试
@@ -643,11 +658,24 @@ on("worker-receive-start-auto-test", (event) => {
     event.sender.send('worker-send-measure-start-judgment', MeasureStart())
     return;
   }
+  // event.sender.send('worker-send-measure-start-judgment', true)
 })
 
 // 量测开始信号
 on("worker-receive-measure-start", (event: any) => {
+  CheckOrigin(null, (error: any, result: any) => {
+    if (error) {
+      event.sender.send('worker-send-dll-error', '读取原点状态失败');
+      return
+    }
+    if (result == true) {
+      event.sender.send('worker-send-check-origin');
+      return
+    }
+  })
+
   event.sender.send('worker-send-measure-start-judgment', MeasureStart())
+  // event.sender.send('worker-send-measure-start-judgment', true)
 })
 
 // 量测
@@ -788,17 +816,17 @@ on("worker-receive-proofreading-position-trigger", (event, index: number) => {
 on("worker-receive-proofreading-start", (event, data) => {
   // event.sender.send('worker-send-proofreading-start-success', '启动试调成功');
   StartProofreading(data, (error: any, result: any) => {
-      if (error) {
-          event.sender.send('worker-send-dll-error', '启动试调失败');
-          return
-      }
-      if (result == true) {
-          event.sender.send('worker-send-proofreading-start-success', '启动试调成功');
-          event.sender.send('worker-send-dll-success', '启动试调成功');
-      } else {
-          event.sender.send('worker-send-proofreading-start-error', '启动试调失败');
-          event.sender.send('worker-send-dll-error', '启动试调失败');
-      }
+    if (error) {
+      event.sender.send('worker-send-dll-error', '启动试调失败');
+      return
+    }
+    if (result == true) {
+      event.sender.send('worker-send-proofreading-start-success', '启动试调成功');
+      event.sender.send('worker-send-dll-success', '启动试调成功');
+    } else {
+      event.sender.send('worker-send-proofreading-start-error', '启动试调失败');
+      event.sender.send('worker-send-dll-error', '启动试调失败');
+    }
   })
 })
 
@@ -812,6 +840,21 @@ on("worker-receive-proofreading-loop", (event) => {
 on("worker-receive-proofreading-execute", (event) => {
   event.sender.send('worker-send-proofreading-data', MeasureOneGroupExecution())
   MeasureEnd();
+})
+
+// 结束试调
+on("worker-receive-proofreading-stop", (event) => {
+  StopAdjustMode(null, (error: any, result: any) => {
+    if (error) {
+      event.sender.send('worker-send-dll-error', '结束试调异常');
+      return
+    }
+    if (result == true) {
+      event.sender.send('worker-send-dll-success', '结束试调成功');
+    } else {
+      event.sender.send('worker-send-dll-error', '结束试调异常');
+    }
+  })
 })
 
 

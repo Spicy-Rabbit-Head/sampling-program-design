@@ -25,6 +25,7 @@ const {
   proofreadingDeviationUpdate,
   verificationPLCStatus,
   proofreadingMachineMove,
+  rrDeviationUpdate,
 } = useIpcSendEvent();
 
 
@@ -143,6 +144,13 @@ function passwordComparison() {
                           @blur="proofreadingDeviationUpdate(configStore.verificationDeviationUpperLimit)"
                           :disabled="!changePermission"/>
         </n-input-group>
+        <n-input-group>
+          <n-input-group-label class="t-w-1/5">RR偏差上限 :</n-input-group-label>
+          <n-input-number placeholder="N/A" class="t-font-mono"
+                          v-model:value="configStore.rrDeviationUpperLimit"
+                          @blur="rrDeviationUpdate(configStore.rrDeviationUpperLimit)"
+                          :disabled="!changePermission"/>
+        </n-input-group>
         <div class="t-flex-auto"></div>
         <div class="t-grid t-grid-cols-4 t-border t-rounded-md t-h-32 t-overflow-hidden t-overflow-y-auto">
           <div v-for="index1 in 4" :key="index1">
@@ -210,13 +218,21 @@ function passwordComparison() {
             </a-button-group>
           </div>
           <div>
-            <p class="t-mb-1">校对机位置 :</p>
+            <p class="t-mb-1">校机位置 :</p>
             <a-button-group>
               <a-button type="primary" :disabled="!changePermission" @click.stop="proofreadingMachineMove(0)">
                 0 欧姆
               </a-button>
               <a-button type="primary" :disabled="!changePermission" @click.stop="proofreadingMachineMove(1)">
                 50 欧姆
+              </a-button>
+            </a-button-group>
+          </div>
+          <div>
+            <p class="t-mb-1">对机位置 :</p>
+            <a-button-group>
+              <a-button type="primary" :disabled="!changePermission" @click.stop="proofreadingMachineMove(2)">
+                间距移动
               </a-button>
             </a-button-group>
           </div>

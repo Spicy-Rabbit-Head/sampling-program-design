@@ -283,11 +283,15 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     }
   })
 
+  // 恢复原点停止量测
+  ipcMain.on('worker-send-check-origin', function (_) {
+    auto.value = false;
+    render.webContents.send('render-receive-check-origin')
+  })
+
   // 量测数据
   ipcMain.on('worker-send-measure-data', function (event, data) {
     event.reply('worker-receive-measure-start');
-    console.log('量测数据')
-    console.log(data)
     render.webContents.send('render-receive-measure-data', data)
   })
 
@@ -488,8 +492,6 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
 
   // 起始位置
   ipcMain.on('worker-send-start-position', function (_, data) {
-    console.log('位置')
-    console.log(data)
     render.webContents.send('render-receive-start-position', data)
   })
 
@@ -570,6 +572,7 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
   ipcMain.on('render-send-proofreading-stop', function (event) {
     auto.value = false;
     event.reply('render-receive-proofreading-stop')
+    worker.webContents.send('worker-receive-proofreading-stop')
   })
 
   // 试调开始成功
@@ -601,41 +604,6 @@ export function useIpcEvent(render: BrowserWindow, worker: BrowserWindow) {
     event.reply('worker-receive-proofreading-loop');
     render.webContents.send('render-receive-proofreading-data', data);
   })
-
-// // 渲染进程发起数据表读取
-// ipcMain.on('render-send-read-data-table', function (event, pathName) {
-//     let path = join(__dirname, '../../data', pathName);
-//     if (process.env.VITE_DEV_SERVER_URL) {
-//         path = join(__dirname + '../../public/data', pathName)
-//     }
-//     fs.readFile(path, 'utf8', function (err, data) {
-//         if (err) {
-//             console.log(err)
-//         } else {
-//             event.reply('render-receive-read-data-table', data)
-//         }
-//     })
-// })
-
-// 渲染进程发起数据表创建
-// ipcMain.on('render-send-found-data-table', function (_, i: boolean, data) {
-//     let name: string;
-//     let database: string = JSON.stringify([[[]]]);
-//     if (i) {
-//         name = data + '_' + dayjs().format('YYYY_MM_DD_HH_mm_ss') + '.json'
-//         localStore.set('dataTable', name)
-//     } else {
-//         name = localStore.get('dataTable')
-//         database = data
-//     }
-//     let path = join(__dirname, '../../data', name);
-//     if (process.env.VITE_DEV_SERVER_URL) {
-//         path = join(__dirname + '../../public/data', name);
-//     }
-//     fs.writeFile(path, database, 'utf8', function (err) {
-//         if (err) console.log(err)
-//     })
-// })
 }
 
 

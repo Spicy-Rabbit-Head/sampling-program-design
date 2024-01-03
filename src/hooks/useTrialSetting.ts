@@ -23,7 +23,6 @@ function initStep() {
     for (let i = 8; i <= 32; i++) {
         column.push(i)
     }
-    console.log(column)
     steps.name = '试调'
     steps.current = 0
     steps.currentStatus = 'process'
